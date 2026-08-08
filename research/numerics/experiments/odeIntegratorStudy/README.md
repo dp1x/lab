@@ -2,7 +2,7 @@
 
 > Status: complete
 > Date: 2026-08-05
-> Domain: Computational Physics
+> Domain: numerics
 > Experiment dir: `research/numerics/experiments/odeIntegratorStudy`
 
 ## Research Question

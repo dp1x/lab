@@ -3,7 +3,7 @@
 > Status: planning | running | complete
 > Date: YYYY-MM-DD
 > Domain: <domain>
-> Experiment dir: `research/<domain>/<name>/`
+> Experiment dir: `research/<domain>/experiments/<name>/`
 
 ## Research Question
 

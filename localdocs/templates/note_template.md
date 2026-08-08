@@ -18,7 +18,7 @@ _Detailed notes. Equations, derivations, links to experiments._
 
 ## Source Experiments
 
-- `research/<domain>/<name>/` — brief description of what it validated
+- `research/<domain>/experiments/<name>/` — brief description of what it validated
 
 ## Key Takeaways
 

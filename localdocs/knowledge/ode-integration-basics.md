@@ -1,5 +1,5 @@
 ---
-tags: [numerics, physics, odes, symplectic-integration]
+tags: [numerics, odes, symplectic-integration]
 date: 2026-08-05
 aliases: [ode-integrators, symplectic-integrators]
 links:
