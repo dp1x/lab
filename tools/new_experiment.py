@@ -11,7 +11,7 @@ Creates:
     └── results/             # outputs, figures
 
 Domain must be an existing dir under research/ or a new one (auto-created).
-Add a glossary entry when creating a new domain (rule: docs follow structure).
+Update research/README.md when adding a domain (docs follow structure).
 """
 
 from __future__ import annotations

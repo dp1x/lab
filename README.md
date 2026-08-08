@@ -90,7 +90,8 @@ knowledge note (Obsidian) → commit.
 
 ## Research Domains
 
-1. **Orbital Mechanics — flagship** (orbits, transfers, perturbations, JPL-validated)
+1. **Orbital Mechanics — flagship (planned next)** (orbits, transfers,
+   perturbations; validation against NASA/JPL Horizons is a target, not yet achieved)
 2. Numerics (foundation — 001 complete)
 3. Energy Systems (planned — power flow, batteries, grid)
 4. Computer Architecture (planned — pipelines, caches, scheduling)

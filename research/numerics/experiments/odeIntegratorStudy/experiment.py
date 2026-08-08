@@ -54,11 +54,9 @@ def forward_euler(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarr
     y = y0.astype(float).copy()
     states = np.empty((n_steps + 1, 2))
     states[0] = y
-    t = t0
     for i in range(n_steps):
         y = y + h * np.array([y[1], acceleration(y[0])])
         states[i + 1] = y
-        t += h
     return states
 
 
@@ -66,7 +64,6 @@ def rk2_midpoint(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarra
     y = y0.astype(float).copy()
     states = np.empty((n_steps + 1, 2))
     states[0] = y
-    t = t0
     for i in range(n_steps):
         k1 = np.array([y[1], acceleration(y[0])])
         k2 = np.array(
@@ -74,7 +71,6 @@ def rk2_midpoint(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarra
         )
         y = y + h * k2
         states[i + 1] = y
-        t += h
     return states
 
 
@@ -82,7 +78,6 @@ def rk4(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarray:
     y = y0.astype(float).copy()
     states = np.empty((n_steps + 1, 2))
     states[0] = y
-    t = t0
     for i in range(n_steps):
         k1 = np.array([y[1], acceleration(y[0])])
         k2 = np.array([y[1] + h / 2 * k1[1], acceleration(y[0] + h / 2 * k1[0])])
@@ -90,19 +85,25 @@ def rk4(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarray:
         k4 = np.array([y[1] + h * k3[1], acceleration(y[0] + h * k3[0])])
         y = y + h / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4)
         states[i + 1] = y
-        t += h
     return states
 
 
 def symplectic_euler(t0: float, y0: np.ndarray, h: float, n_steps: int) -> np.ndarray:
-    """Semi-implicit Euler: v updated with new x — symplectic, 1st order."""
+    """Semi-implicit (symplectic) Euler, 1st order.
+
+    Per step: v is updated from the CURRENT x, then x is updated with the
+    NEW v::
+
+        v_{n+1} = v_n + h * a(x_n)
+        x_{n+1} = x_n + h * v_{n+1}
+    """
     x, v = float(y0[0]), float(y0[1])
     states = np.empty((n_steps + 1, 2))
     states[0] = (x, v)
-    for _ in range(n_steps):
+    for i in range(n_steps):
         v = v + h * acceleration(x)
         x = x + h * v
-        states[_ + 1] = (x, v)
+        states[i + 1] = (x, v)
     return states
 
 
@@ -144,34 +145,53 @@ T_LONG = 200 * np.pi  # energy-drift horizon
 H_ENERGY = 0.05  # stepsize for the energy study
 
 
+def grid_h(t_end: float, h: float) -> tuple[float, int]:
+    """Effective stepsize and step count for a grid landing exactly on t_end.
+
+    ``n = round(t_end / h)`` steps of size ``h_eff = t_end / n`` make the final
+    grid point exactly ``t_end``. Without this, e.g. ``h = 0.1`` over one
+    period gives 63 steps and a final point at 6.3 instead of 2*pi, so the
+    reported "error at t = T" would measure a point past the nominal time.
+    """
+    n_steps = max(1, int(round(t_end / h)))
+    return t_end / n_steps, n_steps
+
+
 def integrate(method: str, h: float, t_end: float) -> np.ndarray:
-    n_steps = int(round(t_end / h))
-    return METHODS[method](0.0, np.array([X0, V0]), h, n_steps)
+    h_eff, n_steps = grid_h(t_end, h)
+    return METHODS[method](0.0, np.array([X0, V0]), h_eff, n_steps)
 
 
 def convergence_table() -> dict:
     """Global error at T_PERIOD vs analytic solution.
 
-    The analytic reference is evaluated exactly at the integrator's time grid
-    ``t_i = i*h`` (``t_0 = 0``), so no time-argument mismatch is measured.
+    The analytic reference is evaluated on the integrator's actual time grid
+    ``t_i = i * h_eff`` ending exactly at ``t_end``, so no time-argument
+    mismatch is measured and the error is evaluated at the nominal time T.
     """
     errors: dict[str, list[float]] = {m: [] for m in METHODS}
     for h in STEPSIZES:
+        h_eff, n_steps = grid_h(T_PERIOD, h)
+        t_num = np.arange(n_steps + 1) * h_eff
         for m in METHODS:
             states = integrate(m, h, T_PERIOD)
-            t_num = np.arange(len(states)) * h
             errors[m].append(max_abs_error(states[:, 0], analytic_solution(t_num)))
+    eff_steps = [grid_h(T_PERIOD, h)[0] for h in STEPSIZES]
     orders = {
-        m: convergence_rate(np.array(errors[m]), np.array(STEPSIZES)).tolist()
+        m: convergence_rate(np.array(errors[m]), np.array(eff_steps)).tolist()
         for m in METHODS
     }
-    return {"stepsizes": STEPSIZES, "errors": errors, "measured_orders": orders}
+    return {
+        "requests": STEPSIZES,
+        "effective_steps": eff_steps,
+        "errors": errors,
+        "measured_orders": orders,
+    }
 
 
 def energy_study() -> dict:
     """Energy deviation |E - E0| over a long horizon for each method."""
     e0 = total_energy(X0, V0)
-    t = np.arange(0.0, T_LONG + H_ENERGY, H_ENERGY)
     result = {}
     for m in METHODS:
         states = integrate(m, H_ENERGY, T_LONG)
@@ -190,46 +210,56 @@ def energy_study() -> dict:
 
 
 def make_figures() -> list[str]:
-    """Write convergence and energy figures; return their paths."""
+    """Write the two figures as genuinely separate plots; return their paths.
+
+    Figure 1 (convergence.png): global error vs stepsize, one line per method.
+    Figure 2 (energy_deviation.png): |E(t) - E(0)| over the long horizon.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+    (RESULTS_DIR / "figures").mkdir(parents=True, exist_ok=True)
 
+    # --- Figure 1: convergence ---
+    fig1, ax1 = plt.subplots(figsize=(7.5, 5.5))
     for m in METHODS:
         errs = []
         for h in STEPSIZES:
             states = integrate(m, h, T_PERIOD)
-            t_num = np.arange(len(states)) * h
+            h_eff, n_steps = grid_h(T_PERIOD, h)
+            t_num = np.arange(n_steps + 1) * h_eff
             errs.append(max_abs_error(states[:, 0], analytic_solution(t_num)))
-        axes[0].loglog(STEPSIZES, errs, marker="o", label=m)
-    axes[0].set_xlabel("stepsize h")
-    axes[0].set_ylabel("global error at t = T")
-    axes[0].set_title("Convergence")
-    axes[0].legend(fontsize=8)
-    axes[0].grid(True, which="both", alpha=0.3)
-
-    e0 = total_energy(X0, V0)
-    for m in ["euler", "rk4", "symplectic_euler", "velocity_verlet"]:
-        states = integrate(m, H_ENERGY, T_LONG)
-        e = total_energy(states[:, 0], states[:, 1])
-        t_num = np.arange(len(e)) * H_ENERGY
-        axes[1].semilogy(t_num, np.abs(e - e0) + 1e-16, label=m)
-    axes[1].set_xlabel("time t")
-    axes[1].set_ylabel("|E(t) - E(0)|")
-    axes[1].set_title("Energy deviation, h = 0.05")
-    axes[1].legend(fontsize=8)
-    axes[1].grid(True, which="both", alpha=0.3)
-
-    fig.tight_layout()
-    (RESULTS_DIR / "figures").mkdir(parents=True, exist_ok=True)
+        ax1.loglog(STEPSIZES, errs, marker="o", label=m)
+    ax1.set_xlabel("stepsize h")
+    ax1.set_ylabel("max |error| at t = 2pi")
+    ax1.set_title("Convergence: global error vs stepsize")
+    ax1.legend(fontsize=8)
+    ax1.grid(True, which="both", alpha=0.3)
+    fig1.tight_layout()
     p1 = RESULTS_DIR / "figures" / "convergence.png"
+    fig1.savefig(p1, dpi=150)
+    plt.close(fig1)
+
+    # --- Figure 2: energy deviation ---
+    e0 = total_energy(X0, V0)
+    fig2, ax2 = plt.subplots(figsize=(7.5, 5.5))
+    for m in METHODS:
+        states = integrate(m, H_ENERGY, T_LONG)
+        h_eff = T_LONG / (len(states) - 1)
+        t_num = np.arange(len(states)) * h_eff
+        dev = np.abs(total_energy(states[:, 0], states[:, 1]) - e0) + 1e-16
+        ax2.semilogy(t_num, dev, label=m)
+    ax2.set_xlabel("time t")
+    ax2.set_ylabel("|E(t) - E(0)|")
+    ax2.set_title("Energy deviation over long horizon, h ~ 0.05")
+    ax2.legend(fontsize=8)
+    ax2.grid(True, which="both", alpha=0.3)
+    fig2.tight_layout()
     p2 = RESULTS_DIR / "figures" / "energy_deviation.png"
-    fig.savefig(p1, dpi=150)
-    fig.savefig(p2, dpi=150)
-    plt.close(fig)
+    fig2.savefig(p2, dpi=150)
+    plt.close(fig2)
     return [str(p1), str(p2)]
 
 
@@ -240,7 +270,9 @@ def main() -> dict:
     figures = make_figures()
 
     print("=== Convergence: global error at t = 2pi ===")
-    print(f"{'method':<16}", *[f"h={h:<8}" for h in STEPSIZES], "order")
+    print("requested h:   ", *[f"{h:<8}" for h in conv["requests"]])
+    print("effective h:   ", *[f"{h:.6f}" for h in conv["effective_steps"]])
+    print(f"{'method':<16}", *[f"h={h:<8}" for h in conv["requests"]], "order")
     for m in METHODS:
         avg_order = np.mean(conv["measured_orders"][m])
         print(

@@ -21,6 +21,18 @@ from experiment import (
     total_energy,
 )
 
+# Per-method coarse-step tolerance: at least ~10x the error each method actually
+# produces at h = 0.05 (euler 1.7e-01, rk2 2.0e-03, rk4 2.5e-07,
+# symplectic_euler 2.5e-02, velocity_verlet 5.0e-04). The test catches gross
+# implementation errors without demanding precision typical of fine grids.
+METHOD_ATOL = {
+    "euler": 0.5,
+    "rk2_midpoint": 0.02,
+    "rk4": 1e-5,
+    "symplectic_euler": 0.05,
+    "velocity_verlet": 5e-3,
+}
+
 
 def test_analytic_solution_satisfies_ic():
     assert analytic_solution(0.0) == pytest.approx(X0)
@@ -36,12 +48,18 @@ def test_analytic_solution_energy_const():
     assert np.allclose(e, e[0], atol=1e-12)
 
 
+@pytest.mark.parametrize("m", METHODS)
 @pytest.mark.parametrize("h", [0.05, 0.025])
-def test_all_methods_close_to_analytic_at_coarse_step(h):
-    states = integrate("rk4", h, T_PERIOD)
+def test_all_methods_close_to_analytic_at_coarse_step(m, h):
+    states = integrate(m, h, T_PERIOD)
     x = states[:, 0]
-    t = np.arange(len(x)) * h
-    assert np.allclose(x, analytic_solution(t), atol=0.1)
+    # Grid ends exactly on T_PERIOD (see grid_h in experiment.py).
+    t = np.arange(len(x)) * (T_PERIOD / (len(x) - 1))
+    err = float(np.max(np.abs(x - analytic_solution(t))))
+    assert err < METHOD_ATOL[m], (
+        f"{m} at h={h}: max error {err:.2e} exceeds tolerance {METHOD_ATOL[m]:.1e} "
+        f"(expected O(h^{THEORETICAL_ORDER[m]}) at this scale)"
+    )
 
 
 @pytest.mark.parametrize("m", METHODS)
@@ -49,7 +67,8 @@ def test_measured_order_close_to_theoretical(m):
     errors = []
     for h in STEPSIZES:
         states = integrate(m, h, T_PERIOD)
-        t = np.arange(len(states)) * h
+        # Reference on the exact integrator grid (ends on T_PERIOD).
+        t = np.arange(len(states)) * (T_PERIOD / (len(states) - 1))
         err = np.max(np.abs(states[:, 0] - analytic_solution(t)))
         errors.append(err)
     slope = (np.log(errors[0]) - np.log(errors[-1])) / (
@@ -91,7 +110,25 @@ def test_energy_drift_symplectic_vs_dissipative():
     assert dev["symplectic_euler"]["max_deviation"] < dev["euler"]["max_deviation"]
 
 
-def test_determinism():
-    a = integrate("rk4", 0.05, T_PERIOD)
-    b = integrate("rk4", 0.05, T_PERIOD)
-    assert np.array_equal(a, b)
+def test_determinism_across_processes():
+    """A fresh interpreter must produce bit-identical results.
+
+    Catches global/process-level state (RNG, clocks, platform coupling) that a
+    same-process double call cannot detect. Cheap: one subprocess spawn.
+    """
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    exp_dir = Path(__file__).resolve().parents[1]
+    script = (
+        "import json\n"
+        "import sys\n"
+        f"sys.path.insert(0, {str(exp_dir)!r})\n"
+        "import experiment\n"
+        "print(json.dumps(experiment.convergence_table(), sort_keys=True))\n"
+    )
+    out = subprocess.check_output([sys.executable, "-c", script], text=True).strip()
+    expected = json.dumps(convergence_table(), sort_keys=True)
+    assert out == expected, "results differ between interpreter processes"

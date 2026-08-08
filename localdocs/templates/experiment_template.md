@@ -30,9 +30,11 @@ enough detail to reproduce._
 ## Implementation
 
 - Script: `experiment.py`
-- Language/runtime: Python 3.12, numpy, scipy, matplotlib
+- Language/runtime: Python 3.12, numpy, matplotlib
 - Runtime: `uv run python experiment.py`
 - Determinism: fixed seeds / no RNG (state how)
+- Dependencies: declare only what this experiment actually uses
+  (`uv add <pkg>` + `uv sync`); the lockfile pins exact versions.
 
 ## Validation Method
 

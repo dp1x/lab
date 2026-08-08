@@ -14,22 +14,19 @@ dist/
 .coverage
 htmlcov/
 
-# Broken MCP leftovers
-.playwright-mcp/
-
 # IDE
 .idea/
 .vscode/
 *.swp
 
 # Data / large artifacts
+# Raw experiment data lives in data/ and stays untracked. Reproducible small
+# summaries are committed inside research/<domain>/experiments/<name>/results/.
 data/
 *.npz
 *.npy
 *.h5
 *.pkl
-!*.json
-*.csv.bak
 
 # OS
 Thumbs.db
