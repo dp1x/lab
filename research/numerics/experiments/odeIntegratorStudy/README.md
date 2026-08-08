@@ -1,7 +1,7 @@
 # Comparative Numerical Integration of ODEs: Convergence Order and Energy Preservation
 
 > Status: complete
-> Date: 2026-08-05
+> Date: 2026-08-05 (figures + results regenerated 2026-08-09)
 > Domain: numerics
 > Experiment dir: `research/numerics/experiments/odeIntegratorStudy`
 
@@ -41,11 +41,13 @@ methods (Euler, RK2, RK4) exhibit secular energy drift.
 
 ## Methodology
 
-For each method and each stepsize h in {0.1, 0.05, 0.025, 0.0125}, integrate the
-oscillator as a first-order system from t=0 to t=2pi (one period), then compute the
-maximum absolute error against the analytic solution at all grid points. The
-convergence order is the log-log slope of error vs stepsize across the four grid
-refinements.
+For each method and each requested stepsize h in {0.1, 0.05, 0.025, 0.0125}, integrate
+the oscillator as a first-order system from t=0 to t=2pi (one period). The grid uses
+`n = round(2pi/h)` steps of effective size `h_eff = 2pi/n` so the final grid point is
+exactly 2pi (effective stepsizes ~0.0997, ~0.0499, ~0.0250, ~0.0125; recorded in
+`results.json`). The maximum absolute error against the analytic solution is evaluated
+at every grid point, so the reported error is strictly "at t = T". The convergence
+order is the log-log slope of error vs effective stepsize across the four refinements.
 
 Energy behaviour is measured over the long horizon t in [0, 200pi] with h = 0.05,
 recording max deviation and final deviation of E from its initial value.
@@ -73,24 +75,26 @@ measured energy behaviour (E0 = 0.5, h = 0.05, horizon t ∈ [0, 200π]):
 
 | method          | theoretical order | measured order | energy: max \|ΔE\| | energy: final \|ΔE\| |
 |-----------------|-------------------|----------------|---------------------|------------------------|
-| euler           | 1                 | 1.07           | 2.115e+13           | 2.115e+13             |
-| rk2_midpoint    | 2                 | 2.01           | 9.914e-03           | 9.914e-03             |
+| euler           | 1                 | 1.06           | 2.119e+13           | 2.119e+13             |
+| rk2_midpoint    | 2                 | 2.01           | 9.915e-03           | 9.915e-03             |
 | rk4             | 4                 | 4.01           | 1.363e-06           | 1.363e-06             |
-| symplectic_euler| 1                 | 1.02           | 1.282e-02           | 1.171e-03             |
-| velocity_verlet | 2                 | 2.00           | 3.125e-04           | 6.879e-07             |
+| symplectic_euler| 1                 | 1.02           | 1.282e-02           | 1.630e-03             |
+| velocity_verlet | 2                 | 2.00           | 3.125e-04           | 1.338e-06             |
 
 All five methods match theoretical convergence order (Euler 1, RK2 2, RK4 4,
-symplectic Euler 1, Verlet 2), confirming the implementations. At h = 0.1 RK4
-achieves max error 4.08e-06 vs 3.68e-01 for Euler over one period.
+symplectic Euler 1, Verlet 2), confirming the implementations. At the coarsest grid
+(h_eff ~ 0.0997) RK4 achieves max error 4.04e-06 vs 3.66e-01 for Euler over one period.
 
 The energy study confirms geometric integration theory: non-symplectic methods
 (Euler, RK2, RK4) show secular, integrating-time-proportional energy error (Euler
 blows up to 2.1e13; RK4's 1.36e-06 is small but grows linearly with t), while
 symplectic methods have bounded, oscillating energy error — velocity Verlet's max
-deviation 3.125e-04 with final deviation 6.879e-07 (error does not accumulate),
-and symplectic Euler oscillates (1.282e-02 max, 1.171e-03 final).
+deviation 3.125e-04 with final deviation 1.338e-06 (error does not accumulate),
+and symplectic Euler oscillates (1.282e-02 max, 1.630e-03 final).
 
-See `results/results.json` for exact numbers and `results/figures/` for figures.
+See `results/results.json` for exact numbers and `results/figures/` for the two
+figures (convergence.png: error vs stepsize; energy_deviation.png: |E(t)-E(0)| over
+the long horizon).
 
 ## Limitations
 
@@ -112,4 +116,8 @@ See `results/results.json` for exact numbers and `results/figures/` for figures.
 ### Reproducibility Notes
 
 - `uv.lock` pins exact dependency versions.
-- Command to reproduce: `uv sync && uv run pytest && uv run python experiment.py`
+- Command to reproduce (from the repo root):
+  `uv sync && uv run pytest && uv run python research/numerics/experiments/odeIntegratorStudy/experiment.py`
+- Numerical results are deterministic; re-running rewrites `results.json` with a
+  fresh timestamp and the generation commit (provenance). This is intended: the
+  metadata identifies the actual run, while the scientific output stays identical.

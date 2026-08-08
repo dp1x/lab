@@ -25,29 +25,32 @@ Global error E(h) ≍ C·h^p where p is the method order. Measured (one period, 
 
 | method           | order | err(h=0.1) |
 |------------------|-------|------------|
-| euler            | 1.07  | 3.68e-01   |
-| rk2_midpoint     | 2.01  | 8.14e-03   |
-| rk4              | 4.01  | 4.08e-06   |
-| symplectic_euler | 1.02  | 5.20e-02   |
-| velocity_verlet  | 2.00  | 2.01e-03   |
+| euler            | 1.06  | 3.66e-01   |
+| rk2_midpoint     | 2.01  | 8.10e-03   |
+| rk4              | 4.01  | 4.04e-06   |
+| symplectic_euler | 1.02  | 5.19e-02   |
+| velocity_verlet  | 2.00  | 2.00e-03   |
 
-RK4 dominates per-step accuracy; interestingly symplectic Euler is ~5× more
+RK4 dominates per-step accuracy; interestingly symplectic Euler is ~7× more
 accurate than forward Euler at the same order thanks to its implicit nature.
 
 ### Energy preservation (geometric integration)
 
-Over t ∈ [0, 200π] at h = 0.05 (E0 = 0.5): non-symplectic methods accumulate energy
+Over t ∈ [0, 200π] at h ≈ 0.05 (E0 = 0.5): non-symplectic methods accumulate energy
 error proportional to integration time (forward Euler diverges, 2.1e13; RK4 grows
 linearly, 1.4e-6·t). Symplectic methods (Verlet, symplectic Euler) oscillate in a
-bounded energy shell: velocity Verlet final |ΔE| = 6.9e-7 with max 3.1e-4 over the
+bounded energy shell: velocity Verlet final |ΔE| = 1.3e-6 with max 3.1e-4 over the
 whole horizon.
 
 ### Method of measurement
 
-Central lesson: **always evaluate the reference on the integrator's time grid**
-`t_i = i·h`, not an independently generated grid. `np.linspace(0, T, n+1)` with
-non-dividing T misaligns sample points and swamps high-order convergence — first
-measured orders came out 0.65–0.87 until the grid was aligned.
+Central lesson: **always evaluate the reference on the integrator's exact time grid
+and construct that grid so its final point lands exactly on the nominal end time**.
+`np.linspace(0, T, n+1)` with non-dividing T misaligns sample points and swamps
+high-order convergence — first measured orders came out 0.65–0.87 until the grid was
+aligned. Separately, naive `n = round(T/h)` steps can end at 6.3 instead of 2π
+(h = 0.1); using `n` steps of size `T/n` fixes both issues (see `grid_h` in
+`experiment.py`).
 
 ## Source Experiments
 
