@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "description": "Convergence order and energy preservation of five ODE integrators on the harmonic oscillator.",
+    "git_commit": "not-a-git-repo",
+    "name": "ode_integrator_comparison",
+    "python_platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-05T23:22:47+00:00"
+  },
+  "results": {
+    "convergence": {
+      "errors": {
+        "euler": [
+          0.368247196243,
+          0.170413701348,
+          0.081554027951,
+          0.040077059197
+        ],
+        "rk2_midpoint": [
+          0.008139412208,
+          0.002020904879,
+          0.000503382059,
+          0.000125613581
+        ],
+        "rk4": [
+          4.079629e-06,
+          2.52873e-07,
+          1.5738e-08,
+          9.82e-10
+        ],
+        "symplectic_euler": [
+          0.052020307082,
+          0.02549573069,
+          0.012623008779,
+          0.006280802889
+        ],
+        "velocity_verlet": [
+          0.002007709681,
+          0.000501576945,
+          0.000125374402,
+          3.1344646e-05
+        ]
+      },
+      "measured_orders": {
+        "euler": [
+          1.111633207283,
+          1.063213295174,
+          1.024979484052
+        ],
+        "rk2_midpoint": [
+          2.009923195571,
+          2.005275712842,
+          2.002661342502
+        ],
+        "rk4": [
+          4.011954226963,
+          4.006097781581,
+          4.002992952278
+        ],
+        "symplectic_euler": [
+          1.028819230475,
+          1.014199857862,
+          1.007034928485
+        ],
+        "velocity_verlet": [
+          2.001007727271,
+          2.000228211045,
+          1.999951861526
+        ]
+      },
+      "stepsizes": [
+        0.1,
+        0.05,
+        0.025,
+        0.0125
+      ]
+    },
+    "energy_study": {
+      "energy_deviations": {
+        "euler": {
+          "final_deviation": 21149754100233.824,
+          "max_deviation": 21149754100233.824
+        },
+        "rk2_midpoint": {
+          "final_deviation": 0.009914190726,
+          "max_deviation": 0.009914190726
+        },
+        "rk4": {
+          "final_deviation": 1.36307e-06,
+          "max_deviation": 1.36307e-06
+        },
+        "symplectic_euler": {
+          "final_deviation": 0.001170657421,
+          "max_deviation": 0.012820512537
+        },
+        "velocity_verlet": {
+          "final_deviation": 6.87917e-07,
+          "max_deviation": 0.000312499997
+        }
+      },
+      "horizon": 628.318530717959,
+      "initial_energy": 0.5,
+      "stepsize": 0.05
+    },
+    "figures": [
+      "convergence.png",
+      "energy_deviation.png"
+    ],
+    "theoretical_orders": {
+      "euler": 1.0,
+      "rk2_midpoint": 2.0,
+      "rk4": 4.0,
+      "symplectic_euler": 1.0,
+      "velocity_verlet": 2.0
+    }
+  }
+}

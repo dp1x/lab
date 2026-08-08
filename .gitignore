@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# uv
+.uv/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Broken MCP leftovers
+.playwright-mcp/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Data / large artifacts
+data/
+*.npz
+*.npy
+*.h5
+*.pkl
+!*.json
+*.csv.bak
+
+# OS
+Thumbs.db
+.DS_Store
