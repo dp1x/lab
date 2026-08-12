@@ -1,83 +1,111 @@
-# Computational Research Laboratory
+# Research Lab
 
-A long-term computational research environment that converts temporary abundant AI
-inference compute into permanent technical value.
+A small, reproducible computational research environment for structured investigations
+across mathematically and computationally tractable domains.
 
 ## Mission
 
+The laboratory conducts computational investigations, validates them against theory
+or external reality, and accumulates the results, code, and documentation into a
+coherent, reproducible research record.
+
 The laboratory produces:
 
-- reproducible scientific experiments
+- reproducible computational experiments with traceable results
 - validated computational models
-- engineering simulations
-- technical documentation
 - reusable software infrastructure
-- a growing scientific knowledge base
-- open-source-quality engineering artifacts
+- technical documentation and an Obsidian-linked knowledge base
+- engineering-quality, open-source-style artifacts
 
 This is a monorepo laboratory, operated as a small independent research organization.
 
 ## Core Principles
 
-1. **Deterministic Engineering** — prioritize work where reality provides feedback
-   (simulations, mathematics, physics, algorithms, optimization). *"If the result is
-   wrong, reality should reveal it."*
-2. **Reproducibility Above Everything** — every experiment contains research question,
-   theory, references, assumptions, methodology, implementation, validation, results,
-   limitations, and future improvements. Another person can reproduce it.
-3. **Scientific Integrity** — never fabricate papers, results, benchmarks, or outcomes.
-   Separate known facts / assumptions / hypotheses / results.
-4. **Self-Improving Laboratory** — improve templates, tooling, and workflow only with
+1. **Deterministic Engineering.** Prioritize work where the computer can judge whether
+   the result is right — simulations, mathematics, algorithms, optimization.
+   *"If the result is wrong, reality should reveal it."*
+2. **Validation Before Trust.** Tests must pass and results must agree with analytic
+   solutions, conservation laws, published data, or benchmarks before they are recorded.
+3. **Reproducibility.** Every experiment contains: question → theory → references →
+   assumptions → methodology → implementation → validation → results → limitations →
+   next question. The full run is `uv sync && uv run pytest && uv run python experiment.py`.
+4. **Scientific Integrity.** Never fabricate papers, results, benchmarks, or citations.
+   Separate known facts, assumptions, hypotheses, and results. Cite real references.
+5. **Self-Improving Laboratory.** Improve templates, tooling, and workflow only with
    measurable benefit; research output comes before framework rewrites.
-5. **Documentation Is Memory** — every meaningful activity creates durable artifacts:
-   experiment cards, reports, notes, results, Obsidian-compatible knowledge entries.
-6. **Aggressive Delegation and Parallelism** — heavy subagent use for independent
-   work; never concurrent edits to the same file.
+6. **Documentation Is Memory.** Every meaningful activity creates durable artifacts:
+   experiment cards, figures, results, and Obsidian-compatible knowledge notes.
+7. **Purposeful Delegation.** Subagents may be used when doing so materially improves
+   research quality, throughput, or verification. Delegation is a means, not a quota.
+8. **Goodhart's Law.** Do not optimize for activity metrics instead of research value —
+   no experiments merely to increase count, no agents merely to fill quotas, no
+   compute/datasets generated merely because resources are available.
 
 ## Repository Layout
 
 ```
-├── AGENTS.md                operating manual for AI agents
-├── README.md                this file
-├── pyproject.toml / uv.lock   Python environment + pinned dependencies (uv)
-├── localdocs/               THE LAB'S OWN WRITING
-│   ├── charter.md          source of truth (16-section master document)
-│   ├── roadmap.md          experiment sequence (orbital-mechanics flagship)
-│   ├── templates/          experiment card + note templates
-│   ├── knowledge/          Obsidian-compatible knowledge base (compounding)
-│   └── reports/            multi-experiment syntheses
-├── webdocs/                 EXTERNAL web material (public sources only)
-├── research/
-│   ├── <domain>/experiments/<name>/   self-contained experiment
-│   │   ├── README.md                 experiment card
-│   │   ├── experiment.py             runnable implementation
-│   │   ├── tests/                    validation tests (pytest)
-│   │   └── results/                  outputs, figures (JSON, committed)
-│   └── <domain>/README.md           domain index
-├── src/lab_utils/          shared reusable utilities (metrics, I/O, validation)
-├── tools/                  lab-level scripts (scaffolder, ...)
-└── data/                   shared datasets (gitignored)
+├── AGENTS.md              operating manual for research agents
+├── README.md              this file
+├── LICENSE                MIT
+├── pyproject.toml / uv.lock  Python env + pinned dependencies (uv)
+├── localdocs/             THE LAB'S OWN WRITING
+│   ├── charter.md         source of truth (mission, philosophy, standards)
+│   ├── roadmap.md         experiment sequence (orbital-mechanics flagship)
+│   ├── templates/         experiment card + knowledge note templates
+│   ├── knowledge/         Obsidian-compatible knowledge base (compounding)
+│   └── reports/           multi-experiment syntheses (every ~5 experiments)
+├── webdocs/               EXTERNAL web material fetched for reference (public only)
+├── research/              one dir per domain, experiments self-contained
+│   ├── <domain>/experiments/<name>/
+│   │   ├── README.md      experiment card
+│   │   ├── experiment.py  runnable implementation
+│   │   ├── tests/         validation tests (pytest)
+│   │   └── results/       outputs, figures (JSON preferred, committed)
+│   └── <domain>/README.md  domain index
+├── src/lab_utils/         shared reusable utilities (metrics, I/O, validation)
+├── tools/                 lab-level scripts (scaffolder, ...)
+└── data/                  shared datasets (gitignored; large ephemeral data preferred on scratch)
 ```
 
 ## Quickstart
 
-Requires [uv](https://docs.astral.sh/uv/) (Python 3.12 managed by uv):
+Requires [uv](https://docs.astral.sh/uv/) (Python 3.12):
 
 ```bash
-uv sync            # create venv, install dependencies
-uv run pytest      # run all tests
+uv sync          # create venv, install dependencies
+uv run pytest    # run the full test suite
 uv run python research/<domain>/experiments/<name>/experiment.py
 ```
 
 ## Research Workflow
 
 ```
-Research → Question → Theory → Design → Implementation → Testing → Simulation
-    → Validation → Documentation → Knowledge Update → Improvement → Next
+Question → Theory → Design → Implement → Test (pytest) → Run →
+Validate → Document (card + figures + results) → Knowledge note → Commit → Next
 ```
 
-Every experiment: card → code → tests green → run → validate → results →
-knowledge note (Obsidian) → commit.
+Every experiment: card → deterministic code → tests green → run → validate against
+theory/real data → results → knowledge note → commit.
+
+## Research Domains
+
+1. **Orbital Mechanics — flagship (next)** — orbits, transfers, perturbations; validated
+   against Kepler's laws and, where feasible, NASA/JPL Horizons ephemeris.
+2. **Numerics — foundation (001 complete)** — verified numerical methods (integrators,
+   error analysis) that applied domains build on.
+3. Energy Systems (planned) — power flow, batteries, grid modelling.
+4. Computer Architecture (planned) — pipelines, caches, scheduling.
+5. Cybersecurity (planned) — cryptography, protocols, attack modelling.
+
+## Resource Architecture
+
+- **`C:\Users\Dhane\lab`** — permanent laboratory state: source, docs, tests, committed
+  results. Kept lean; avoid unnecessary writes/rebuilds.
+- **`R:`** — disposable local scratch (virtualenvs, caches, downloaded temp files, large
+  sweeps). Check free space at runtime before large operations; do not hard-code capacity.
+- **Google Colab** — optional, *ephemeral* remote compute used only when a workload would
+  otherwise cause excessive local SSD/CPU pressure. Hardware is dynamically allocated (no
+  assumed GPU/CPU); never attempt to circumvent Colab limits.
 
 ## Operating Reference
 
@@ -87,12 +115,3 @@ knowledge note (Obsidian) → commit.
 - [Experiment template](localdocs/templates/experiment_template.md)
 - [Knowledge base](localdocs/knowledge/)
 - [Research overview](research/)
-
-## Research Domains
-
-1. **Orbital Mechanics — flagship (planned next)** (orbits, transfers,
-   perturbations; validation against NASA/JPL Horizons is a target, not yet achieved)
-2. Numerics (foundation — 001 complete)
-3. Energy Systems (planned — power flow, batteries, grid)
-4. Computer Architecture (planned — pipelines, caches, scheduling)
-5. Cybersecurity (planned — cryptography, protocols)

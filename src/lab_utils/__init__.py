@@ -1,4 +1,4 @@
-"""lab_utils — shared utilities for the Computational Research Laboratory.
+"""lab_utils — shared utilities for the Research Lab.
 
 Contains only reusable code: metrics, numerical helpers, and result I/O.
 Each module is self-contained and covered by tests in `src/lab_utils/tests/`.

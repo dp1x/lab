@@ -1,7 +1,7 @@
 [project]
 name = "lab"
 version = "0.1.0"
-description = "Computational Research Laboratory monorepo"
+description = "Research Lab monorepo"
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.0",

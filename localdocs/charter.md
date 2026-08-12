@@ -1,4 +1,4 @@
-# Computational Research Laboratory — Charter
+# Research Lab — Charter
 
 Master reference document for the laboratory. This document defines the mission,
 philosophy, standards, structure, and operating rules. AGENTS.md is the concise
@@ -8,9 +8,11 @@ operating manual derived from this document; `charter.md` is the source of truth
 
 ## 1. Mission
 
-Convert temporary abundant AI inference capability into permanent technical value.
+The laboratory conducts computational investigations, validates them against theory
+or external reality, and accumulates results, code, and documentation into a
+coherent, reproducible research record.
 
-The laboratory is a personal research environment producing:
+The laboratory is a research environment producing:
 
 - reproducible scientific experiments
 - validated computational models
@@ -46,6 +48,11 @@ where results can be tested:
 Avoid unsupported speculation. The standard:
 
 > "If the result is wrong, reality should reveal it."
+
+Work is judged by scientific and engineering merit, not activity. The laboratory
+does not optimize for experiment counts, agent counts, dataset sizes, or compute
+usage; it optimizes for useful, validated output. Delegation to subagents is a tool
+used where it improves quality or throughput, never a quota to satisfy.
 
 ## 3. Scientific Integrity
 
@@ -153,16 +160,20 @@ research/<domain>/experiments/<name>/
 
 ## 7. Technology Stack
 
-Primary language: Python. Scientific ecosystem: NumPy, SciPy, Matplotlib, pandas,
-SymPy, Jupyter, pytest.
+Primary language: Python. Dependencies are added only when an experiment needs
+them (rule 7). Current environment: NumPy, Matplotlib, pytest (installed via uv).
 
-Later additions by phase:
+Later additions will track domain demand:
 
-- Aerospace engineering: Astropy, poliastro, SPICE tools.
+- Orbital mechanics: Astropy, poliastro, SPICE tools — added when a propagation or
+  ephemeris step genuinely requires them.
 - Energy systems: PyPSA, pandapower, oemof.
 - Visualization: Plotly, PyVista.
 
-Add dependencies with `uv add <pkg>` and update relevant docs. Avoid unnecessary
+External compute (Google Colab) is an optional, disposable scratch tier — see
+§14. No dependency or service is added merely because it is available.
+
+Add new dependencies with `uv add <pkg>` and update relevant docs; avoid unnecessary
 dependencies.
 
 ## 8. Shared Infrastructure
@@ -221,8 +232,8 @@ real-world data (NASA/JPL Horizons) as the answer key. Sequence:
 - JPL ephemeris validation (013)
 - Eclipse timing, launch windows, trajectory optimization (014+)
 
-Sweep methodology: one experiment, one question, many parameter combinations;
-CSVs → `data/` (gitignored), summary JSON → `results/` (committed).
+Sweep methodology: one experiment, one question, many parameter combinations; large
+raw outputs → scratch (R:) at runtime, summary JSON → `results/` (committed).
 
 ### Phase 3 — Energy Systems (second pillar)
 
@@ -238,18 +249,32 @@ Renewable generation, battery systems, grid optimization, energy modelling:
 
 Cryptographic analysis, secure protocol modelling, vulnerability testing frameworks.
 
-## 11. Delegation and Parallelism
+## 11. Purposeful Delegation
 
-Subagents are encouraged for independent work: literature research, implementation,
-testing, verification, documentation, review. Run independent work in parallel.
-Never let multiple agents edit the same file simultaneously. The lead agent integrates
-outputs. Parallelism must increase quality, not create confusion.
+Subagents may be delegated independent work when doing so materially improves
+research quality, throughput, or verification: literature/source research,
+independent mathematical derivation, implementation review, adversarial test review,
+documentation consistency, and independent validation of results are valid examples.
+
+Delegation is a means, not a metric. Do not spawn agents merely because delegation
+is encouraged, and never let multiple agents edit the same file simultaneously. The
+lead agent integrates outputs. Parallelism must increase quality, not confusion.
+See also Goodhart's Law (§12).
 
 ## 12. Operating Rules for AI Agents
 
 Agents behave as a research organization — determine the question, design the
 experiment, implement, validate, document, improve. See AGENTS.md for the concise
-operating manual.
+operating manual. Key cross-cutting rules:
+
+- **Goodhart's Law.** Optimize research value, not activity. No experiments, agents,
+  datasets, or compute produced merely to fill quotas or because resources are free.
+- **Responsible web access.** Acquire public data via official API → downloadable
+  dataset → webpage → browser automation (last resort). Never bypass CAPTCHAs,
+  access controls, or rate limits; stop and report antibot/verification gates.
+- **Verify before trusting.** Reality is the verification layer.
+- **Resources.** Keep C: lean; use R: for scratch (check capacity first); Colab is an
+  ephemeral, hardware-as-available overflow tier — never evaded.
 
 ## 13. Self-Improvement
 
@@ -259,10 +284,22 @@ research — research output comes first.
 
 ## 14. Resource Efficiency
 
-Constraints: SSD lifetime (TBW), storage, RAM, CPU. Avoid: unnecessary
-compilation, giant temporary files, repeated rebuilds, duplicated datasets,
-abandoned processes. Clean temporary files; stop unnecessary processes; free
-resources. Prefer incremental changes, lightweight tools, efficient workflows.
+The lab runs across three tiers with different lifetimes:
+
+- **C:** — permanent state (source, docs, tests, committed results). Kept lean;
+  avoid unnecessary writes, rebuilds, and duplicated artifacts.
+- **R:** — disposable local scratch (venvs, caches, downloads, large sweeps).
+  Check free space at runtime before large operations; capacity is dynamic
+  (do not hard-code it); clean up after use. Prefer R: for large ephemeral data
+  over the repository drive even when a path is gitignored.
+- **Colab** — optional ephemeral remote compute for workloads that would otherwise
+  cause excessive local SSD/CPU pressure. Hardware is dynamically allocated (no
+  assumed GPU/CPU); never attempt to circumvent Colab limits; checkpoint long
+  runs so they can resume from the repository.
+
+Constraints: SSD lifetime (TBW), storage, RAM, CPU. Avoid unnecessary
+compilation, giant temporary files, repeated rebuilds, duplicated datasets, and
+abandoned processes. Prefer incremental changes, lightweight tools, efficiency.
 
 ## 15. Decision Making
 
@@ -276,7 +313,7 @@ The laboratory succeeds when it produces over time:
 
 - **Technical assets** — validated simulations, software tools, datasets, docs.
 - **Knowledge assets** — scientific notes, experiment history, lessons learned.
-- **Portfolio assets** — reproducible engineering projects, open-source, proven skill.
+- **Engineering assets** — reproducible projects, open-source-quality artifacts.
 - **Personal growth** — deeper understanding of mathematics, physics, engineering, CS.
 
 ---
