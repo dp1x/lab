@@ -1,0 +1,314 @@
+{
+  "meta": {
+    "description": "Validation of a two-body RK4 propagator against Kepler's three laws, conservation invariants, and an IAU-real-units Earth anchor.",
+    "git_commit": "e216b5c",
+    "name": "kepler_orbit_validation",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-12T23:23:32+00:00"
+  },
+  "results": {
+    "conservation": {
+      "a": 1.0,
+      "angular_momentum_analytic": 0.8,
+      "e": 0.6,
+      "energy_analytic": -0.5,
+      "max_rel_angular_momentum_drift": 7e-11,
+      "max_rel_energy_drift": 1.193e-09,
+      "orbits": 10,
+      "steps_per_orbit": 2024,
+      "total_steps": 20240
+    },
+    "earth_anchor": {
+      "a_km": 149597870.7,
+      "e_input": 0.01671123,
+      "e_measured": 0.01671123,
+      "mu_km3_s2": 132712440000.0,
+      "period_measured_days": 365.25689847422365,
+      "period_rel_error": 2.468998188331952e-10,
+      "period_theory_days": 365.2568983840418,
+      "period_theory_s": 31558196.020381212,
+      "rel_diff_vs_sidereal_year": 1.4657760849695002e-06,
+      "sidereal_year_days": 365.256363
+    },
+    "figures": [
+      "orbit_shapes.png",
+      "equal_areas.png",
+      "kepler3.png",
+      "conservation.png",
+      "propagator_convergence.png"
+    ],
+    "kepler1": {
+      "cases": [
+        {
+          "a": 1.0,
+          "e_from_eccentricity_vector": 0.3,
+          "e_input": 0.3,
+          "max_rel_conic_error": 4.006e-09,
+          "max_rel_pointwise_error": 2.58e-08,
+          "orbits": 5,
+          "steps_per_orbit": 875,
+          "total_steps": 4375
+        },
+        {
+          "a": 1.0,
+          "e_from_eccentricity_vector": 0.6,
+          "e_input": 0.6,
+          "max_rel_conic_error": 6.042e-09,
+          "max_rel_pointwise_error": 1.76971e-07,
+          "orbits": 5,
+          "steps_per_orbit": 2024,
+          "total_steps": 10120
+        },
+        {
+          "a": 1.0,
+          "e_from_eccentricity_vector": 0.85,
+          "e_input": 0.85,
+          "max_rel_conic_error": 1.1432e-08,
+          "max_rel_pointwise_error": 3.043824e-06,
+          "orbits": 5,
+          "steps_per_orbit": 8814,
+          "total_steps": 44070
+        }
+      ],
+      "circular": {
+        "a": 1.0,
+        "e_input": 0.0,
+        "max_rel_radius_variation": 9.28e-10,
+        "measured_eccentricity": 0.0,
+        "orbits": 5,
+        "steps_per_orbit": 512
+      }
+    },
+    "kepler2": {
+      "a": 1.0,
+      "areal_velocity_rel_error": 9.057189e-06,
+      "areal_velocity_slope": 0.399996377124,
+      "e": 0.6,
+      "ellipse_area_pi_ab": 2.513274122872,
+      "expected_areal_velocity_h_over_2": 0.4,
+      "full_orbit_area_rel_error": 2.1788393734477407e-05,
+      "full_orbit_sector_area": 2.513219362666,
+      "interval_areas": [
+        0.2094194476543074,
+        0.20943577221245419,
+        0.20943805089255046,
+        0.20943863378236488,
+        0.20943884883848177,
+        0.20943892796993213,
+        0.20943892796991206,
+        0.20943884883841132,
+        0.20943863378218663,
+        0.20943805089204054,
+        0.20943577221029908,
+        0.20941944762274278
+      ],
+      "intervals": 12,
+      "max_rel_interval_deviation": 7.4005157e-05,
+      "mean_interval_area": 0.209434946889,
+      "steps_per_interval": 64
+    },
+    "kepler3": {
+      "T2_over_a3_max": 39.478417631767,
+      "T2_over_a3_max_rel_err": 8.237e-09,
+      "T2_over_a3_min": 39.478417279173,
+      "cells": [
+        {
+          "T2_over_a3": 39.47841763176684,
+          "a": 0.5,
+          "e": 0.1,
+          "period_measured": 2.2214414698503435,
+          "period_rel_error": 3.4714417622494467e-10,
+          "period_theory": 2.221441469079183
+        },
+        {
+          "T2_over_a3": 39.47841743907108,
+          "a": 0.5,
+          "e": 0.3,
+          "period_measured": 2.2214414644288705,
+          "period_rel_error": 2.0933761452580003e-09,
+          "period_theory": 2.221441469079183
+        },
+        {
+          "T2_over_a3": 39.47841762502507,
+          "a": 0.5,
+          "e": 0.6,
+          "period_measured": 2.2214414696606646,
+          "period_rel_error": 2.6175865431849834e-10,
+          "period_theory": 2.221441469079183
+        },
+        {
+          "T2_over_a3": 39.47841727917335,
+          "a": 0.5,
+          "e": 0.85,
+          "period_measured": 2.2214414599301664,
+          "period_rel_error": 4.118504485818281e-09,
+          "period_theory": 2.221441469079183
+        },
+        {
+          "T2_over_a3": 39.47841763176632,
+          "a": 1.0,
+          "e": 0.1,
+          "period_measured": 6.283185309360716,
+          "period_rel_error": 3.47137612005739e-10,
+          "period_theory": 6.283185307179586
+        },
+        {
+          "T2_over_a3": 39.47841743907127,
+          "a": 1.0,
+          "e": 0.3,
+          "period_measured": 6.283185294026532,
+          "period_rel_error": 2.0933736635800397e-09,
+          "period_theory": 6.283185307179586
+        },
+        {
+          "T2_over_a3": 39.478417625025045,
+          "a": 1.0,
+          "e": 0.6,
+          "period_measured": 6.283185308824263,
+          "period_rel_error": 2.6175837806257483e-10,
+          "period_theory": 6.283185307179586
+        },
+        {
+          "T2_over_a3": 39.478417279175886,
+          "a": 1.0,
+          "e": 0.85,
+          "period_measured": 6.283185281302461,
+          "period_rel_error": 4.118472409503897e-09,
+          "period_theory": 6.283185307179586
+        },
+        {
+          "T2_over_a3": 39.47841763176684,
+          "a": 2.0,
+          "e": 0.1,
+          "period_measured": 17.771531758802748,
+          "period_rel_error": 3.4714417622494467e-10,
+          "period_theory": 17.771531752633464
+        },
+        {
+          "T2_over_a3": 39.47841743907108,
+          "a": 2.0,
+          "e": 0.3,
+          "period_measured": 17.771531715430964,
+          "period_rel_error": 2.0933761452580003e-09,
+          "period_theory": 17.771531752633464
+        },
+        {
+          "T2_over_a3": 39.47841762502507,
+          "a": 2.0,
+          "e": 0.6,
+          "period_measured": 17.771531757285317,
+          "period_rel_error": 2.6175865431849834e-10,
+          "period_theory": 17.771531752633464
+        },
+        {
+          "T2_over_a3": 39.47841727917335,
+          "a": 2.0,
+          "e": 0.85,
+          "period_measured": 17.77153167944133,
+          "period_rel_error": 4.118504485818281e-09,
+          "period_theory": 17.771531752633464
+        },
+        {
+          "T2_over_a3": 39.47841763176632,
+          "a": 4.0,
+          "e": 0.1,
+          "period_measured": 50.26548247488573,
+          "period_rel_error": 3.47137612005739e-10,
+          "period_theory": 50.26548245743669
+        },
+        {
+          "T2_over_a3": 39.47841743907127,
+          "a": 4.0,
+          "e": 0.3,
+          "period_measured": 50.26548235221225,
+          "period_rel_error": 2.0933736635800397e-09,
+          "period_theory": 50.26548245743669
+        },
+        {
+          "T2_over_a3": 39.478417625025045,
+          "a": 4.0,
+          "e": 0.6,
+          "period_measured": 50.2654824705941,
+          "period_rel_error": 2.6175837806257483e-10,
+          "period_theory": 50.26548245743669
+        },
+        {
+          "T2_over_a3": 39.478417279175886,
+          "a": 4.0,
+          "e": 0.85,
+          "period_measured": 50.26548225041969,
+          "period_rel_error": 4.118472409503897e-09,
+          "period_theory": 50.26548245743669
+        },
+        {
+          "T2_over_a3": 39.47841763176684,
+          "a": 8.0,
+          "e": 0.1,
+          "period_measured": 142.17225407042199,
+          "period_rel_error": 3.4714417622494467e-10,
+          "period_theory": 142.17225402106772
+        },
+        {
+          "T2_over_a3": 39.47841743907108,
+          "a": 8.0,
+          "e": 0.3,
+          "period_measured": 142.1722537234477,
+          "period_rel_error": 2.0933761452580003e-09,
+          "period_theory": 142.17225402106772
+        },
+        {
+          "T2_over_a3": 39.47841762502507,
+          "a": 8.0,
+          "e": 0.6,
+          "period_measured": 142.17225405828253,
+          "period_rel_error": 2.6175865431849834e-10,
+          "period_theory": 142.17225402106772
+        },
+        {
+          "T2_over_a3": 39.47841727917335,
+          "a": 8.0,
+          "e": 0.85,
+          "period_measured": 142.17225343553065,
+          "period_rel_error": 4.118504485818281e-09,
+          "period_theory": 142.17225402106772
+        }
+      ],
+      "expected_4pi2_over_mu": 39.478417604357,
+      "fit_intercept": 0.79817986775,
+      "loglog_slope": 1.5,
+      "mu": 1.0
+    },
+    "propagator_convergence": {
+      "a": 1.0,
+      "e": 0.6,
+      "max_errors": [
+        0.001313887161,
+        6.2546311e-05,
+        3.314341e-06,
+        1.88921e-07,
+        1.1244e-08
+      ],
+      "measured_order": [
+        4.392772779599,
+        4.238131053734,
+        4.132867667039,
+        4.070547269442
+      ],
+      "steps_per_orbit": [
+        128,
+        256,
+        512,
+        1024,
+        2048
+      ],
+      "stepsizes": [
+        0.0078125,
+        0.00390625,
+        0.001953125,
+        0.0009765625,
+        0.00048828125
+      ],
+      "theoretical_order": 4.0
+    }
+  }
+}

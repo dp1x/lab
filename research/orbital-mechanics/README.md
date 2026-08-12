@@ -16,8 +16,8 @@ checks and real-world data (NASA/JPL Horizons) as ultimate validation.
 
 | # | Experiment | Status | Question |
 |---|-----------|--------|----------|
-| 002 | Kepler orbit validation | next | Does Newtonian gravity reproduce elliptical orbits and Kepler's laws? |
-| 003 | Kepler's equation solvers | planned | Newton vs bisection vs series; convergence study |
+| 002 | Kepler orbit validation | **complete** | Does Newtonian gravity reproduce elliptical orbits and Kepler's laws? |
+| 003 | Kepler's equation solvers | next | Newton vs bisection vs series; convergence study |
 | 004 | Hohmann transfer | planned | Least-fuel orbit-to-orbit transfer; Δv budget |
 | 005 | Bi-elliptic vs Hohmann | planned | Crossover radius law |
 | 006 | Plane-change maneuvers | planned | Cost of changing inclination |

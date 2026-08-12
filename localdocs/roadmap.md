@@ -33,7 +33,7 @@ Continue foundation work only where it directly serves the flagship.
 
 | # | Experiment | Question | Validation |
 |---|-----------|----------|-----------|
-| 002 | Kepler orbit validation | Does Newtonian gravity reproduce elliptical orbits and Kepler's laws? | Kepler's three laws; energy + angular-momentum conservation |
+| 002 | Kepler orbit validation | Does Newtonian gravity reproduce elliptical orbits and Kepler's laws? | **COMPLETE** (2026-08-13): analytic conic pointwise (≤3e-6), equal areas (≤7.4e-5), T²/a³ = 4π²/μ (≤8.2e-9), invariants ≤1.2e-9 over 10 orbits, IAU Earth anchor 365.256898 d vs sidereal year |
 | 003 | Kepler's equation solvers | Newton vs bisection vs series; convergence study | Closed-form roots, known test orbits |
 | 004 | Hohmann transfer | Least-fuel orbit-to-orbit transfer; Δv budget | Closed-form Δv equations |
 | 005 | Bi-elliptic vs Hohmann | Crossover radius law (β > 15.58) | Closed-form comparison |
