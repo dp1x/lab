@@ -7,8 +7,13 @@ Creates:
     research/<domain>/experiments/<name>/
     ├── README.md            # experiment card from template
     ├── experiment.py        # runnable skeleton
-    ├── tests/test_experiment.py
+    ├── tests/test_<name>.py # validation test skeleton
     └── results/             # outputs, figures
+
+Test module basenames must be unique per experiment, tests/ must NOT have an
+__init__.py, and tests load experiment.py via importlib from its explicit
+path: two experiments both named "experiment.py" (and two tests/test_*.py
+files) otherwise collide in pytest's module registry and sys.modules.
 
 Domain must be an existing dir under research/ or a new one (auto-created).
 Update research/README.md when adding a domain (docs follow structure).
@@ -54,13 +59,26 @@ TEST_SKELETON = '''"""Validation tests for {title}.
 
 These must pass BEFORE any results are trusted (laboratory rule: verify before
 trust). Replace the placeholder with the experiment's real invariants.
+
+The experiment module is loaded via importlib from its explicit path (see
+tools/new_experiment.py) so that multiple experiments with an "experiment.py"
+module never collide in pytest/sys.modules.
 """
 
-from experiment import answer_skeleton
+import importlib.util
+from pathlib import Path
+
+_EXP_DIR = Path(__file__).resolve().parents[1]
+_spec = importlib.util.spec_from_file_location(
+    "{module_name}", _EXP_DIR / "experiment.py"
+)
+experiment = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(experiment)
 
 
 def test_skeleton():
-    assert answer_skeleton(2, 3) == 5
+    assert experiment.answer_skeleton(2, 3) == 5
 '''
 
 
@@ -101,15 +119,18 @@ def main(argv: list[str]) -> int:
         return 1
 
     exp_dir.mkdir(parents=True)
-    (exp_dir / "tests").mkdir()
+    tests_dir = exp_dir / "tests"
+    tests_dir.mkdir()
     (exp_dir / "results").mkdir()
-    (exp_dir / "tests" / "__init__.py").write_text("", encoding="utf-8")
 
     card = CARD_TEMPLATE.read_text(encoding="utf-8")
     (exp_dir / "README.md").write_text(fill_card(card, domain, name), encoding="utf-8")
     (exp_dir / "experiment.py").write_text(SKELETON_PY, encoding="utf-8")
-    (exp_dir / "tests" / "test_experiment.py").write_text(
-        TEST_SKELETON.format(title=name.replace("-", " ").title()),
+    module_name = f"{name.replace('-', '_')}_experiment"
+    (tests_dir / f"test_{name.replace('-', '_')}.py").write_text(
+        TEST_SKELETON.format(
+            title=name.replace("-", " ").title(), module_name=module_name
+        ),
         encoding="utf-8",
     )
 
