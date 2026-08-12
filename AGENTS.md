@@ -13,7 +13,7 @@ knowledge.
 ## Repo Structure
 
 ```
-C:\Users\Dhane\lab
+$REPO_ROOT
 ├── AGENTS.md              this manual
 ├── README.md              lab overview + index
 ├── LICENSE                MIT
@@ -91,7 +91,6 @@ hosted public document/dataset is fine when it is the source.)
 - **`C:`** — permanent state (source, docs, tests, committed results). Keep lean.
 - **`R:`** — disposable local scratch (venvs, caches, temp downloads, large sweeps).
   Check free space at runtime before large operations; never hard-code capacity.
-  Currently ~1.7 GB free, but this is dynamic.
 - **Colab** — optional, ephemeral remote compute only for workloads that would
   otherwise cause excessive local SSD/CPU pressure. Hardware-as-available (no assumed
   GPU/CPU); never evade Colab limits; checkpoint long runs so they remain resumable

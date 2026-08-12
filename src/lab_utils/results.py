@@ -60,7 +60,6 @@ def save_json_result(
             "description": description,
             "timestamp_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "git_commit": _git_commit(),
-            "python_platform": platform.platform(),
             "python_version": platform.python_version(),
         },
         "results": _numpy_to_python(data),

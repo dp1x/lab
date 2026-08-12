@@ -37,7 +37,7 @@ methods (Euler, RK2, RK4) exhibit secular energy drift.
 
 - Unit mass, omega = 1 (verified), x0 = 1, v0 = 0 (verified).
 - Float64 arithmetic; double-precision round-off negligible at the stepsizes used.
-- Energy study horizon 200 periods is "long-term" for this linear problem (plausible).
+- Energy study horizon 200π = 100 periods is "long-term" for this linear problem (plausible).
 
 ## Methodology
 
@@ -45,8 +45,8 @@ For each method and each requested stepsize h in {0.1, 0.05, 0.025, 0.0125}, int
 the oscillator as a first-order system from t=0 to t=2pi (one period). The grid uses
 `n = round(2pi/h)` steps of effective size `h_eff = 2pi/n` so the final grid point is
 exactly 2pi (effective stepsizes ~0.0997, ~0.0499, ~0.0250, ~0.0125; recorded in
-`results.json`). The maximum absolute error against the analytic solution is evaluated
-at every grid point, so the reported error is strictly "at t = T". The convergence
+`results.json`). The reported error is the maximum absolute error over all grid
+points in [0, T] (the standard definition of global error). The convergence
 order is the log-log slope of error vs effective stepsize across the four refinements.
 
 Energy behaviour is measured over the long horizon t in [0, 200pi] with h = 0.05,

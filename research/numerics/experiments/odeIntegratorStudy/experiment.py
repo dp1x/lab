@@ -167,7 +167,8 @@ def convergence_table() -> dict:
 
     The analytic reference is evaluated on the integrator's actual time grid
     ``t_i = i * h_eff`` ending exactly at ``t_end``, so no time-argument
-    mismatch is measured and the error is evaluated at the nominal time T.
+    mismatch is measured and the error is the maximum absolute error over all
+    grid points in [0, T] (the standard definition of global error).
     """
     errors: dict[str, list[float]] = {m: [] for m in METHODS}
     for h in STEPSIZES:
@@ -183,7 +184,7 @@ def convergence_table() -> dict:
     }
     return {
         "requests": STEPSIZES,
-        "effective_steps": eff_steps,
+        "effective_stepsizes": eff_steps,
         "errors": errors,
         "measured_orders": orders,
     }
@@ -271,7 +272,7 @@ def main() -> dict:
 
     print("=== Convergence: global error at t = 2pi ===")
     print("requested h:   ", *[f"{h:<8}" for h in conv["requests"]])
-    print("effective h:   ", *[f"{h:.6f}" for h in conv["effective_steps"]])
+    print("effective h:   ", *[f"{h:.6f}" for h in conv["effective_stepsizes"]])
     print(f"{'method':<16}", *[f"h={h:<8}" for h in conv["requests"]], "order")
     for m in METHODS:
         avg_order = np.mean(conv["measured_orders"][m])

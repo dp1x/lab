@@ -1,15 +1,14 @@
 {
   "meta": {
     "description": "Convergence order and energy preservation of five ODE integrators on the harmonic oscillator.",
-    "git_commit": "69ba42b",
+    "git_commit": "153f3a8",
     "name": "ode_integrator_comparison",
-    "python_platform": "Windows-11-10.0.26100-SP0",
     "python_version": "3.12.13",
-    "timestamp_utc": "2026-08-08T20:11:25+00:00"
+    "timestamp_utc": "2026-08-12T20:19:12+00:00"
   },
   "results": {
     "convergence": {
-      "effective_steps": [
+      "effective_stepsizes": [
         0.099733100114,
         0.049866550057,
         0.025032610786,

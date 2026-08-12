@@ -99,7 +99,7 @@ theory/real data → results → knowledge note → commit.
 
 ## Resource Architecture
 
-- **`C:\Users\Dhane\lab`** — permanent laboratory state: source, docs, tests, committed
+- **`$REPO_ROOT`** — permanent laboratory state: source, docs, tests, committed
   results. Kept lean; avoid unnecessary writes/rebuilds.
 - **`R:`** — disposable local scratch (virtualenvs, caches, downloaded temp files, large
   sweeps). Check free space at runtime before large operations; do not hard-code capacity.
