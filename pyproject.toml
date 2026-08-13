@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.0",
     "matplotlib>=3.9",
+    "mpmath>=1.4.1",
 ]
 
 [dependency-groups]

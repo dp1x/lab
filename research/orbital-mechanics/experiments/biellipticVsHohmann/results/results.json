@@ -1,0 +1,1606 @@
+{
+  "meta": {
+    "description": "Bi-elliptic vs Hohmann transfer crossover: closed-form three-burn costs, the bi-parabolic limit, the 11.94 and 15.58 boundaries (the latter equal to the Hohmann cost maximum via the corner identity d/ds dv_biell|_{s=R} = d/dR dv_H), the crossover curve s_c(R), adversarial region verification, shape diagnostics, RK4 validation of the full three-burn trajectory, mpmath 50-digit cross-checks, and real-system anchors.",
+    "git_commit": "ded6ef5",
+    "name": "bielliptic_vs_hohmann",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-13T13:06:12+00:00"
+  },
+  "results": {
+    "constants": {
+      "au_km": 149597870.7,
+      "geo_alt_km": 35786.0,
+      "leo_alt_km": 200.0,
+      "mars_a_au": 1.523679,
+      "mu_earth_km3_s2": 398600.4,
+      "mu_sun_km3_s2": 132712440000.0,
+      "r_earth_km": 6378.1
+    },
+    "crossover_curve": {
+      "R_grid": [
+        11.938865472646,
+        11.999578027081,
+        12.060290581516,
+        12.121003135952,
+        12.181715690387,
+        12.242428244822,
+        12.303140799258,
+        12.363853353693,
+        12.424565908128,
+        12.485278462563,
+        12.545991016999,
+        12.606703571434,
+        12.667416125869,
+        12.728128680305,
+        12.78884123474,
+        12.849553789175,
+        12.91026634361,
+        12.970978898046,
+        13.031691452481,
+        13.092404006916,
+        13.153116561352,
+        13.213829115787,
+        13.274541670222,
+        13.335254224658,
+        13.395966779093,
+        13.456679333528,
+        13.517391887963,
+        13.578104442399,
+        13.638816996834,
+        13.699529551269,
+        13.760242105705,
+        13.82095466014,
+        13.881667214575,
+        13.94237976901,
+        14.003092323446,
+        14.063804877881,
+        14.124517432316,
+        14.185229986752,
+        14.245942541187,
+        14.306655095622,
+        14.367367650057,
+        14.428080204493,
+        14.488792758928,
+        14.549505313363,
+        14.610217867799,
+        14.670930422234,
+        14.731642976669,
+        14.792355531104,
+        14.85306808554,
+        14.913780639975,
+        14.97449319441,
+        15.035205748846,
+        15.095918303281,
+        15.156630857716,
+        15.217343412151,
+        15.278055966587,
+        15.338768521022,
+        15.399481075457,
+        15.460193629893,
+        15.520906184328,
+        15.581618738763
+      ],
+      "classical_table_R": [
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        15.58
+      ],
+      "classical_table_s_c": [
+        815.820250475173,
+        48.904843328389,
+        26.104611282351,
+        18.190281512222,
+        15.588202011253
+      ],
+      "endpoint_R_bp": {
+        "R": 11.938765472646,
+        "s_c": Infinity
+      },
+      "endpoint_R_star": {
+        "R": 15.581718738763,
+        "s_c": 15.581718738763
+      },
+      "note_wikipedia_R12_entry": "independent computation gives s_c(12) ~ 815.82; the widely copied table entry '12 -> 15.81' (Wikipedia, from Gobetz & Doll 1969) is a dropped-digit transcription error for 815.81, consistent with this experiment's float64 and 50-digit results",
+      "s_c_grid": [
+        498363.46231973625,
+        821.467540419522,
+        412.051371524389,
+        275.428751769488,
+        207.088736583506,
+        166.075258568754,
+        138.728801837073,
+        119.193451924929,
+        104.540648865431,
+        93.143176714116,
+        84.024598693007,
+        76.563492765757,
+        70.34554912988,
+        65.083921757015,
+        60.573710971853,
+        56.664651000463,
+        53.244038633676,
+        50.225686484443,
+        47.54255815579,
+        45.141728943591,
+        42.980858204044,
+        41.025669537076,
+        39.248118141024,
+        37.625036214459,
+        36.137116984307,
+        34.768142551166,
+        33.504389912863,
+        32.334168974736,
+        31.247459551875,
+        30.235623470084,
+        29.291174243497,
+        28.407591328333,
+        27.579169202294,
+        26.800893882691,
+        26.068341234434,
+        25.377592710123,
+        24.725165132802,
+        24.107951864797,
+        23.523173265269,
+        22.968334769374,
+        22.441191255275,
+        21.939716625534,
+        21.462077733844,
+        21.006611949761,
+        20.571807782664,
+        20.156288089098,
+        19.758795470377,
+        19.378179534272,
+        19.013385748914,
+        18.663445661492,
+        18.327468290665,
+        18.00463253159,
+        17.69418043728,
+        17.395411260522,
+        17.107676157794,
+        16.830373470926,
+        16.562944514248,
+        16.304869805243,
+        16.055665685038,
+        15.814881282666,
+        15.582095780898
+      ]
+    },
+    "figures": [
+      "cost_curves.png",
+      "crossover_map.png",
+      "shape_per_R.png",
+      "saving_curve.png",
+      "time_penalty.png",
+      "trajectory_geometry.png"
+    ],
+    "high_precision_mpmath": {
+      "R_bp": {
+        "float64": 11.938765472646,
+        "mpmath": "11.938765472645870715530055180410063728914783501855"
+      },
+      "R_star": {
+        "float64": 15.581718738763,
+        "mpmath": "15.581718738763179213242444820819518455232994902437"
+      },
+      "corner_identity_50_digits": {
+        "d_dvH_dR": "0.01289086365265767636614113033891924190604591869175",
+        "d_f_ds_at_corner": "0.012890863652657676366141130338779721745760241058044",
+        "rel_diff": "1.0823181754537689129158984124201519380012764236731e-29"
+      },
+      "dps": 50,
+      "s_c_table": {
+        "R": [
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "float64": [
+          815.820250475173,
+          48.904843328389,
+          26.104611282351,
+          18.190281512222
+        ],
+        "mpmath": [
+          "815.82025047528616653870791877703413954969803218747",
+          "48.904843328388456800259428248663483575296006270507",
+          "26.104611282350363104204879568363585198433056488837",
+          "18.190281512222373103853056653366420617487017682261"
+        ],
+        "wikipedia_12_entry_suspected_error": "15.81 (should be 815.81)"
+      }
+    },
+    "low_family_and_inward": {
+      "crossover_thresholds": {
+        "R_bp": 11.938765472646,
+        "R_star": 15.581718738763,
+        "inward_equivalent_outer_over_inner_R_bp": 11.938765472646
+      },
+      "inward_high_family": {
+        "R_in": 0.05,
+        "cases": [
+          {
+            "dv_bielliptic": 0.5335833392727287,
+            "dv_hohmann": 0.534731360500452,
+            "s": 1.1,
+            "wins": true
+          },
+          {
+            "dv_bielliptic": 0.5256306136214401,
+            "dv_hohmann": 0.534731360500452,
+            "s": 2.0,
+            "wins": true
+          },
+          {
+            "dv_bielliptic": 0.5159265023297746,
+            "dv_hohmann": 0.534731360500452,
+            "s": 5.0,
+            "wins": true
+          },
+          {
+            "dv_bielliptic": 0.5093482175055791,
+            "dv_hohmann": 0.534731360500452,
+            "s": 20.0,
+            "wins": true
+          },
+          {
+            "dv_bielliptic": 0.5073513853304848,
+            "dv_hohmann": 0.534731360500452,
+            "s": 100.0,
+            "wins": true
+          }
+        ],
+        "dv_hohmann_inward": 0.534731360500452,
+        "note": "inward bi-elliptic wins when r_outer/r_inner > R_bp and s is large enough - the same thresholds as outward, by time-reversal symmetry",
+        "r1_outer": 20.0,
+        "r2_inner": 1.0
+      },
+      "low_family_never_wins": {
+        "grid_R": [
+          1.001,
+          1.126432049372,
+          1.267581580273,
+          1.426418099114,
+          1.605157904742,
+          1.806295013191,
+          2.032635957522,
+          2.287338948311,
+          2.573957941213,
+          2.896492226492,
+          3.259442232446,
+          3.667872321383,
+          4.127481454356,
+          4.644682710666,
+          5.226692771687,
+          5.881632617632,
+          6.618640842292,
+          7.448001166874,
+          8.381285932197,
+          9.431517571407,
+          10.613350316334,
+          11.94327467286,
+          13.439847518446,
+          15.123951032421,
+          17.019084071982,
+          19.151690059581,
+          21.551525956798,
+          24.252077473141,
+          27.2910263033,
+          30.710775912385,
+          34.559043205592,
+          38.889524338079,
+          43.762643955297,
+          49.246398318193,
+          55.417304077684,
+          62.361465936971,
+          70.175778099137,
+          78.969276264235,
+          88.86465904072,
+          100.0
+        ],
+        "worst_margin_g_min": 5.0003115e-05
+      },
+      "time_reversal_burn_identity": true
+    },
+    "real_anchors": {
+      "earth_mars": {
+        "R": 1.523679,
+        "dv1_km_s": 8.369956562469394,
+        "dv2_km_s": 1.5037385195496817,
+        "dv3_km_s": 5.422956990546631,
+        "dv_bi_parabolic_km_s": 22.331944520132964,
+        "dv_bielliptic_km_s": 15.296652072565706,
+        "dv_hohmann_km_s": 5.593584484731027,
+        "name": "Earth -> Mars (heliocentric, circular mean orbits)",
+        "r1_km": 149597870.7,
+        "r2_km": 227939134.0303053,
+        "r_b_km": 683817402.0909159,
+        "s": 4.571037,
+        "saving_percent_of_hohmann": -173.46779358247704,
+        "saving_vs_hohmann_km_s": -9.70306758783468,
+        "t_bielliptic_days": 1820.5629859926355,
+        "t_hohmann_days": 258.8657589353646,
+        "t_ratio": 7.032845879192568,
+        "v1_km_s": 29.784691829676934
+      },
+      "geo_15_58x": {
+        "R": 15.58,
+        "dv1_km_s": 1.20285926869464,
+        "dv2_km_s": 0.3215552862151858,
+        "dv3_km_s": 0.11476403452464123,
+        "dv_bi_parabolic_km_s": 1.5962216273757424,
+        "dv_bielliptic_km_s": 1.639178589434467,
+        "dv_hohmann_km_s": 1.648813289010517,
+        "name": "GEO -> 15.58 x GEO (boundary)",
+        "r1_km": 42164.1,
+        "r2_km": 656916.678,
+        "r_b_km": 1264923.0,
+        "s": 30.0,
+        "saving_percent_of_hohmann": 0.5843414557770734,
+        "saving_vs_hohmann_km_s": 0.009634699576049899,
+        "t_bielliptic_days": 84.67817928070563,
+        "t_hohmann_days": 11.901818222317395,
+        "t_ratio": 7.114726313154698,
+        "v1_km_s": 3.0746624768390367
+      },
+      "geo_lunar": {
+        "R": 9.116760466843,
+        "dv1_km_s": 1.1961908630919629,
+        "dv2_km_s": 0.2595666962427899,
+        "dv3_km_s": 0.22885845706064534,
+        "dv_bi_parabolic_km_s": 1.6953619588054623,
+        "dv_bielliptic_km_s": 1.684616016395398,
+        "dv_hohmann_km_s": 1.6186140224077405,
+        "name": "GEO -> lunar distance",
+        "r1_km": 42164.1,
+        "r2_km": 384400.0,
+        "r_b_km": 1153200.0,
+        "s": 27.350281400528,
+        "saving_percent_of_hohmann": -4.077685790061142,
+        "saving_vs_hohmann_km_s": -0.06600199398765749,
+        "t_bielliptic_days": 65.43454013768277,
+        "t_hohmann_days": 5.672816358278281,
+        "t_ratio": 11.534753816275902,
+        "v1_km_s": 3.0746624768390367
+      },
+      "leo_50x_best_saving": {
+        "R": 50.0,
+        "dv1_km_s": 3.2243501839569007,
+        "dv2_km_s": 6.68322529110561e-05,
+        "dv3_km_s": 0.4559538344702725,
+        "dv_bi_parabolic_km_s": 3.680348442699177,
+        "dv_bielliptic_km_s": 3.680370850680084,
+        "dv_hohmann_km_s": 3.9987539029217682,
+        "name": "LEO -> 50 x LEO (max-saving ratio)",
+        "r1_km": 6578.1,
+        "r2_km": 328905.0,
+        "r_b_km": 6578100000.0,
+        "s": 1000000.0,
+        "saving_percent_of_hohmann": 7.962056679933499,
+        "saving_vs_hohmann_km_s": 0.3183830522416842,
+        "t_bielliptic_days": 21727991.661187883,
+        "t_hohmann_days": 3.956655538351152,
+        "t_ratio": 5491504.491756323,
+        "v1_km_s": 7.784283232541661
+      },
+      "leo_geo": {
+        "R": 6.409768778219,
+        "dv1_km_s": 3.169721907261323,
+        "dv2_km_s": 0.16064670597281716,
+        "dv3_km_s": 1.1405715935221705,
+        "dv_bi_parabolic_km_s": 4.497922585898615,
+        "dv_bielliptic_km_s": 4.47094020675631,
+        "dv_hohmann_km_s": 3.931873004006139,
+        "name": "LEO(200 km) -> GEO",
+        "r1_km": 6578.1,
+        "r2_km": 42164.1,
+        "r_b_km": 657810.0,
+        "s": 100.0,
+        "saving_percent_of_hohmann": -13.710188559013028,
+        "saving_vs_hohmann_km_s": -0.5390672027501715,
+        "t_bielliptic_days": 22.951579363696133,
+        "t_hohmann_days": 0.2191189623696187,
+        "t_ratio": 104.74483410970376,
+        "v1_km_s": 7.784283232541661
+      },
+      "wiki_14x_r0_6700": {
+        "R": 14.0,
+        "dv1_km_s": 3.061043061551147,
+        "dv2_km_s": 0.608825437530097,
+        "dv3_km_s": 0.44766151128502063,
+        "dv_bi_parabolic_km_s": 4.048759042340369,
+        "dv_bielliptic_km_s": 4.117530010366265,
+        "dv_hohmann_km_s": 4.133715805467763,
+        "name": "Wikipedia worked example (r0 = 6700 km, R = 14, s = 40)",
+        "r1_km": 6700.0,
+        "r2_km": 93800.0,
+        "r_b_km": 268000.0,
+        "s": 40.0,
+        "saving_percent_of_hohmann": 0.3915555849313396,
+        "saving_vs_hohmann_km_s": 0.016185795101498535,
+        "t_bielliptic_days": 7.362875846561013,
+        "t_hohmann_days": 0.6487410273986446,
+        "t_ratio": 11.349483901280383,
+        "v1_km_s": 7.713144431094583
+      }
+    },
+    "region_verification": {
+      "R_hi_region": {
+        "crossings_counted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "n_R": 90,
+        "n_s_per_R": 400,
+        "worst_margin": 0.016404089536,
+        "worst_margin_at_R": 1000.0
+      },
+      "R_lo_region": {
+        "crossings_counted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "n_R": 90,
+        "n_s_per_R": 400,
+        "worst_margin": 1.7185e-08,
+        "worst_margin_at_R": 11.937571596099
+      },
+      "mid_crossing_counts": {
+        "all_exactly_one": true,
+        "max_crossings_seen": 1,
+        "min_crossings_seen": 1,
+        "n_R": 60
+      }
+    },
+    "rk4_transfer_validation": [
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 2.1499376424746284e-16
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 5.0,
+          "r_final": 4.999999994836,
+          "rel_r_error": 1.0328010446869485e-09,
+          "rel_v_error": 1.0293581091459791e-09,
+          "v_ellipse1_at_rb": 0.2581988897471612,
+          "v_final_mag": 0.258198890013
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 1.3136335981433191e-16
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 2.0,
+          "r_final": 1.999999999579,
+          "rel_r_error": 2.1041435260826802e-10,
+          "rel_v_error": 2.0670891664959902e-10,
+          "v_ellipse2_at_r2": 0.8451542547285166,
+          "v_final_mag": 0.845154254903
+        },
+        "burn1": {
+          "dv1": 0.2909944487358056,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.2909944487358056
+        },
+        "burn2": {
+          "dv2": 0.07986281214424545,
+          "dv2_measured": 0.079862811878,
+          "rel_dv2_error": 3.3279459337556003e-09,
+          "v_ellipse1_at_rb": 0.2581988897471612,
+          "v_ellipse2_at_rb": 0.33806170189140666
+        },
+        "burn3": {
+          "dv3": 0.138047473541969,
+          "dv3_measured": 0.138047473717,
+          "rel_dv3_error": 1.2655133477949422e-09,
+          "v_circ_r2": 0.7071067811865476,
+          "v_ellipse2_at_r2": 0.8451542547285166
+        },
+        "case": {
+          "R": 2.0,
+          "e1": 0.666666666667,
+          "e2": 0.428571428571,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 2.0,
+          "r_b": 5.0,
+          "s": 5.0,
+          "steps_leg1": 1331,
+          "steps_leg2": 593,
+          "t1": 16.32419427810796,
+          "t2": 20.570835877443244
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.642968694371052e-12,
+          "energy": 8.28e-10
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.505729123138735e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.467493979165053e-11
+        }
+      },
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 4.931010601072444e-16
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 100.0,
+          "r_final": 99.999997894452,
+          "rel_r_error": 2.1055475372122602e-08,
+          "rel_v_error": 2.1052168072823267e-08,
+          "v_ellipse1_at_rb": 0.014071950894605844,
+          "v_final_mag": 0.014071951191
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 2.7712275185651334e-16,
+          "rel_v_error": 2.050290825419805e-16
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 6.41,
+          "r_final": 6.409999998736,
+          "rel_r_error": 1.9718558559249463e-10,
+          "rel_v_error": 1.9388390664408098e-10,
+          "v_ellipse2_at_r2": 0.5414953873179597,
+          "v_final_mag": 0.541495387423
+        },
+        "burn1": {
+          "dv1": 0.4071950894605838,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.4071950894605838
+        },
+        "burn2": {
+          "dv2": 0.02063790343247535,
+          "dv2_measured": 0.020637903136,
+          "rel_dv2_error": 1.4354417084095361e-08,
+          "v_ellipse1_at_rb": 0.014071950894605844,
+          "v_ellipse2_at_rb": 0.034709854327081194
+        },
+        "burn3": {
+          "dv3": 0.14651913455127752,
+          "dv3_measured": 0.146519134656,
+          "rel_dv3_error": 7.16542869601876e-10,
+          "v_circ_r2": 0.39497625276668213,
+          "v_ellipse2_at_r2": 0.5414953873179597
+        },
+        "case": {
+          "R": 6.41,
+          "e1": 0.980198019802,
+          "e2": 0.879522601259,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 6.41,
+          "r_b": 100.0,
+          "s": 100.0,
+          "steps_leg1": 91871,
+          "steps_leg2": 6122,
+          "t1": 1127.4231284242157,
+          "t2": 1219.2100782628725
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.3884326927177477e-12,
+          "energy": 2.0845e-08
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.506015945186907e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.467595239192055e-11
+        }
+      },
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 4.931010601072444e-16
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 100.0,
+          "r_final": 99.999997894452,
+          "rel_r_error": 2.1055475372122602e-08,
+          "rel_v_error": 2.1052168072823267e-08,
+          "v_ellipse1_at_rb": 0.014071950894605844,
+          "v_final_mag": 0.014071951191
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 1.4719616800160392e-16
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 12.5,
+          "r_final": 12.499999997554,
+          "rel_r_error": 1.9566726905395627e-10,
+          "rel_v_error": 1.923194476948316e-10,
+          "v_ellipse2_at_r2": 0.37712361663282534,
+          "v_final_mag": 0.377123616705
+        },
+        "burn1": {
+          "dv1": 0.4071950894605838,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.4071950894605838
+        },
+        "burn2": {
+          "dv2": 0.033068501184497334,
+          "dv2_measured": 0.033068500888,
+          "rel_dv2_error": 8.958527495021833e-09,
+          "v_ellipse1_at_rb": 0.014071950894605844,
+          "v_ellipse2_at_rb": 0.047140452079103175
+        },
+        "burn3": {
+          "dv3": 0.09428090415820634,
+          "dv3_measured": 0.094280904231,
+          "rel_dv3_error": 7.692777907793264e-10,
+          "v_circ_r2": 0.282842712474619,
+          "v_ellipse2_at_r2": 0.37712361663282534
+        },
+        "case": {
+          "R": 12.5,
+          "e1": 0.980198019802,
+          "e2": 0.777777777778,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 12.5,
+          "r_b": 100.0,
+          "s": 100.0,
+          "steps_leg1": 91871,
+          "steps_leg2": 2444,
+          "t1": 1127.4231284242157,
+          "t2": 1325.359400733194
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.3884326927177477e-12,
+          "energy": 2.0845e-08
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.505650963437802e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.467364446537212e-11
+        }
+      },
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 3.97399365172811e-16
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 40.0,
+          "r_final": 39.999999664491,
+          "rel_r_error": 8.387718430924452e-09,
+          "rel_v_error": 8.38435823347375e-09,
+          "v_ellipse1_at_rb": 0.03492151478847893,
+          "v_final_mag": 0.034921515081
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 1.2688263138573217e-16,
+          "rel_v_error": 1.7064601008853095e-16
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 14.0,
+          "r_final": 13.999999997137,
+          "rel_r_error": 2.044997821875378e-10,
+          "rel_v_error": 2.0089489248283403e-10,
+          "v_ellipse2_at_r2": 0.3253000243161777,
+          "v_final_mag": 0.325300024382
+        },
+        "burn1": {
+          "dv1": 0.3968605915391563,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.3968605915391563
+        },
+        "burn2": {
+          "dv2": 0.0789334937221833,
+          "dv2_measured": 0.078933493429,
+          "rel_dv2_error": 3.709382380683271e-09,
+          "v_ellipse1_at_rb": 0.03492151478847893,
+          "v_ellipse2_at_rb": 0.11385500851066223
+        },
+        "burn3": {
+          "dv3": 0.05803878240375332,
+          "dv3_measured": 0.058038782469,
+          "rel_dv3_error": 1.1259904274875969e-09,
+          "v_circ_r2": 0.2672612419124244,
+          "v_ellipse2_at_r2": 0.3253000243161777
+        },
+        "case": {
+          "R": 14.0,
+          "e1": 0.951219512195,
+          "e2": 0.481481481481,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 14.0,
+          "r_b": 40.0,
+          "s": 40.0,
+          "steps_leg1": 23762,
+          "steps_leg2": 686,
+          "t1": 291.5953971103367,
+          "t2": 440.7532455089149
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.476303005517787e-12,
+          "energy": 8.178e-09
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.5060463297171995e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.467686011353988e-11
+        }
+      },
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 4.1203243148778306e-16
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 20.5,
+          "r_final": 20.499999912381,
+          "rel_r_error": 4.27411420077544e-09,
+          "rel_v_error": 4.270765390246434e-09,
+          "v_ellipse1_at_rb": 0.06736259938424745,
+          "v_final_mag": 0.067362599672
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 0.0
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 20.0,
+          "r_final": 19.999999986596,
+          "rel_r_error": 6.701847965473462e-10,
+          "rel_v_error": 6.591282100669113e-10,
+          "v_ellipse2_at_r2": 0.22498285257018433,
+          "v_final_mag": 0.224982852718
+        },
+        "burn1": {
+          "dv1": 0.3809332873770719,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.3809332873770719
+        },
+        "burn2": {
+          "dv2": 0.1521328665378836,
+          "dv2_measured": 0.15213286625,
+          "rel_dv2_error": 1.8910435231523627e-09,
+          "v_ellipse1_at_rb": 0.06736259938424745,
+          "v_ellipse2_at_rb": 0.21949546592213104
+        },
+        "burn3": {
+          "dv3": 0.0013760548202053635,
+          "dv3_measured": 0.001376054968,
+          "rel_dv3_error": 1.077664808712805e-07,
+          "v_circ_r2": 0.22360679774997896,
+          "v_ellipse2_at_r2": 0.22498285257018433
+        },
+        "case": {
+          "R": 20.0,
+          "e1": 0.906976744186,
+          "e2": 0.012345679012,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 20.0,
+          "r_b": 20.5,
+          "s": 20.5,
+          "steps_leg1": 9024,
+          "steps_leg2": 261,
+          "t1": 110.729303731937,
+          "t2": 286.2776305583699
+        },
+        "max_rel_drift": {
+          "angular_momentum": 1.100872494450718e-11,
+          "energy": 4.066e-09
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.505835704549099e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.4674443354761304e-11
+        }
+      },
+      {
+        "arrival_apoapsis_analytic": {
+          "rel_r_error": 0.0,
+          "rel_v_error": 6.886305980398658e-15
+        },
+        "arrival_apoapsis_rk4": {
+          "apsis_at_final": true,
+          "r_b": 200.0,
+          "r_final": 199.999991565726,
+          "rel_r_error": 4.2171368193066886e-08,
+          "rel_v_error": 4.2168274012053245e-08,
+          "v_ellipse1_at_rb": 0.007053456158586011,
+          "v_final_mag": 0.007053456456
+        },
+        "arrival_periapsis_analytic": {
+          "rel_r_error": 3.552713678800501e-16,
+          "rel_v_error": 0.0
+        },
+        "arrival_periapsis_rk4": {
+          "apsis_at_final": true,
+          "r2": 20.0,
+          "r_final": 19.999999996081,
+          "rel_r_error": 1.9594512679077525e-10,
+          "rel_v_error": 1.9261497429231822e-10,
+          "v_ellipse2_at_r2": 0.30151134457776363,
+          "v_final_mag": 0.301511344636
+        },
+        "burn1": {
+          "dv1": 0.41069123171719646,
+          "v_circ_r1": 1.0,
+          "v_ellipse_r1": 1.4106912317171965
+        },
+        "burn2": {
+          "dv2": 0.02309767829919036,
+          "dv2_measured": 0.023097678002,
+          "rel_dv2_error": 1.2877141660905901e-08,
+          "v_ellipse1_at_rb": 0.007053456158586011,
+          "v_ellipse2_at_rb": 0.030151134457776372
+        },
+        "burn3": {
+          "dv3": 0.07790454682778467,
+          "dv3_measured": 0.077904546886,
+          "rel_dv3_error": 7.454712497470761e-10,
+          "v_circ_r2": 0.22360679774997896,
+          "v_ellipse2_at_r2": 0.30151134457776363
+        },
+        "case": {
+          "R": 20.0,
+          "e1": 0.990049751244,
+          "e2": 0.818181818182,
+          "mu": 1.0,
+          "r1": 1.0,
+          "r2": 20.0,
+          "r_b": 200.0,
+          "s": 200.0,
+          "steps_leg1": 257923,
+          "steps_leg2": 3303,
+          "t1": 3165.184026425056,
+          "t2": 3624.423189674453
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.34383278280206e-12,
+          "energy": 4.1961e-08
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.505835704549099e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.4674443354761304e-11
+        }
+      }
+    ],
+    "saving_and_time": {
+      "asymptote_meas_at_1e4": 0.005645744715,
+      "asymptote_pred_at_1e4": 0.005857864376269049,
+      "asymptote_ratio": 0.963788908835294,
+      "large_R_asymptote": "(2 - sqrt(2))/sqrt(R)",
+      "peak_saving_at_R": 50.096221796037,
+      "peak_saving_over_v1": 0.04090366878,
+      "time_ratio_cases": [
+        {
+          "R": 2.0,
+          "s": 3.0,
+          "t_biell_over_t_hohmann": 3.691258132399
+        },
+        {
+          "R": 6.41,
+          "s": 30.0,
+          "t_biell_over_t_hohmann": 19.448777338826
+        },
+        {
+          "R": 14.0,
+          "s": 40.0,
+          "t_biell_over_t_hohmann": 11.34948390128
+        },
+        {
+          "R": 20.0,
+          "s": 100.0,
+          "t_biell_over_t_hohmann": 24.207342591093
+        }
+      ]
+    },
+    "shape_diagnostics": {
+      "hump_onset_R_approx": 9.531705443933,
+      "note": "the hump exists for intermediate R but never dips below dv_H for R < R_bp; the unique crossing for R_bp < R < R_star follows from the hump-plus-monotone-decrease structure",
+      "shapes": [
+        {
+          "R": 1.2,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.280282808188,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.365936724118,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.457321087467,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.554819278578,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.658840326835,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.769820626647,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 1.888225768226,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.014552490865,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.149330766872,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.293126024946,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.446541522288,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.61022087542,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.784850760311,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 2.971163793162,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 3.169941603913,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 3.382018115374,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 3.608283041744,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 3.849685621184,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 4.107238598108,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 4.382022471903,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 4.675190029892,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 4.987971183568,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 5.321678128382,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 5.67771084873,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 6.057562991243,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 6.462828131002,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 6.895206456996,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 7.356511904831,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 7.848679766653,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 8.373774810182,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 8.933999940926,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_increasing"
+        },
+        {
+          "R": 9.531705443933,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 10.169398843814,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 10.84975542445,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 11.575629452472,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 12.350066151627,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 13.176314478259,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 14.057840751493,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 14.998343195315,
+          "n_max": 1,
+          "n_min": 0,
+          "shape": "single_hump"
+        },
+        {
+          "R": 16.001767453552,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 17.072323142835,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 18.214501512999,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 19.433094289003,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 20.73321377342,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 22.120314293827,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 23.600215085082,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 25.179124702471,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 26.863667068159,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 28.660909260204,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 30.578391160726,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 32.6241570876,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 34.806789542394,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 37.135445216115,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 39.619893403828,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 42.270556989296,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 45.098556171599,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 48.115755117159,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 51.334811732895,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 54.76923076932,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 58.43342047636,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 62.342753049578,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 66.513629120395,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 70.963546560852,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 75.711173891579,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 80.776428600923,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 86.18056070381,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 91.946241890896,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 98.097660641994,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 104.660623702823,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 111.662664350783,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 119.133157903962,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 127.103444957973,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 135.606962867617,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 144.679386024978,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 154.358775522457,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 164.685738828605,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 175.703600146643,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 187.458582170379,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        },
+        {
+          "R": 200.0,
+          "n_max": 0,
+          "n_min": 0,
+          "shape": "monotone_decreasing"
+        }
+      ]
+    },
+    "theory_constants": {
+      "R_bp_bi_parabolic_crossover": 11.938765472646,
+      "R_star_always_cheaper_boundary": 15.581718738763,
+      "R_star_exp004_peak_cross_check": 15.581718736882,
+      "identity_d_ds_f_at_s_eq_R_equals_d_dR_dvH": {
+        "checks": [
+          {
+            "R": 1.5,
+            "d_dvH_dR": 0.26338541814,
+            "d_f_ds_at_corner": 0.263385418151,
+            "rel_diff": 4.24873501611296e-11
+          },
+          {
+            "R": 2.0,
+            "d_dvH_dR": 0.160010961731,
+            "d_f_ds_at_corner": 0.160010961717,
+            "rel_diff": 8.718365749189783e-11
+          },
+          {
+            "R": 6.41,
+            "d_dvH_dR": 0.012889119819,
+            "d_f_ds_at_corner": 0.012889119829,
+            "rel_diff": 7.116189732796507e-10
+          },
+          {
+            "R": 11.94,
+            "d_dvH_dR": 0.001438006553,
+            "d_f_ds_at_corner": 0.001438006558,
+            "rel_diff": 3.509061792065446e-09
+          },
+          {
+            "R": 15.0,
+            "d_dvH_dR": 0.000141716746,
+            "d_f_ds_at_corner": 0.000141716746,
+            "rel_diff": 4.317152595568244e-09
+          }
+        ],
+        "max_rel_diff": 4.317152595568244e-09
+      }
+    }
+  }
+}
