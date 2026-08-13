@@ -110,9 +110,12 @@ All runs in `experiment.py`, deterministic (no RNG):
    interior peak located by dense grid + parabolic refinement
    (R* = 15.5817, value 0.536258); digit-safe vs textbook forms.
 3. **Complete transfer propagated with RK4** (Exp 002 machinery) for
-   R ∈ {1.5, 6.41, 20} plus an inward case (R = 1.3825): burn 1 at r1 →
-   half-orbit coast → verify arrival radius, speed, radial velocity and
-   apside timing → burn 2 → one full orbit of the target circle verified.
+   R ∈ {1.5, 6.41, 20} plus a Venus-like ratio case (R = 1.3825) and a true
+   inward transfer (R = 0.5, r2 < r1): burn 1 at r1 → half-orbit coast →
+   verify arrival radius, speed, radial velocity and apside timing → burn 2
+   → one full orbit of the target circle verified. The analytic same-ellipse
+   reference is phase-shifted by a half-period for inward flights (which
+   start at apoapsis), so it always compares against the arrival apside.
 4. **Optimality scan (two-impulse family)** at R ∈ {2, 6.41, 20}: cost
    Δv1 + Δv2 with vector velocity mismatches (no tangency assumed) over a
    121 × 131 grid of transfer ellipses (r_p ≤ r1, r_a ≥ r2), plus 1D
@@ -202,9 +205,12 @@ R ≈ 5.88 (the circularization burn peaks for mid-ratio targets).
 | R = 1.5 | 0.200 | 358 | 4.5e-10 | 4.5e-10 | 1.5e-9 | 3.8e-9 | 4.5e-11 |
 | R = 6.41 | 0.730 | 1826 | 1.3e-9 | 1.3e-9 | 5.1e-9 | 1.4e-9 | 4.5e-11 |
 | R = 20 | 0.905 | 8711 | 4.2e-9 | 4.2e-9 | 2.4e-8 | 1.9e-9 | 4.5e-11 |
-| inward 1.383 | 0.161 | 333 | 4.7e-10 | 4.6e-10 | 1.5e-9 | 5.0e-9 | 4.5e-11 |
+| Venus-like 1.383 | 0.161 | 333 | 4.7e-10 | 4.6e-10 | 1.5e-9 | 5.0e-9 | 4.5e-11 |
+| inward R = 0.5 | 0.333 | 471 | 2.3e-10 | 2.2e-10 | 3.0e-10 | 1.7e-9 | 4.5e-11 |
 
-The analytic same-ellipse reference hits r2/v(r2) exactly (0 to 1.4e-16).
+The analytic same-ellipse reference hits r2/v(r2) exactly (0 to 1.4e-16) in
+both directions (for r2 < r1 the reference is the same ellipse one
+half-period later — the leg the inward flight actually flies).
 The apside (apoapsis outward, periapsis inward) is reached precisely at
 t_tr; the post-circularization orbit holds r2 to 4.5e-11 over one orbit.
 
@@ -268,3 +274,14 @@ decreases to its minimum at r_p = r1.
 - Numerical results are deterministic; re-running rewrites `results.json`
   with a fresh timestamp and generation commit (provenance), while the
   scientific output stays identical.
+
+### Change Log
+
+- 2026-08-13 (audit fix): `validate_transfer_rk4`'s analytic-arrival metric
+  was misleading for genuine inward transfers (r2 < r1): the closed-form
+  reference starts at periapsis while the inward flight starts at
+  apoapsis, so it compared against the departure apside. The reference is
+  now phase-shifted by a half-period for inward flights; a true inward
+  case (R = 0.5) was added to the committed RK4 validation set and to the
+  test suite (previously the "inward" case R = 1.3825 was actually an
+  outward-branch call). No closed-form results changed.

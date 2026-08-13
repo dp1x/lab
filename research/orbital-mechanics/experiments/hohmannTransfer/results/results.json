@@ -1,10 +1,10 @@
 {
   "meta": {
     "description": "Hohmann two-impulse transfer between coplanar circular orbits: closed-form dvs and transfer time verified from first principles, full radius-ratio sweep with asymptotes and the interior maximum, RK4 trajectory validation of the complete transfer, optimality scan over the two-impulse family, and real-system anchors (LEO->GEO, Earth->Mars, Earth->Venus) from IAU nominal constants.",
-    "git_commit": "898e6df",
+    "git_commit": "99b4032",
     "name": "hohmann_transfer",
     "python_version": "3.12.13",
-    "timestamp_utc": "2026-08-13T01:42:42+00:00"
+    "timestamp_utc": "2026-08-13T11:50:54+00:00"
   },
   "results": {
     "closed_form_budget_r1_1_r2_2": {
@@ -1117,6 +1117,54 @@
         "max_rel_drift": {
           "angular_momentum": 5.472003744094752e-12,
           "energy": 1.37e-10
+        },
+        "post_burn_circular_orbit": {
+          "radius_max_rel_variation": 4.505795736520213e-11,
+          "speed_rel_error_vs_sqrt_mu_r2": 4.4674708377101524e-11
+        }
+      },
+      {
+        "arrival_analytic": {
+          "r_final": 1.0,
+          "rel_r_error": 0.0,
+          "rel_v_error": 3.845925372767127e-16,
+          "v_final": 1.154700538379
+        },
+        "arrival_rk4": {
+          "apsis_at_final": true,
+          "r2": 1.0,
+          "r_final": 0.999999999772,
+          "rel_r_error": 2.2791635245766884e-10,
+          "rel_v_error": 2.2393477371742515e-10,
+          "v_final_mag": 1.154700538638,
+          "v_r2": 1.1547005383792517,
+          "v_radial": 3.51e-10,
+          "v_radial_over_v": 3.04e-10
+        },
+        "burn1": {
+          "dv1": 0.12975651199692176,
+          "v1_circ": 0.7071067811865476,
+          "v_after_burn": 0.5773502691896258
+        },
+        "burn2": {
+          "dv2": 0.15470053837925146,
+          "dv2_measured_against_v2": 0.154700538638,
+          "rel_dv2_error": 1.6714733415086308e-09,
+          "v2_circ": 1.0
+        },
+        "case": {
+          "R": 0.5,
+          "a_transfer": 1.5,
+          "e_transfer": 0.333333333333,
+          "mu": 1.0,
+          "r1": 2.0,
+          "r2": 1.0,
+          "steps_half_orbit": 471,
+          "transfer_time": 5.771474235728388
+        },
+        "max_rel_drift": {
+          "angular_momentum": 3.805158563815796e-12,
+          "energy": 2.12e-10
         },
         "post_burn_circular_orbit": {
           "radius_max_rel_variation": 4.505795736520213e-11,

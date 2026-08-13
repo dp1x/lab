@@ -18,8 +18,8 @@ burns at r1 and r2 on the half-ellipse with a_t = (r1+r2)/2, e_t = (r2−r1)/(r2
 Measured (μ = r1 = 1): Δv_total = (√(2R/(1+R)) − 1 + √(1/R)(1 − √(2/(1+R)))) · v1
 with R = r2/r1. On the verified RK4 machinery (Experiment 002), the complete
 burn → coast → burn transfer closes the target circle to relative radius error
-4.5e-10–4.2e-9 and 4.5e-11 in circularity across R ∈ {1.5, 6.41, 20} and the
-inward case.
+4.5e-10–4.2e-9 and 4.5e-11 in circularity across R ∈ {1.5, 6.41, 20}, a
+Venus-like ratio (R = 1.3825) and a true inward transfer (R = 0.5).
 
 ## Key quantitative facts (verified in Experiment 004)
 
@@ -36,7 +36,11 @@ inward case.
   at 0.1900·v1 near R = 5.88 and vanishes at both ends.
 - **Inward transfers**: exact burn-magnitude symmetry —
   Δv_total(r1, r2) = Δv_total(r2, r1) (numbers identical in the experiment); the
-  textbook formula set assumes r2 > r1, the inward case swaps burn order.
+  textbook formula set assumes r2 > r1, the inward case swaps burn order. When
+  validating a true inward flight (r2 < r1) against the closed-form ellipse,
+  remember kepler-style solutions start at periapsis while the flight starts
+  at apoapsis: compare against the same ellipse phase-shifted by a half-period
+  (the leg actually flown), or the analytic arrival metric is meaningless.
 - **Optimality**: within the two-impulse class with burns at r1, r2 (transfer
   ellipse r_p ≤ r1, r_a ≥ r2, tangency NOT assumed), the Hohmann corner is the
   strict minimum (121×131 grid gap ≤ 7.8e-16 at R ∈ {2, 6.41, 20}). Caveat:

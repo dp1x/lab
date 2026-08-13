@@ -220,16 +220,22 @@ def test_rk4_arrival_matches_closed_form():
 
 
 def test_inward_transfer_also_lands_on_target():
-    r = validate_transfer_rk4(1.0 / 1.3825, 1.0)  # Venus-like inward ratio
-    assert r["arrival_rk4"]["rel_r_error"] < 1e-6
-    assert r["arrival_rk4"]["rel_v_error"] < 1e-6
+    """True inward transfers (r2 < r1) must land on r2 with speed v_r2."""
+    for r1, r2 in ((1.0 / 1.3825, 1.0), (2.0, 1.0), (1.0, 0.5)):
+        r = validate_transfer_rk4(r1, r2)
+        assert r["arrival_rk4"]["rel_r_error"] < 1e-6
+        assert r["arrival_rk4"]["rel_v_error"] < 1e-6
+        assert r["arrival_rk4"]["v_radial_over_v"] < 1e-6
 
 
 def test_analytic_arrival_is_exact():
     """The closed-form transfer orbit (kepler_solution of the ellipse) must
     hit r2 with speed v_a at t_tr to machine precision - this validates the
-    transfer-ellipse algebra itself, independent of the integrator."""
-    for r1, r2 in ((1.0, 1.5), (1.0, 6.409676), (1.0, 20.0)):
+    transfer-ellipse algebra itself, independent of the integrator. Covered
+    for both directions (the inward flight starts at apoapsis, i.e. the
+    same ellipse a half-period later; the reference is phase-shifted)."""
+    for r1, r2 in ((1.0, 1.5), (1.0, 6.409676), (1.0, 20.0),
+                   (2.0, 1.0), (1.0, 0.5)):
         r = validate_transfer_rk4(r1, r2)
         assert r["arrival_analytic"]["rel_r_error"] < 1e-9
         assert r["arrival_analytic"]["rel_v_error"] < 1e-9

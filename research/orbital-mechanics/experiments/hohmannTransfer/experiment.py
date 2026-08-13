@@ -358,7 +358,13 @@ def validate_transfer_rk4(
     apsis_at_final = r_max_idx == len(states) - 1 or r_min_idx == len(states) - 1
 
     # Analytic reference for the same flight: the closed-form transfer orbit.
-    ana = kepler_solution(a_t, e_t, mu, t)
+    # kepler_solution starts at periapsis; the outward flight (r2 > r1) does
+    # too, but the inward flight (r2 < r1) starts at apoapsis, i.e. the same
+    # ellipse one half-period later. Shift the reference times accordingly so
+    # the analytic endpoint is the arrival apside (r2, v_r2), not the
+    # departure one (avoids a misleading 100 %/50 % mismatch for r2 < r1).
+    t_analytic = t + (t_tr if R < 1.0 else 0.0)
+    ana = kepler_solution(a_t, e_t, mu, t_analytic)
     ana_r_fin = np.hypot(ana[-1, 0], ana[-1, 1])
     ana_v_fin = np.hypot(ana[-1, 2], ana[-1, 3])
 
@@ -739,7 +745,8 @@ def main() -> dict:
         validate_transfer_rk4(1.0, 1.5),
         validate_transfer_rk4(1.0, 6.409676),
         validate_transfer_rk4(1.0, 20.0),
-        validate_transfer_rk4(1.0 / 1.3825, 1.0),  # inward (Venus-like ratio)
+        validate_transfer_rk4(1.0 / 1.3825, 1.0),  # Venus-like ratio (R = 1.3825)
+        validate_transfer_rk4(2.0, 1.0),  # inward (R = 0.5, r2 < r1)
     ]
     opt_cases = [
         optimality_scan(1.0, 2.0),
