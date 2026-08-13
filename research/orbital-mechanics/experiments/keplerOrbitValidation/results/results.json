@@ -1,10 +1,10 @@
 {
   "meta": {
     "description": "Validation of a two-body RK4 propagator against Kepler's three laws, conservation invariants, and an IAU-real-units Earth anchor.",
-    "git_commit": "e216b5c",
+    "git_commit": "2c3ee6d",
     "name": "kepler_orbit_validation",
     "python_version": "3.12.13",
-    "timestamp_utc": "2026-08-12T23:23:32+00:00"
+    "timestamp_utc": "2026-08-13T01:06:58+00:00"
   },
   "results": {
     "conservation": {
@@ -12,7 +12,7 @@
       "angular_momentum_analytic": 0.8,
       "e": 0.6,
       "energy_analytic": -0.5,
-      "max_rel_angular_momentum_drift": 7e-11,
+      "max_rel_angular_momentum_drift": 6.963624121780754e-11,
       "max_rel_energy_drift": 1.193e-09,
       "orbits": 10,
       "steps_per_orbit": 2024,
