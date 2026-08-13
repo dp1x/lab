@@ -117,6 +117,8 @@ hosted public document/dataset is fine when it is the source.)
 
 ## Current Priority
 
-Numerics foundation (001) is complete. Next: the orbital-mechanics flagship sequence
-(002 Kepler orbit validation), reusing `src/lab_utils/` and templates — do not rebuild
+Orbital-mechanics flagship sequence 001–005 is complete (numerics foundation,
+Kepler validation, Kepler solvers, Hohmann transfer, bi-elliptic vs Hohmann
+crossover). Next: 006 plane-change maneuvers, reusing `src/lab_utils/`, the Exp 002
+RK4 machinery, and the Exp 004/005 closed-form transfer costs — do not rebuild
 scaffolding. See `localdocs/roadmap.md`.
