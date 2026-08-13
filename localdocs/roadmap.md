@@ -35,7 +35,7 @@ Continue foundation work only where it directly serves the flagship.
 |---|-----------|----------|-----------|
 | 002 | Kepler orbit validation | Does Newtonian gravity reproduce elliptical orbits and Kepler's laws? | **COMPLETE** (2026-08-13): analytic conic pointwise (≤3e-6), equal areas (≤7.4e-5), T²/a³ = 4π²/μ (≤8.2e-9), invariants ≤1.2e-9 over 10 orbits, IAU Earth anchor 365.256898 d vs sidereal year |
 | 003 | Kepler's equation solvers | Newton vs bisection vs series; convergence study | **COMPLETE** (2026-08-13): Newton order 2 (≤9 iters at e ≤ 0.99), bisection halving 0.49992 (49–50 iters), series q_meas matches Watson q(e) ≤ 0.14%, cross-solver agreement ≤ 1.8e-13 |
-| 004 | Hohmann transfer | Least-fuel orbit-to-orbit transfer; Δv budget | Closed-form Δv equations |
+| 004 | Hohmann transfer | Least-fuel orbit-to-orbit transfer; Δv budget | **COMPLETE** (2026-08-13): closed forms vs RK4 (r/v err ≤ 4.2e-9), (R−1)/2 and √2−1 asymptotes (≤0.9999×, ≤2.4e-6), peak R* 15.5817 / 0.536258, inward symmetry 0.0, 2-impulse optimality grid gap ≤ 7.8e-16, LEO→GEO 3.9319 km/s, E→Mars 258.87 d / v∞ 2.945/2.649 / TMI 3.6114 km/s |
 | 005 | Bi-elliptic vs Hohmann | Crossover radius law (β > 15.58) | Closed-form comparison |
 | 006 | Plane-change maneuvers | Cost of changing inclination | Closed-form Δv |
 | 007 | Gravity assist / slingshot | Velocity boost from a flyby | Patched-conic / known flyby numbers |
