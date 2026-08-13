@@ -181,7 +181,9 @@ two-body idealization residual; e_measured = 0.01671123 vs JPL 0.01671123.
 
 ## Future Improvements
 
-- Kepler's equation solver study (roadmap 003): Newton vs bisection vs series.
+- Kepler solver internals now measured in detail (roadmap 003, complete):
+  Newton order 2, bisection halving 1/2, Fourier-Bessel series decay q(e);
+  Newton with the M + e sin M starter is the recommended path.
 - Add eccentric-anomaly-based uniform-time sampling to decouple step count
   from eccentricity (regularization in eccentric anomaly).
 - Hohmann transfer economics (roadmap 004), reusing this propagator.
