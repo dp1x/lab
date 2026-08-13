@@ -43,7 +43,10 @@ def _numpy_to_python(obj: Any) -> Any:
     if isinstance(obj, np.generic):
         return obj.item()
     if isinstance(obj, float):
-        return round(obj, 12)  # avoid float repr noise in saved JSON
+        # Cosmetic 12-decimal rounding of the JSON repr -- but never destroy
+        # small values: anything below 1e-10 keeps full precision (round would
+        # zero tol=1e-14 or gut 6.96e-11 to 7.0e-11).
+        return obj if abs(obj) < 1e-10 else round(obj, 12)
     return obj
 
 

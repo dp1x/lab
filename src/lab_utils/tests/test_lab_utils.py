@@ -68,3 +68,21 @@ def test_save_json_result_roundtrip():
         # Float rounded to 12 significant decimals to avoid repr noise.
         assert abs(data["results"]["metrics"]["error"] - 0.123456789012) < 1e-9
         assert "git_commit" in data["meta"]
+
+
+def test_save_json_result_preserves_small_values():
+    """Values below 1e-10 must survive byte-exact (tol, drift, history tails)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        path = save_json_result(
+            os.path.join(tmp, "out.json"),
+            {"tol": 1e-14, "drift": 6.96e-11, "residual": 1.77e-15},
+            name="test-small",
+        )
+        import json
+
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        r = data["results"]
+        assert r["tol"] == 1e-14
+        assert r["drift"] == 6.96e-11
+        assert r["residual"] == 1.77e-15
