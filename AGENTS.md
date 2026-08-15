@@ -119,6 +119,9 @@ hosted public document/dataset is fine when it is the source.)
 
 Orbital-mechanics flagship sequence 001–005 is complete (numerics foundation,
 Kepler validation, Kepler solvers, Hohmann transfer, bi-elliptic vs Hohmann
-crossover). Next: 006 plane-change maneuvers, reusing `src/lab_utils/`, the Exp 002
-RK4 machinery, and the Exp 004/005 closed-form transfer costs — do not rebuild
+crossover). Experiment 006 (plane-change maneuvers, including the combined
+transfer + plane change global optimum) is COMPLETE (2026-08-16) in
+`research/orbital-mechanics/experiments/planeChangeManeuvers/`. Next: 007
+gravity assist / slingshot, reusing `src/lab_utils/`, the Exp 002 RK4
+machinery, and the Exp 004/005/006 closed-form transfer costs — do not rebuild
 scaffolding. See `localdocs/roadmap.md`.
