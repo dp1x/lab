@@ -170,6 +170,28 @@ def test_finite_s_window_pinches_shut_near_R_6p5():
     assert co["regime"] == "infinite_s"
 
 
+def test_di_c_boundary_not_float_tie_artifact():
+    """REGRESSION (audit 2026-08-16): di_c(R) must not be reported at the
+    float64 tie point where the 3-burn delta-v merely equals the two-burn
+    delta-v to ~1e-7. At R = 1.05 the committed boundary was 11.24 deg, but
+    the 3-burn family is actually WORSE than two-burn there (mpmath 40-digit
+    confirms two-burn wins by 1e-7..3e-7 from 11 to 15 deg); the genuine
+    finite-s regime only opens near 17-18 deg (mpmath win +8.8e-5 at 18 deg).
+    The WIN_MARGIN (1e-5) suppresses the spurious sub-1e-7 'wins' so the
+    reported di_c(1.05) lands in [16, 19] deg, matching the high-precision
+    anchor."""
+    dc = di_c_boundary(1.05)
+    assert 16.0 <= dc <= 19.0, (
+        f"di_c(1.05) = {dc} deg is the float-tie artifact, not the robust "
+        f"boundary (mpmath-confirmed ~17-18 deg)"
+    )
+    # and just below the reported boundary the 3-burn must NOT be declared a
+    # winner, while just above it must be.
+    assert not combined_optimum(1.05, np.radians(dc - 0.5))["beats_two_burn"]
+    assert combined_optimum(1.05, np.radians(dc + 0.5))["beats_two_burn"]
+
+
+
 def test_di_c_monotone_decreasing_with_R_eventually():
     """di_c(R) (two-burn -> 3-burn) decreases toward 0 as R grows large
     (very large radius ratios make the bi-parabolic strategy win even for

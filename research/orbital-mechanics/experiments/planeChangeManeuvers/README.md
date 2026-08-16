@@ -167,22 +167,32 @@ Boundary highlights (R, di_c in deg, di_inf in deg):
 
 | R     | di_c   | di_inf  | finite-s window (deg) |
 |-------|--------|---------|-----------------------|
-| 1.05  | 11.24  | 60.17   | 48.93                 |
-| 2.00  | 36.17  | 57.35   | 21.18                 |
-| 4.00  | 40.81  | 47.89   | 7.08                  |
-| 6.41  | 37.88  | 38.42   | 0.54                  |
-| 6.43* | 37.85  | 37.85   | 0.00 (pinch)          |
-| 8.00  | ~31    | ~31     | 0 (no finite-s window)|
-| 12.00 | 8.75   | 8.75    | 0                     |
-| 20.00 | 0      | 0       | 0                     |
+| 1.05  | 17.01  | 60.17   | 43.15                 |
+| 2.00  | 37.88  | 57.35   | 19.47                 |
+| 4.00  | 41.85  | 48.53   | 6.68                  |
+| 6.21* | 38.74  | 38.74   | 0.00 (pinch)          |
+| 8.00  | 31.87  | 31.87   | 0 (no finite-s window)|
+| 12.00 | 0      | 0       | 0                     |
 
-(*) **The finite-s window pinches shut at R_pinch ~ 6.43** (window width
--> 0 between R = 6.42 and R = 6.43). This is the "abrupt behavior near
-R ~ 6.41" the prior investigation flagged: for R > 6.43 the only 3-burn
-regime that beats two-burn is the s->infinity one — no finite intermediate
-apoapsis is ever optimal. For small R the finite-s window is wide (21 deg at
-R = 2); di_inf(R) decreases monotonically and di_c(R) first rises (to ~40.9
-deg near R = 3.8) then falls toward 0 as R grows.
+(*) **The finite-s window pinches shut at R_pinch ~ 6.21** (window width
+-> 0 near R = 6.21). This is the "abrupt behavior near R ~ 6.41" the prior
+investigation flagged: for R > 6.21 the only 3-burn regime that beats
+two-burn is the s->infinity one — no finite intermediate apoapsis is ever
+optimal. For small R the finite-s window is wide (43 deg at R = 1.05, 19 deg
+at R = 2); di_inf(R) decreases monotonically and di_c(R) first rises (to
+~41.8 deg near R = 3.8) then falls toward 0 as R grows.
+
+> **Boundary-resolution note (audit 2026-08-16).** The regime boundary is
+> defined where the three-burn delta-v *robustly* beats the two-burn delta-v
+> by at least `WIN_MARGIN = 1e-5` (normalized units). A naive "first tie"
+> criterion (advantage ~1e-12) latched onto float64 grid-optimization noise
+> (~1e-7 near a near-tie) and reported di_c up to ~6 deg too low near R = 1
+> (e.g. 11.24 deg instead of the high-precision-verified ~17 deg at
+> R = 1.05). The 1e-5 margin sits two orders of magnitude above that noise
+> floor and well below the ~1e-4 genuine dip depth at the true boundary, so
+> the reported di_c is reproducible and matches a 40-digit mpmath anchor
+> (R = 1.05: no 3-burn win 11-15 deg, clear win +8.8e-5 at 18 deg).
+
 
 **Canonical finite-s dip**: R = 2, delta_i = 47.5 deg -> finite s* = 2.72,
 dv = 0.6501 (v1 units) vs two-burn 0.6618 — a **1.77% saving** (the prior

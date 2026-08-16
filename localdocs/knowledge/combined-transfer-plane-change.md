@@ -52,13 +52,21 @@ coplanar bi-parabolic limit of Exp 005 (verified to ~1e-16).
 
 | R     | di_c   | di_inf  | finite-s window |
 |-------|--------|---------|-----------------|
-| 1.05  | 11.24  | 60.17   | 48.93           |
-| 2.00  | 36.17  | 57.35   | 21.18           |
-| 4.00  | 40.81  | 47.89   | 7.08            |
-| 6.41  | 37.88  | 38.42   | 0.54            |
-| 6.43* | 37.85  | 37.85   | 0.00 (pinch)    |
-| 8.00  | ~31    | ~31     | 0               |
-| 12.00 | 8.75   | 8.75    | 0               |
+| 1.05  | 17.01  | 60.17   | 43.15           |
+| 2.00  | 37.88  | 57.35   | 19.47           |
+| 4.00  | 41.85  | 48.53   | 6.68            |
+| 6.21* | 38.74  | 38.74   | 0.00 (pinch)    |
+| 8.00  | 31.87  | 31.87   | 0               |
+| 12.00 | 0      | 0       | 0               |
+
+> **Boundary-resolution correction (audit 2026-08-16).** The earlier
+> published table (di_c(1.05) = 11.24 deg, pinch at R ~ 6.427) was wrong at
+> the float-noise tie. di_c is now defined at a robust 1e-5 win margin
+> (above the ~1e-7 grid-optimization noise), giving di_c(1.05) = 17.01 deg
+> (high-precision mpmath confirms no 3-burn win 11-15 deg, clear win at 18
+> deg) and pinch at R ~ 6.21. The three-regime structure, the s->infinity
+> identity, the R=2/47.5 deg dip (1.77%), and the SES-8 5.21% anchor are
+> unchanged.
 
 (*) Pinch at R ~ 6.427: window width -> 0. di_inf(R) decreases monotonically;
 di_c(R) rises to ~40.9 deg near R = 3.8 then falls to 0 as R grows.

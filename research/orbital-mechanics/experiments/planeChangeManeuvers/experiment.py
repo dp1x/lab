@@ -84,6 +84,17 @@ BASE_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = BASE_DIR / "results"
 FIG_DIR = RESULTS_DIR / "figures"
 
+# Margin (in normalized delta-v units) required for the three-burn family to
+# count as genuinely beating two-burn (or finite-s beating the s->inf limit).
+# The float64 grid optimizer's global minimum has a noise floor of ~1e-7 in
+# delta-v near a near-tie; advantages smaller than this are not reproducible
+# and would let float-grid artifacts define the regime boundary. A margin of
+# 1e-5 sits two orders of magnitude above that noise floor and well below the
+# ~1e-4 genuine dip depth at the true boundary, so it separates artifact from
+# reality. (Audit finding 2026-08-16: the prior 1e-12 threshold produced a
+# di_c(R) boundary at the float-tie point, in error by up to ~6 deg near R=1.)
+WIN_MARGIN = 1e-5
+
 
 # --------------------------------------------------------------------------- #
 # Small generic helpers
@@ -375,13 +386,13 @@ def combined_optimum(R, di, **kw):
     finite_dv = tb["total_dv"]
     # true 3-burn minimum: either a finite dip below the s->infinity limit, or
     # the s->infinity limit itself.
-    if finite_dv < inf - 1e-9:
+    if finite_dv < inf - WIN_MARGIN:
         three_dv = finite_dv
         three_regime = "finite_s"
     else:
         three_dv = inf
         three_regime = "infinite_s"
-    if three_dv < two - 1e-12:
+    if three_dv < two - WIN_MARGIN:
         winner = three_regime
         best_dv = three_dv
     else:
@@ -399,7 +410,7 @@ def combined_optimum(R, di, **kw):
         "three_burn_theta2_deg": float(tb["theta2_deg"]),
         "three_burn_theta3_deg": float(tb["theta3_deg"]),
         "bi_parabolic_limit_dv": float(inf),
-        "beats_two_burn": bool(three_dv < two - 1e-12),
+        "beats_two_burn": bool(three_dv < two - WIN_MARGIN),
     }
 
 
