@@ -22,7 +22,8 @@ and a second boundary di_inf(R) a **finite intermediate-apoapsis three-burn**
 free at the near-rest apoapsis and the cost is exactly the coplanar
 bi-parabolic value (sqrt(2)-1)(1 + 1/sqrt(R)), independent of delta_i.
 
-The finite-s window **pinches shut at R_pinch ~ 6.43**: for R > 6.43 the only
+The finite-s window **pinches shut at R_pinch ~ 6.21** (independently
+re-confirmed in the 2026-08-17 adversarial audit): for R > 6.21 the only
 three-burn regime that beats two-burn is the s->infinity one — no finite
 intermediate apoapsis is ever optimal. This resolves the prior investigation's
 "abrupt behavior near R ~ 6.41".
@@ -68,7 +69,7 @@ coplanar bi-parabolic limit of Exp 005 (verified to ~1e-16).
 > identity, the R=2/47.5 deg dip (1.77%), and the SES-8 5.21% anchor are
 > unchanged.
 
-(*) Pinch at R ~ 6.427: window width -> 0. di_inf(R) decreases monotonically;
+(*) Pinch at R ~ 6.21: window width -> 0. di_inf(R) decreases monotonically;
 di_c(R) rises to ~40.9 deg near R = 3.8 then falls to 0 as R grows.
 
 ### Methodological lesson
@@ -111,7 +112,7 @@ optimum s* -> infinity at delta_i >= 60 deg, cost -> 2(sqrt(2)-1).
   vs split) is insufficient — a finite-s intermediate optimum genuinely beats
   two-burn for moderate R and mid-range delta_i.
 - The s->infinity (super-synchronous) strategy is the winning 3-burn for large
-  delta_i at all R, and for ALL 3-burn-winning cases once R > 6.43.
+  delta_i at all R, and for ALL 3-burn-winning cases once R > 6.21.
 - Non-unimodality in s is the key numerical trap; global grid search + analytic
   limit is the correct solver. RK4 trajectory validation (independent 3D
   Cowell) reproduces the closed-form burns and final inclined circular orbit to

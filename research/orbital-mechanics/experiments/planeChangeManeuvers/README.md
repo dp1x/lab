@@ -229,7 +229,7 @@ vs delta_i, showing the dip and divergence).
   phasing constraints (the super-synchronous 5% saving is a delta-v optimum,
   not a mission delta-v; the time penalty is unbounded as s -> infinity).
 - The regime boundaries are located numerically (bisection, tol 1e-4 deg) over
-  a discrete R grid; the pinch R ~ 6.43 is bracketed to ~1e-3 in R, not proved
+  a discrete R grid; the pinch R ~ 6.21 is bracketed to ~1e-3 in R, not proved
   analytically.
 - The 3D RK4 validation uses a custom Cowell integrator (independent of Exp
   002's planar propagator); both are first-principles but the 3D one is new
