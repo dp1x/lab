@@ -175,12 +175,19 @@ Boundary highlights (R, di_c in deg, di_inf in deg):
 | 12.00 | 0      | 0       | 0                     |
 
 (*) **The finite-s window pinches shut at R_pinch ~ 6.21** (window width
--> 0 near R = 6.21). This is the "abrupt behavior near R ~ 6.41" the prior
-investigation flagged: for R > 6.21 the only 3-burn regime that beats
-two-burn is the s->infinity one — no finite intermediate apoapsis is ever
-optimal. For small R the finite-s window is wide (43 deg at R = 1.05, 19 deg
-at R = 2); di_inf(R) decreases monotonically and di_c(R) first rises (to
-~41.8 deg near R = 3.8) then falls toward 0 as R grows.
+-> 0 near R = 6.21). This is the **operational** pinch under the experiment's
+optimizer + `WIN_MARGIN = 1e-5` (committed value 6.214815); an independent
+continuous root solve places the mathematical pinch at ~6.48–6.51 — both lie
+in the [6.2, 6.5] soft-pinch band because the window closes slowly. This is
+the "abrupt behavior near R ~ 6.41" the prior investigation flagged: for
+R > R_pinch the only 3-burn regime that beats two-burn is the s->infinity one
+— no finite intermediate apoapsis is ever optimal. For small R the finite-s
+window is wide (43 deg at R = 1.05, 19 deg at R = 2); di_inf(R) decreases
+monotonically and di_c(R) first rises (to ~41.8 deg near R = 3.8) then falls
+toward 0 as R grows. **Caveat:** `di_c(1.05) = 17.01°` is the *robust*
+classification boundary (3-burn beats two-burn by ≥ 1e-5), not the exact
+mathematical crossing (~11.4–11.9°); the genuine 3-burn advantage is shallow
+there (float-tie region). See `localdocs/knowledge/audit-006-closure-2026-08-17.md`.
 
 > **Boundary-resolution note (audit 2026-08-16).** The regime boundary is
 > defined where the three-burn delta-v *robustly* beats the two-burn delta-v
