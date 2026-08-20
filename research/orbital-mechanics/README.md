@@ -20,8 +20,8 @@ checks and real-world data (NASA/JPL Horizons) as ultimate validation.
 | 003 | Kepler's equation solvers | **complete** | Newton vs bisection vs series; convergence study |
 | 004 | Hohmann transfer | **complete** | Least-fuel orbit-to-orbit transfer; Δv budget |
 | 005 | Bi-elliptic vs Hohmann | **complete** | When do three burns beat two? (R_bp = 11.94, R* = 15.58) |
-| 006 | Plane-change maneuvers | planned | Cost of changing inclination |
-| 007 | Gravity assist / slingshot | planned | Free velocity boost from a flyby |
+| 006 | Plane-change maneuvers | **complete** (audited 2026-08-17) | Cost of changing inclination; three regimes, boundaries + pinch |
+| 007 | Gravity assist / slingshot | **complete** | Max heliocentric energy change from an unpowered flyby (patched conic) |
 | 008 | Ground tracks | planned | The path a satellite traces over Earth |
 | 009 | J2 precession | planned | Orbit-node drift from Earth's bulge |
 | 010 | Orbit decay | planned | Drag over time → re-entry timeline |
