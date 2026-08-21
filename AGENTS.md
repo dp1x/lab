@@ -115,6 +115,20 @@ hosted public document/dataset is fine when it is the source.)
 7. Write an Obsidian note in `localdocs/knowledge/` (link to prior notes).
 8. `git add` + commit (message describes what was verified).
 
+## Remote-State Safety
+
+- **Before any automated push:** verify the live remote tip immediately beforehand
+  (`git ls-remote origin <branch>` or equivalent). Never assume the local
+  `origin/<branch>` ref is current — it can be stale.
+- Compare the live remote tip against the intended push target. If the remote changed
+  unexpectedly, **STOP and reconcile**; never overwrite another agent's or the owner's
+  work blindly.
+- For history-rewriting operations, use `--force-with-lease=<expected-remote-tip>` only;
+  never plain `--force`. After pushing, re-verify: remote tip == local HEAD, clean tree,
+  and (where applicable) GitHub signature/verification state.
+- Commit only from a verified-clean tree; never commit unrelated files, and keep the
+  canonical Git identity (no repo-local identity overrides).
+
 ## Current Priority
 
 Orbital-mechanics flagship: experiments 001–009 are complete (numerics
