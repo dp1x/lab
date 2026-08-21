@@ -1,0 +1,473 @@
+{
+  "meta": {
+    "description": "Spherical-Earth ground tracks: Keplerian ECI to ECEF spherical lat/lon, dual-algebra cross-check, invariant and RK4 validation, real anchors.",
+    "git_commit": "2e93371",
+    "name": "ground_tracks",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-21T03:15:57+00:00"
+  },
+  "results": {
+    "a_geo_exact_km": 42164.169461861835,
+    "constants": {
+      "GMST0_deg": 0.0,
+      "GMST0_rad": 0.0,
+      "MU_EARTH_km3s2": 398600.4418,
+      "OMEGA_EARTH_rad_s": 7.2921159e-05,
+      "R_EARTH_km": 6378.137,
+      "T_SIDEREAL_days": 0.997269560217,
+      "T_SIDEREAL_s": 86164.09000273276,
+      "frame_convention": "ECI J2000 pseudo-inertial (Z=CIP, X=\u03b3), ECEF WGS-84 (Z=CIP, X=Greenwich), t0 epoch, GMST0=0, R_z_passive(\u03b8)=[[c,s,0],[-s,c,0],[0,0,1]], r_ecef=R\u00b7r_eci, \u03bb=atan2(y_ecef,x_ecef) wrapped (-180,180]",
+      "units": "km, km\u00b3/s\u00b2, rad, s (angles internal rad, I/O deg)"
+    },
+    "figures": [
+      "ground_tracks_map.png",
+      "lat_lon_vs_time.png",
+      "delta_lon_vs_altitude.png",
+      "rk4_convergence.png"
+    ],
+    "headline": {
+      "GEO_5orbit_err_deg": 1.2789769243681803e-12,
+      "GEO_period_match_rel": 8.444303901953428e-16,
+      "convergence_mean_order": 4.058300213353,
+      "delta_lon_err_deg_over_all": 0.0,
+      "max_lat_err_deg_over_all": 1.3012067e-05,
+      "pathological_all_finite": true,
+      "propagation_max_dlat_deg": 0.000187369598,
+      "propagation_max_dlon_deg": 0.000649480025,
+      "trig_vs_matrix_max_dlat_deg": 2.2737367544323206e-13,
+      "trig_vs_matrix_max_dlon_deg": 1.1368683772161603e-13,
+      "trig_vs_matrix_max_great_circle_rad": 2.1073e-08
+    },
+    "meta": {
+      "description": "Spherical-Earth ground tracks: Kepler ECI to ECEF lat/lon via two independent algebras, validated against invariants and 3-D RK4 propagation, with real LEO/GEO/Molniya anchors.",
+      "experiment": "groundTracks"
+    },
+    "orbits": {
+      "Equatorial_LEO": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.064278058695,
+        "T_min": 92.56040452087,
+        "T_sec": 5553.624271252228,
+        "a_km": 6778.137,
+        "delta_lon_deg": -23.203456771694,
+        "delta_lon_wrapped_deg": -23.203456771694,
+        "description": "Equatorial LEO (400 km, 0\u00b0) \u2014 degenerate \u03c6\u22610, \u03bb linear",
+        "e": 0.0,
+        "inc_deg": 0.0,
+        "max_lat_theory_deg": 0.0,
+        "omega_deg": 0.0
+      },
+      "GEO": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.997269560217,
+        "T_min": 1436.068166712211,
+        "T_sec": 86164.09000273269,
+        "a_geo_exact": true,
+        "a_km": 42164.169461861835,
+        "delta_lon_deg": -360.0,
+        "delta_lon_wrapped_deg": 2.8421709430404007e-13,
+        "description": "Geostationary (a=42164.2 km \u2261 R_E+35786 km, 0\u00b0) \u2014 stationary point",
+        "e": 0.0,
+        "inc_deg": 0.0,
+        "max_lat_theory_deg": 0.0,
+        "omega_deg": 0.0
+      },
+      "GEO_inclined": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.997269560217,
+        "T_min": 1436.068166712211,
+        "T_sec": 86164.09000273269,
+        "a_km": 42164.169461861835,
+        "delta_lon_deg": -360.0,
+        "delta_lon_wrapped_deg": 2.8421709430404007e-13,
+        "description": "Inclined GEO (5\u00b0) \u2014 figure-8 lat \u00b15\u00b0, lon small",
+        "e": 0.0,
+        "inc_deg": 5.0,
+        "max_lat_theory_deg": 5.0,
+        "omega_deg": 0.0
+      },
+      "ISS": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.064562762816,
+        "T_min": 92.970378454535,
+        "T_sec": 5578.222707272112,
+        "a_km": 6798.137,
+        "delta_lon_deg": -23.306230873607,
+        "delta_lon_wrapped_deg": -23.306230873607,
+        "description": "ISS-like LEO (420 km, 51.6\u00b0) \u2014 latitude-band test, real mean TLE ~51.64\u00b0/408-420 km",
+        "e": 0.0003,
+        "inc_deg": 51.6,
+        "max_lat_theory_deg": 51.6,
+        "omega_deg": 0.0
+      },
+      "Molniya": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.498585155566,
+        "T_min": 717.962624014399,
+        "T_sec": 43077.75744086394,
+        "a_km": 26560.0,
+        "delta_lon_deg": -179.982086252163,
+        "delta_lon_wrapped_deg": -179.982086252163,
+        "description": "Molniya-like (a=26560 km, e=0.74, 63.4\u00b0, \u03c9=270\u00b0) \u2014 elliptical dwell, connects to Exp 012",
+        "e": 0.74,
+        "inc_deg": 63.4,
+        "max_lat_theory_deg": 63.4,
+        "omega_deg": 270.0
+      },
+      "Polar_LEO": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.065705764219,
+        "T_min": 94.616300475431,
+        "T_sec": 5676.978028525858,
+        "a_km": 6878.137,
+        "delta_lon_deg": -23.718837977683,
+        "delta_lon_wrapped_deg": -23.718837977683,
+        "description": "Polar LEO (500 km, 90\u00b0) \u2014 pole singularity, covers all latitudes",
+        "e": 0.0,
+        "inc_deg": 90.0,
+        "max_lat_theory_deg": 90.0,
+        "omega_deg": 0.0
+      },
+      "Retro_LEO": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.064278058695,
+        "T_min": 92.56040452087,
+        "T_sec": 5553.624271252228,
+        "a_km": 6778.137,
+        "delta_lon_deg": -23.203456771694,
+        "delta_lon_wrapped_deg": -23.203456771694,
+        "description": "Retrograde equatorial (400 km, 180\u00b0) \u2014 \u03c6\u22610 same but opposite node handling",
+        "e": 0.0,
+        "inc_deg": 180.0,
+        "max_lat_theory_deg": 0.0,
+        "omega_deg": 0.0
+      },
+      "SSO": {
+        "M0_deg": 0.0,
+        "Omega_deg": 0.0,
+        "T_days": 0.067143886411,
+        "T_min": 96.687196432109,
+        "T_sec": 5801.231785926518,
+        "a_km": 6978.137,
+        "delta_lon_deg": -24.237979451385,
+        "delta_lon_wrapped_deg": -24.237979451385,
+        "description": "SSO-like LEO (600 km, 98\u00b0) \u2014 retrograde, near-repeating",
+        "e": 0.0,
+        "inc_deg": 98.0,
+        "max_lat_theory_deg": 82.0,
+        "omega_deg": 0.0
+      }
+    },
+    "validation": {
+      "convergence": {
+        "T_sec": 5578.222707272112,
+        "max_errors_deg": [
+          8.6259425e-05,
+          5.040765e-06,
+          3.04013e-07,
+          1.8655e-08
+        ],
+        "max_errors_rad": [
+          1.505511e-06,
+          8.7978e-08,
+          5.306e-09,
+          3.26e-10
+        ],
+        "mean_order": 4.058300213353,
+        "measured_order_per_interval": [
+          4.096967587377,
+          4.051436403721,
+          4.026496648961
+        ],
+        "steps_per_orbit": [
+          128,
+          256,
+          512,
+          1024
+        ],
+        "stepsizes_sec": [
+          43.579864900563,
+          21.789932450282,
+          10.894966225141,
+          5.44748311257
+        ]
+      },
+      "invariants": {
+        "Equatorial_LEO": {
+          "delta_lon_analytic_deg": -23.203456771694,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": 336.796543228305,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 0.0,
+          "max_lat_err_rad": 0.0,
+          "max_lat_measured_deg": 0.0,
+          "max_lat_theory_deg": 0.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 2.6836126262214185e-16
+        },
+        "GEO": {
+          "delta_lon_analytic_deg": -360.0,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": 2.5579538487363607e-13,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": 8.526512829121202e-13,
+          "max_lat_err_deg": 0.0,
+          "max_lat_err_rad": 0.0,
+          "max_lat_measured_deg": 0.0,
+          "max_lat_theory_deg": 0.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 1.725625740301762e-16
+        },
+        "GEO_inclined": {
+          "delta_lon_analytic_deg": -360.0,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": 2.5579538487363607e-13,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": 0.218443095986,
+          "max_lat_err_deg": 8.881784197001252e-16,
+          "max_lat_err_rad": 1.5501637768927253e-17,
+          "max_lat_measured_deg": 5.0,
+          "max_lat_theory_deg": 5.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 3.451251480603524e-16
+        },
+        "ISS": {
+          "delta_lon_analytic_deg": -23.306230873607,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": 336.693769126393,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 1.3012067e-05,
+          "max_lat_err_rad": 2.27103e-07,
+          "max_lat_measured_deg": 51.599986987933,
+          "max_lat_theory_deg": 51.6,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 2.676518941982701e-16
+        },
+        "Molniya": {
+          "delta_lon_analytic_deg": -179.982086252163,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": 180.017913747837,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 1.4210854715202004e-14,
+          "max_lat_err_rad": 2.4802620430283604e-16,
+          "max_lat_measured_deg": 63.4,
+          "max_lat_theory_deg": 63.4,
+          "pts_per_orbit": 5430,
+          "r_preserve_max_rel": 3.9653169558235427e-16
+        },
+        "Polar_LEO": {
+          "delta_lon_analytic_deg": -23.718837977683,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": -23.718837977683,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 0.0,
+          "max_lat_err_rad": 0.0,
+          "max_lat_measured_deg": 90.0,
+          "max_lat_theory_deg": 90.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 2.6445960636519113e-16
+        },
+        "Retro_LEO": {
+          "delta_lon_analytic_deg": -23.203456771694,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": -383.203456771695,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 7.0167092985348775e-15,
+          "max_lat_err_rad": 1.2246467991473535e-16,
+          "max_lat_measured_deg": 7.0167092985348775e-15,
+          "max_lat_theory_deg": 0.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 2.6836126262214185e-16
+        },
+        "SSO": {
+          "delta_lon_analytic_deg": -24.237979451385,
+          "delta_lon_err_deg": 0.0,
+          "delta_lon_err_rad": 0.0,
+          "delta_lon_measured_deg": -384.237979451385,
+          "has_nan_or_inf": false,
+          "lon_variation_deg_for_GEO": null,
+          "max_lat_err_deg": 2.842170943040401e-14,
+          "max_lat_err_rad": 4.960524086056721e-16,
+          "max_lat_measured_deg": 82.0,
+          "max_lat_theory_deg": 82.0,
+          "pts_per_orbit": 720,
+          "r_preserve_max_rel": 2.6066977526320516e-16
+        }
+      },
+      "pathological": {
+        "all_finite_and_bounded": true,
+        "antimeridian_max_step_deg": 0.467772976706,
+        "antimeridian_ok": true,
+        "es_tested": [
+          0.0,
+          1e-12,
+          0.3,
+          0.6,
+          0.74,
+          0.8
+        ],
+        "failures": [],
+        "incs_tested_deg": [
+          0.0,
+          0.01,
+          30.0,
+          51.6,
+          63.4,
+          89.9,
+          90.0,
+          90.1,
+          98.0,
+          120.0,
+          179.9,
+          180.0
+        ]
+      },
+      "propagation_vs_analytic": {
+        "Equatorial_LEO": {
+          "N_total": 2561,
+          "max_abs_dlat_deg": 0.0,
+          "max_abs_dlat_rad": 0.0,
+          "max_abs_dlon_deg": 1.263334e-06,
+          "max_abs_dlon_rad": 2.2049e-08,
+          "max_r_rel_err": 9.28e-10,
+          "num_orbits": 5,
+          "pts_per_orbit": 512
+        },
+        "GEO": {
+          "N_total": 2561,
+          "max_abs_dlat_deg": 0.0,
+          "max_abs_dlat_rad": 0.0,
+          "max_abs_dlon_deg": 1.26334e-06,
+          "max_abs_dlon_rad": 2.2049e-08,
+          "max_r_rel_err": 9.28e-10,
+          "num_orbits": 5,
+          "pts_per_orbit": 512
+        },
+        "ISS": {
+          "N_total": 2561,
+          "max_abs_dlat_deg": 9.89905e-07,
+          "max_abs_dlat_rad": 1.7277e-08,
+          "max_abs_dlon_deg": 1.972874e-06,
+          "max_abs_dlon_rad": 3.4433e-08,
+          "max_r_rel_err": 9.28e-10,
+          "num_orbits": 5,
+          "pts_per_orbit": 512
+        },
+        "Molniya": {
+          "N_total": 6145,
+          "max_abs_dlat_deg": 0.000187369598,
+          "max_abs_dlat_rad": 3.270216e-06,
+          "max_abs_dlon_deg": 0.000649480025,
+          "max_abs_dlon_rad": 1.1335565e-05,
+          "max_r_rel_err": 1.464367e-06,
+          "num_orbits": 3,
+          "pts_per_orbit": 2048
+        },
+        "Polar_LEO": {
+          "N_total": 2561,
+          "max_abs_dlat_deg": 1.263341e-06,
+          "max_abs_dlat_rad": 2.2049e-08,
+          "max_abs_dlon_deg": 5.684341886080802e-14,
+          "max_abs_dlon_rad": 9.921048172113442e-16,
+          "max_r_rel_err": 9.28e-10,
+          "num_orbits": 5,
+          "pts_per_orbit": 512
+        }
+      },
+      "repeat": {
+        "12h_2orbit_expected_unwrapped_deg": 360.0,
+        "12h_2orbit_expected_wrapped_deg": 0.0,
+        "12h_2orbit_measured_deg": 360.0,
+        "12h_T_sec": 43082.04500136634,
+        "12h_a_km": 26561.762328167155,
+        "12h_err_unwrapped_deg": 3.979039320256561e-13,
+        "12h_err_wrapped_deg": 4.547473508864641e-13,
+        "GEO_5orbit_err_deg": 1.2789769243681803e-12,
+        "GEO_5orbit_err_wrapped_deg": 1.2789769243681803e-12,
+        "GEO_5orbit_expected_deg": 0.0,
+        "GEO_5orbit_measured_delta_deg": 1.2789769243681803e-12,
+        "GEO_T_sec": 86164.09000273269,
+        "GEO_T_vs_Tsid_rel_err": 8.444303901953428e-16,
+        "GEO_a_km": 42164.169461861835,
+        "GEO_wrapped_variation_deg": 1.4779288903810084e-12
+      },
+      "trig_vs_matrix": {
+        "Equatorial_LEO": {
+          "max_abs_dlat_deg": 0.0,
+          "max_abs_dlat_rad": 0.0,
+          "max_abs_dlon_deg": 5.684341886080802e-14,
+          "max_abs_dlon_rad": 9.921048172113442e-16,
+          "max_great_circle_rad": 0.0
+        },
+        "GEO": {
+          "max_abs_dlat_deg": 0.0,
+          "max_abs_dlat_rad": 0.0,
+          "max_abs_dlon_deg": 2.842170943040401e-14,
+          "max_abs_dlon_rad": 4.960524086056721e-16,
+          "max_great_circle_rad": 0.0
+        },
+        "GEO_inclined": {
+          "max_abs_dlat_deg": 1.7763568394002505e-15,
+          "max_abs_dlat_rad": 3.1003275537854505e-17,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 1.4901e-08
+        },
+        "ISS": {
+          "max_abs_dlat_deg": 2.1316282072803006e-14,
+          "max_abs_dlat_rad": 3.720393064542541e-16,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 2.1073e-08
+        },
+        "Molniya": {
+          "max_abs_dlat_deg": 3.552713678800501e-14,
+          "max_abs_dlat_rad": 6.200655107570901e-16,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 2.1073e-08
+        },
+        "Polar_LEO": {
+          "max_abs_dlat_deg": 2.2737367544323206e-13,
+          "max_abs_dlat_rad": 3.968419268845377e-15,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 2.1073e-08
+        },
+        "Retro_LEO": {
+          "max_abs_dlat_deg": 3.1554436208840472e-30,
+          "max_abs_dlat_rad": 5.507288054547833e-32,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 0.0
+        },
+        "SSO": {
+          "max_abs_dlat_deg": 7.105427357601002e-14,
+          "max_abs_dlat_rad": 1.2401310215141802e-15,
+          "max_abs_dlon_deg": 1.1368683772161603e-13,
+          "max_abs_dlon_rad": 1.9842096344226883e-15,
+          "max_great_circle_rad": 2.1073e-08
+        }
+      }
+    }
+  }
+}

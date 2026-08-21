@@ -117,13 +117,15 @@ hosted public document/dataset is fine when it is the source.)
 
 ## Current Priority
 
-Orbital-mechanics flagship: experiments 001–007 are complete (numerics
+Orbital-mechanics flagship: experiments 001–008 are complete (numerics
 foundation, Kepler validation, Kepler solvers, Hohmann transfer, bi-elliptic
-vs Hohmann crossover, combined transfer + plane change, gravity assist).
-Experiment 006 was adversarially audited + closed (2026-08-17); a synthesis
-report for 001–006 is in `localdocs/reports/`. Experiment 007 (gravity assist,
-patched-conic) is COMPLETE (2026-08-21) in
-`research/orbital-mechanics/experiments/gravityAssist/`. Next: 008 ground
-tracks, reusing `src/lab_utils/`, the Exp 002 RK4 machinery, and the Exp
-004–007 closed-form machinery — do not rebuild scaffolding. See
+vs Hohmann crossover, combined transfer + plane change, gravity assist,
+ground tracks). Experiment 006 was adversarially audited + closed (2026-08-17);
+a synthesis report for 001–006 is in `localdocs/reports/`. Experiment 007
+(gravity assist, patched-conic) is COMPLETE (2026-08-21) in
+`research/orbital-mechanics/experiments/gravityAssist/`; Experiment 008
+(ground tracks, spherical-Earth) is COMPLETE (2026-08-21) in
+`research/orbital-mechanics/experiments/groundtracks/`. Next: 009 J2
+precession, reusing `src/lab_utils/`, the Exp 002 RK4 machinery, and the
+Exp 004–008 closed-form machinery — do not rebuild scaffolding. See
 `localdocs/roadmap.md`.

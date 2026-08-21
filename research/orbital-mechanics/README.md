@@ -22,7 +22,7 @@ checks and real-world data (NASA/JPL Horizons) as ultimate validation.
 | 005 | Bi-elliptic vs Hohmann | **complete** | When do three burns beat two? (R_bp = 11.94, R* = 15.58) |
 | 006 | Plane-change maneuvers | **complete** (audited 2026-08-17) | Cost of changing inclination; three regimes, boundaries + pinch |
 | 007 | Gravity assist / slingshot | **complete** | Max heliocentric energy change from an unpowered flyby (patched conic) |
-| 008 | Ground tracks | planned | The path a satellite traces over Earth |
+| 008 | Ground tracks | **complete** (2026-08-21) | Spherical-Earth ground track: dual-algebra lat/lon, invariants + RK4 + real LEO/GEO/Molniya anchors |
 | 009 | J2 precession | planned | Orbit-node drift from Earth's bulge |
 | 010 | Orbit decay | planned | Drag over time → re-entry timeline |
 | 011 | Lagrange points | planned | 3-body stability zones |
