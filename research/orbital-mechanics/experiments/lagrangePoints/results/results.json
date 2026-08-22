@@ -1,0 +1,1308 @@
+{
+  "meta": {
+    "description": "Experiment 011: CR3BP Lagrange points - equilibria, Jacobi integral, stability, adversarial validation",
+    "git_commit": "42cd75e",
+    "name": "lagrange_points_cr3bp",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-22T21:25:49+00:00"
+  },
+  "results": {
+    "adversarial": {
+      "all_mutants_caught": true,
+      "clean_relative_residual": 2.898636695071012e-13,
+      "coriolis_flip_max_eigen_shift": 0.0,
+      "horizon": 1.0,
+      "mutant_caught": {
+        "body_swap_domain_rejected": true,
+        "centrifugal_drop": true,
+        "coriolis_flip": true,
+        "mapping_sign_flip": true,
+        "mu_convention_gamma_rel_shift": true,
+        "planar_frozen_jacobi": true
+      },
+      "mutant_signals": {
+        "body_swap_domain_rejected": 1.0,
+        "centrifugal_drop": 0.553916114239,
+        "coriolis_flip": 0.188487751211,
+        "mapping_sign_flip": 1.286873165087,
+        "mu_convention_gamma_rel_shift": 0.003865439529,
+        "planar_frozen_jacobi": 0.012522413655
+      },
+      "mutant_thresholds": {
+        "body_swap_domain_rejected": 0.5,
+        "centrifugal_drop": 1e-06,
+        "coriolis_flip": 0.01,
+        "mapping_sign_flip": 0.01,
+        "mu_convention_gamma_rel_shift": 1e-12,
+        "planar_frozen_jacobi": 1e-06
+      },
+      "n_steps": 1000,
+      "spatial_true_drift": 8.881784197001252e-16
+    },
+    "bridge_drift_law": {
+      "drift_law_mismatch_reduction_ratio": 16.007506445483,
+      "n_16384": {
+        "EI_drift_integral_predicted": 9.0349652e-05,
+        "EI_drift_measured": 9.0349686e-05,
+        "bridge_identity_max": 1.3322676295501878e-15,
+        "c_drift": 8.881784197001252e-16,
+        "drift_law_rel_mismatch": 3.67353e-07,
+        "identity_E_plus_C2_minus_Lz_max": 5.551115123125783e-16
+      },
+      "n_4096": {
+        "EI_drift_integral_predicted": 9.0349155e-05,
+        "EI_drift_measured": 9.0349686e-05,
+        "bridge_identity_max": 8.881784197001252e-16,
+        "c_drift": 8.881784197001252e-16,
+        "drift_law_rel_mismatch": 5.880413e-06,
+        "identity_E_plus_C2_minus_Lz_max": 5.551115123125783e-16
+      }
+    },
+    "constants": {
+      "AU_KM": 149597870.7,
+      "A_EM_KM": 384400.0,
+      "GM_EARTH_KM3S2": 398600.4418,
+      "GM_MOON_KM3S2": 4902.800066,
+      "GM_SUN_KM3S2": 132712440018.0,
+      "GM_provenance": "IAU 2015 nominal GM_E/GM_Sun (Exp 008 canon); DE-series GM_Moon",
+      "MU_EM": 0.012150584078,
+      "MU_LITERATURE_NOTE": "CR3BP literature often quotes mu_EM = 0.012150585609624 (JPL SOLAR SYSTEM table vintage); the GM-derived value used here differs by 1.53e-9 absolute (1.26e-7 relative). One convention pinned throughout so the dimensional cross-check is internally exact.",
+      "MU_ROUTH": 0.038520896505,
+      "MU_SEM": 3.040423e-06,
+      "MU_derivation": "mu = GM2/(GM1+GM2) from declared GMs (portfolio-consistent)",
+      "N_EM_RAD_S": 2.665314e-06,
+      "T_EM_DAYS": 27.284605586834,
+      "frame_convention": "nondim CR3BP: barycentric rotating frame, +x barycenter->m2, omega=+z_hat, m1>=m2 at (-mu,0,0)/(1-mu,0,0), mu=m2/(m1+m2), L=a, T=1/n, n=1",
+      "jacobi_sign_convention": "C = 2*omega_eff - v_rot^2 ; C_dim = n^2 a^2 C"
+    },
+    "dimensional_crosscheck": {
+      "L_km": 384400.0,
+      "T_days": 27.284605586834,
+      "equilibria": {
+        "L1": 321710.17724406323,
+        "L1_abs_diff_km": 0.0,
+        "L1_mapped": 321710.17724406323,
+        "L1_rel_to_L": 0.0,
+        "L2": 444244.22213246324,
+        "L2_abs_diff_km": 0.0,
+        "L2_mapped": 444244.22213246324,
+        "L2_rel_to_L": 0.0,
+        "L3": -386346.08080415474,
+        "L3_abs_diff_km": 0.0,
+        "L3_mapped": -386346.08080415474,
+        "L3_rel_to_L": 0.0
+      },
+      "gm_total": 403503.241866,
+      "jacobi_along_path_worst_rel": 2.972487571876642e-16,
+      "jacobi_scaling_rel": {
+        "L1": 0.0,
+        "L2": 0.0,
+        "L3": 1.4743277398497122e-16,
+        "L4": 1.4862438015503768e-16
+      },
+      "n_rad_s": 2.665314e-06,
+      "trajectory_90day": {
+        "final_pos_err_km": 3.8922e-08,
+        "final_pos_rel": 1.012546857612308e-13,
+        "final_vel_rel": 3.7566676308097865e-14
+      }
+    },
+    "equilibria": {
+      "anchors": {
+        "em_L1_km_from_moon": 58019.138236390136,
+        "em_L1_published_km": 58000.0,
+        "em_L2_km_from_moon": 64514.90665200985,
+        "em_L2_published_km": 64500.0,
+        "em_L3_km_from_earth": 381675.39628460817,
+        "em_L3_published_km": 381700.0,
+        "sel_published_km": 1500000.0,
+        "sem_L1_km_from_earth": 1497620.8857181896,
+        "sem_L2_km_from_earth": 1507683.3191600102,
+        "trojan_leading_angle_deg_em": 60.606569692724,
+        "trojan_note": "L4 leads m2 by atan2(sqrt3/2, 1/2-mu): 60.607 deg at EM mu, -> 60 deg as mu->0 (Jupiter Trojans swarm +-60 deg)"
+      },
+      "c_ordering_ok": true,
+      "cases": {
+        "above_threshold": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": -1.0408340855860843e-17,
+            "gamma_quintic": 0.0,
+            "residual_inf": 3.3306690738754696e-16,
+            "x": 0.715225350368,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": 4.163336342344337e-17,
+            "gamma_quintic": 6.245004513516506e-17,
+            "residual_inf": 3.3306690738754696e-16,
+            "x": 1.228093667101,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": -2.0816681711721685e-16,
+            "gamma_quintic": -2.220446049250313e-16,
+            "residual_inf": 1.491862189340054e-16,
+            "x": -1.020826334325,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 2.498001805406602e-16,
+            "x": 0.45,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 2.498001805406602e-16,
+            "x": 0.45,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.420416387383,
+            "L2": 3.35439413822,
+            "L3": 3.049922197074,
+            "L4": 2.9525,
+            "L5": 2.9525
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "earth_moon": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": 3.469446951953614e-18,
+            "gamma_quintic": -3.469446951953614e-18,
+            "residual_inf": 1.1102230246251565e-16,
+            "x": 0.836915133309,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": -2.7755575615628914e-17,
+            "gamma_quintic": -2.6020852139652106e-17,
+            "residual_inf": 7.216449660063518e-16,
+            "x": 1.155682159554,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": -1.1796119636642288e-16,
+            "gamma_quintic": 8.881784197001252e-16,
+            "residual_inf": 4.0766001685454967e-17,
+            "x": -1.005062645172,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 3.7816971776294395e-16,
+            "x": 0.487849415922,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 3.7816971776294395e-16,
+            "x": 0.487849415922,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.188341103625,
+            "L2": 3.172160448879,
+            "L3": 3.01214714915,
+            "L4": 2.987997052616,
+            "L5": 2.987997052616
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "equal_mass": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": 0.0,
+            "gamma_quintic": 0.0,
+            "residual_inf": 0.0,
+            "x": 0.0,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": -4.440892098500626e-16,
+            "gamma_quintic": -4.440892098500626e-16,
+            "residual_inf": 4.440892098500626e-16,
+            "x": 1.198406144555,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": 5.551115123125783e-16,
+            "gamma_quintic": -4.440892098500626e-16,
+            "residual_inf": 4.718447854656915e-16,
+            "x": -1.198406144555,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 3.3306690738754696e-16,
+            "x": 0.0,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 3.3306690738754696e-16,
+            "x": 0.0,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 4.0,
+            "L2": 3.456796224086,
+            "L3": 3.456796224086,
+            "L4": 2.75,
+            "L5": 2.75
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "mu_1e-3": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": 1.8431436932253575e-18,
+            "gamma_quintic": -1.3010426069826053e-18,
+            "residual_inf": 2.7755575615628914e-16,
+            "x": 0.931286975502,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": -6.505213034913027e-19,
+            "gamma_quintic": -6.505213034913027e-19,
+            "residual_inf": 2.7755575615628914e-16,
+            "x": 1.069916097988,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": 1.457167719820518e-15,
+            "gamma_quintic": -1.4432899320127035e-15,
+            "residual_inf": 3.07859206877259e-16,
+            "x": -1.000416666612,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 3.2916377956659915e-16,
+            "x": 0.499,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 3.2916377956659915e-16,
+            "x": 0.499,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.039948774975,
+            "L2": 3.038615174651,
+            "L3": 3.000999978968,
+            "L4": 2.999001,
+            "L5": 2.999001
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "mu_1e-6": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": 2.541098841762901e-21,
+            "gamma_quintic": -1.334076891925523e-20,
+            "residual_inf": 1.249000902703301e-16,
+            "x": 0.993081447635,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": 2.456395547037471e-20,
+            "gamma_quintic": 3.959879028413854e-20,
+            "residual_inf": 4.3021142204224816e-16,
+            "x": 1.006948602131,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": -1.0719284533215528e-15,
+            "gamma_quintic": 7.771561172376096e-16,
+            "residual_inf": 8.485279604062042e-17,
+            "x": -1.000000416667,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 2.835470319504556e-16,
+            "x": 0.499999,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 2.835470319504556e-16,
+            "x": 0.499999,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.000429343757,
+            "L2": 3.000428010417,
+            "L3": 3.000001,
+            "L4": 2.999999000001,
+            "L5": 2.999999000001
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "routh_boundary": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": -1.3877787807814457e-17,
+            "gamma_quintic": 2.0816681711721685e-17,
+            "residual_inf": 5.551115123125783e-16,
+            "x": 0.744935118412,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": 1.3877787807814457e-17,
+            "gamma_quintic": 6.938893903907228e-18,
+            "residual_inf": 0.0,
+            "x": 1.214438847932,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": 2.983724378680108e-16,
+            "gamma_quintic": -4.440892098500626e-16,
+            "residual_inf": 1.942890293094024e-16,
+            "x": -1.016047195203,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 2.636779683484747e-16,
+            "x": 0.461479103495,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 2.636779683484747e-16,
+            "x": 0.461479103495,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.365163147119,
+            "L2": 3.314155823368,
+            "L3": 3.038478319487,
+            "L4": 2.962962962963,
+            "L5": 2.962962962963
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        },
+        "sun_earth_moon": {
+          "L1": {
+            "bracket_ok": true,
+            "direct_x_quintic": -3.218725199566341e-20,
+            "gamma_quintic": 1.8634724839594607e-20,
+            "residual_inf": 2.0469737016526324e-16,
+            "x": 0.98998598229,
+            "y": 0.0
+          },
+          "L2": {
+            "bracket_ok": true,
+            "direct_x_quintic": 8.004461351553138e-20,
+            "gamma_quintic": 8.173867941003998e-20,
+            "residual_inf": 7.008282842946301e-16,
+            "x": 1.010075200076,
+            "y": 0.0
+          },
+          "L3": {
+            "bracket_ok": true,
+            "direct_x_quintic": 9.367866759277341e-16,
+            "gamma_quintic": -8.881784197001252e-16,
+            "residual_inf": 2.396264678111888e-16,
+            "x": -1.000001266843,
+            "y": 0.0
+          },
+          "L4": {
+            "residual_inf": 3.1445886408579087e-16,
+            "x": 0.499996959577,
+            "y": 0.866025403784
+          },
+          "L5": {
+            "residual_inf": 3.1445886408579087e-16,
+            "x": 0.499996959577,
+            "y": -0.866025403784
+          },
+          "c_values": {
+            "L1": 3.000897941494,
+            "L2": 3.000893887554,
+            "L3": 3.000003040423,
+            "L4": 2.999996959586,
+            "L5": 2.999996959586
+          },
+          "gamma2_gt_gamma1": true,
+          "ordering_ok": true
+        }
+      },
+      "mpmath_anchor_dev": {
+        "L1": 0.0,
+        "L2": 0.0,
+        "L3": 0.0
+      },
+      "tolerances": {
+        "bridge_identity_abs": 1e-13,
+        "dim_crosscheck_rel": 1e-12,
+        "drift_law_rel": 0.0001,
+        "equilibrium_residual_inf": 2e-14,
+        "growth_rate_rel_eps1e-4": 0.005,
+        "inertial_consistency_rel": 1e-10,
+        "jacobi_order_hi": 5.0,
+        "jacobi_order_lo": 3.5,
+        "lp_frequency_rel": 1e-06,
+        "mpmath_anchor_abs": 5e-16,
+        "mutant_signal_min": 0.01,
+        "quintic_residual_rel": 1e-13,
+        "roundtrip_abs": 1e-14,
+        "zvc_bias_rel": 0.01,
+        "zvc_drift_guard": 1e-06
+      }
+    },
+    "figures": [
+      "f1_geometry_em.png",
+      "f2_zvc_levels_em.png",
+      "f3_eigen_spectrum.png",
+      "f4_jacobi_convergence.png"
+    ],
+    "figures_note": "Deterministic matplotlib/Agg, dpi=150, generated from recorded result data.",
+    "headline": {
+      "L1_growth_rate_rel_err_at_1e-4": 0.002942695717,
+      "L4_LP_freq_rel_err_at_1e-4": 7.501406249255098e-07,
+      "all_mutants_caught": true,
+      "capture_class_orders": [
+        4.954928503556,
+        4.9496838593,
+        4.858442087305,
+        4.711990612117
+      ],
+      "dim_jacobi_along_path_worst_rel": 2.972487571876642e-16,
+      "dim_traj_final_pos_rel": 1.012546857612308e-13,
+      "em_L1_km_from_moon": 58019.138236390136,
+      "em_L2_km_from_moon": 64514.90665200985,
+      "inertial_consistency_clean_residual": 2.898636695071012e-13,
+      "kinematic_roundtrip_orders": [
+        3.999619715409,
+        3.999521063143,
+        4.002074636292
+      ],
+      "lp_floor_plateau": {
+        "drifts": {
+          "1024": 2.1316282072803006e-14,
+          "16384": 1.3322676295501878e-15,
+          "256": 2.206457239140036e-11,
+          "4096": 1.3322676295501878e-15
+        },
+        "plateau_max_over_min": 16561.666666666668,
+        "span": 210.697972367998
+      },
+      "max_equilibrium_residual": 7.216449660063518e-16,
+      "mirror_field_law_max_violation": 0.0,
+      "mu_EM": 0.012150584078,
+      "mutant_catch_matrix": {
+        "body_swap_domain_rejected": true,
+        "centrifugal_drop": true,
+        "coriolis_flip": true,
+        "mapping_sign_flip": true,
+        "mu_convention_gamma_rel_shift": true,
+        "planar_frozen_jacobi": true
+      },
+      "retrograde_floor_turnup": {
+        "16384": 7.983391725474576e-12,
+        "32768": 4.920508445138694e-13
+      },
+      "routh_boundary_gamma_minus_quarter": 4.6773382426613424e-51,
+      "routh_threshold": 0.038520896505,
+      "sem_L1_km_from_earth": 1497620.8857181896,
+      "sem_L2_km_from_earth": 1507683.3191600102,
+      "x_L1": 0.836915133309,
+      "x_L2": 1.155682159554,
+      "x_L3": -1.005062645172,
+      "zvc_closed_never_past_wall": true,
+      "zvc_necessary_condition_honored": true,
+      "zvc_open_crossed": true
+    },
+    "jacobi_conservation": {
+      "class_L4_LP_amp3e-3": {
+        "drifts": {
+          "1024": 5.551115123125783e-14,
+          "2048": 2.220446049250313e-15,
+          "256": 4.597211500367848e-11,
+          "4096": 8.881784197001252e-16
+        },
+        "orders": [
+          4.846882856109,
+          4.643856189775,
+          1.321928094887
+        ],
+        "span": 210.697972367998
+      },
+      "class_L4_LP_floor_plateau": {
+        "drifts": {
+          "1024": 2.1316282072803006e-14,
+          "16384": 1.3322676295501878e-15,
+          "256": 2.206457239140036e-11,
+          "4096": 1.3322676295501878e-15
+        },
+        "plateau_max_over_min": 16561.666666666668,
+        "span": 210.697972367998
+      },
+      "class_capture_C2minus1e-3": {
+        "c_target_minus_c2": -0.001,
+        "drifts": {
+          "1024": 0.000333021809,
+          "16384": 4.57e-10,
+          "2048": 1.0737188e-05,
+          "4096": 3.47446e-07,
+          "8192": 1.1977e-08
+        },
+        "orders": [
+          4.954928503556,
+          4.9496838593,
+          4.858442087305,
+          4.711990612117
+        ],
+        "release_x": 0.8,
+        "span": 30.0,
+        "vy": 0.175727650479
+      },
+      "class_retrograde_rho0p30": {
+        "drifts": {
+          "1024": 9.31242e-07,
+          "2048": 4.4586e-08,
+          "4096": 2.363e-09,
+          "512": 2.4025707e-05,
+          "8192": 1.34e-10
+        },
+        "floor_probe": {
+          "16384": 7.983391725474576e-12,
+          "32768": 4.920508445138694e-13
+        },
+        "orders": [
+          4.689278512141,
+          4.384498193839,
+          4.238115102297,
+          4.1359512398
+        ],
+        "span": 46.830972585225,
+        "t_keplerian": 9.366194517045
+      }
+    },
+    "limitations": [
+      "Classical circular CR3BP: primaries on exact circular rails; real Moon orbit is eccentric (e=0.055) and solar-perturbed.",
+      "No ephemeris fidelity: anchors validate scale+geometry at percent level only.",
+      "Collinear equilibria are linearly unstable: station-keeping costs and halo/Lyapunov orbit families are OUT of scope (future experiment).",
+      "Fixed-step RK4: grazing trajectories (pericenter << 1e-2) need adaptive stepping or guards; ZVC runs carry a Jacobi-drift guard.",
+      "Linear stability does not by itself prove nonlinear stability; KAM refinements (Arnold 1963; Deprit & Deprit-Bartholome 1967) cited, not re-derived.",
+      "Triangular-point stability claim restricted to mu < mu_Routh excluding the degenerate boundary (1:1 resonance)."
+    ],
+    "perturbation_validation": {
+      "L1_unstable_growth": {
+        "bias_scaling_ratios": [
+          101.052413740608,
+          100.769843260038
+        ],
+        "eps_0.0001": {
+          "bias_ratio_consistency": null,
+          "r2": 0.999999455777,
+          "rel_error": 0.002942695717,
+          "sigma_linear": 2.932055914676,
+          "slope_measured": 2.940684063059
+        },
+        "eps_1e-06": {
+          "bias_ratio_consistency": null,
+          "r2": 0.999999999948,
+          "rel_error": 2.9120489e-05,
+          "sigma_linear": 2.932055914676,
+          "slope_measured": 2.932141297578
+        },
+        "eps_1e-08": {
+          "bias_ratio_consistency": null,
+          "r2": 1.0,
+          "rel_error": 2.8898e-07,
+          "sigma_linear": 2.932055914676,
+          "slope_measured": 2.932056761982
+        }
+      },
+      "L4_longperiod_mode": {
+        "amp_0.0001": {
+          "cj_drift": 8.881784197001252e-16,
+          "nu_long_linear": 0.298208152483,
+          "nu_measured": 0.2982079287850493,
+          "rel_error": 7.501406249255098e-07
+        },
+        "amp_0.001": {
+          "cj_drift": 1.3322676295501878e-15,
+          "nu_long_linear": 0.298208152483,
+          "nu_measured": 0.298209082985725,
+          "rel_error": 3.1203125001509506e-06
+        },
+        "amp_1e-05": {
+          "cj_drift": 8.881784197001252e-16,
+          "nu_long_linear": 0.298208152483,
+          "nu_measured": 0.2982078133831538,
+          "rel_error": 1.137125000029548e-06
+        },
+        "extrapolated_rel_error": 3.7880372631473043e-06,
+        "quadratic_coefficient_check": 4.1596367353931845
+      }
+    },
+    "rk4_order_verification": {
+      "errors_by_n": {
+        "1000": 3.3588276495610705e-13,
+        "125": 1.377e-09,
+        "250": 8.608114563821846e-11,
+        "500": 5.381857941331145e-12
+      },
+      "expected_order": 4,
+      "pairwise_orders": [
+        3.999619715409,
+        3.999521063143,
+        4.002074636292
+      ]
+    },
+    "stability": {
+      "boundary_gamma_minus_quarter_50dps": 4.6773382426613424e-51,
+      "cases": {
+        "above_threshold": {
+          "L1": {
+            "A_curvature": 5.983911840075,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 8.31273386603731e-16,
+            "max_real_eigenvalue": 3.205365770203,
+            "nu_closed": 2.508078523634,
+            "nu_numeric_imag": [
+              2.446203556549,
+              2.446203556549
+            ],
+            "omega_z_closed": 2.446203556549,
+            "sigma_closed": 3.205365770203,
+            "sigma_numeric": 3.205365770203
+          },
+          "L2": {
+            "A_curvature": 2.779884787745,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.1347307573150348e-16,
+            "max_real_eigenvalue": 1.956804321145,
+            "nu_closed": 1.746195396714,
+            "nu_numeric_imag": [
+              1.667298649836,
+              1.667298649836
+            ],
+            "omega_z_closed": 1.667298649836,
+            "sigma_closed": 1.956804321145,
+            "sigma_numeric": 1.956804321145
+          },
+          "L3": {
+            "A_curvature": 1.04477455745,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 2.4850979803801525e-15,
+            "max_real_eigenvalue": 0.357401771162,
+            "nu_closed": 1.040654346351,
+            "nu_numeric_imag": [
+              1.02214214151,
+              1.02214214151
+            ],
+            "omega_z_closed": 1.02214214151,
+            "sigma_closed": 0.357401771162,
+            "sigma_numeric": 0.357401771162
+          },
+          "L4": {
+            "classification": "unstable (complex quartet)",
+            "gamma": 0.320625,
+            "max_real_eigenvalue": 0.181985689884,
+            "nu_long_closed": NaN,
+            "nu_numeric_imag": [
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": NaN,
+            "numeric_quartet": [
+              [
+                -0.181985689884,
+                -0.730149841692
+              ],
+              [
+                -0.181985689884,
+                0.730149841692
+              ],
+              [
+                0.181985689884,
+                -0.730149841692
+              ],
+              [
+                0.181985689884,
+                0.730149841692
+              ]
+            ],
+            "quartet_alpha_closed": 0.181985689884,
+            "quartet_beta_closed": 0.730149841692,
+            "routh_stable": false,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 1.2825,
+          "routh_threshold": 0.038520896505
+        },
+        "earth_moon": {
+          "L1": {
+            "A_curvature": 5.147594482092,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 9.087600430003958e-16,
+            "max_real_eigenvalue": 2.932055914676,
+            "nu_closed": 2.334385873135,
+            "nu_numeric_imag": [
+              2.268831082759,
+              2.268831082759
+            ],
+            "omega_z_closed": 2.268831082759,
+            "sigma_closed": 2.932055914676,
+            "sigma_numeric": 2.932055914676
+          },
+          "L2": {
+            "A_curvature": 3.190425243242,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 6.171693471249333e-16,
+            "max_real_eigenvalue": 2.158674334292,
+            "nu_closed": 1.862645870338,
+            "nu_numeric_imag": [
+              1.786176151235,
+              1.786176151235
+            ],
+            "omega_z_closed": 1.786176151235,
+            "sigma_closed": 2.158674334292,
+            "sigma_numeric": 2.158674334292
+          },
+          "L3": {
+            "A_curvature": 1.010691277064,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.5603947343206044e-15,
+            "max_real_eigenvalue": 0.177875347854,
+            "nu_closed": 1.010419894059,
+            "nu_numeric_imag": [
+              1.005331426478,
+              1.005331426478
+            ],
+            "omega_z_closed": 1.005331426478,
+            "sigma_closed": 0.177875347854,
+            "sigma_numeric": 0.177875347854
+          },
+          "L4": {
+            "classification": "stable (center x center)",
+            "gamma": 0.081019894845,
+            "max_real_eigenvalue": 4.0072112295064244e-16,
+            "nu_long_closed": 0.298208152483,
+            "nu_numeric_imag": [
+              0.298208152483,
+              0.298208152483,
+              0.95450086317,
+              0.95450086317,
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": 0.95450086317,
+            "numeric_quartet": [],
+            "quartet_alpha_closed": NaN,
+            "quartet_beta_closed": NaN,
+            "routh_stable": true,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 0.324079579381,
+          "routh_threshold": 0.038520896505
+        },
+        "equal_mass": {
+          "L1": {
+            "A_curvature": 8.0,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.2911800942888547e-15,
+            "max_real_eigenvalue": 3.783346203956,
+            "nu_closed": 2.883350221354,
+            "nu_numeric_imag": [
+              2.828427124746,
+              2.828427124746
+            ],
+            "omega_z_closed": 2.828427124746,
+            "sigma_closed": 3.783346203956,
+            "sigma_numeric": 3.783346203956
+          },
+          "L2": {
+            "A_curvature": 1.569786511805,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 9.606358610100495e-16,
+            "max_real_eigenvalue": 1.155716822249,
+            "nu_closed": 1.328869768421,
+            "nu_numeric_imag": [
+              1.252911214654,
+              1.252911214654
+            ],
+            "omega_z_closed": 1.252911214654,
+            "sigma_closed": 1.155716822249,
+            "sigma_numeric": 1.155716822249
+          },
+          "L3": {
+            "A_curvature": 1.569786511805,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 9.606358610100495e-16,
+            "max_real_eigenvalue": 1.155716822249,
+            "nu_closed": 1.328869768421,
+            "nu_numeric_imag": [
+              1.252911214654,
+              1.252911214654
+            ],
+            "omega_z_closed": 1.252911214654,
+            "sigma_closed": 1.155716822249,
+            "sigma_numeric": 1.155716822249
+          },
+          "L4": {
+            "classification": "unstable (complex quartet)",
+            "gamma": 1.6875,
+            "max_real_eigenvalue": 0.632075195557,
+            "nu_long_closed": NaN,
+            "nu_numeric_imag": [
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": NaN,
+            "numeric_quartet": [
+              [
+                -0.632075195557,
+                -0.948429782766
+              ],
+              [
+                -0.632075195557,
+                0.948429782766
+              ],
+              [
+                0.632075195557,
+                -0.948429782766
+              ],
+              [
+                0.632075195557,
+                0.948429782766
+              ]
+            ],
+            "quartet_alpha_closed": 0.632075195557,
+            "quartet_beta_closed": 0.948429782766,
+            "routh_stable": false,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 6.75,
+          "routh_threshold": 0.038520896505
+        },
+        "mu_1e-3": {
+          "L1": {
+            "A_curvature": 4.453813556425,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 3.3091504089231204e-16,
+            "max_real_eigenvalue": 2.684007403547,
+            "nu_closed": 2.179468326421,
+            "nu_numeric_imag": [
+              2.110406016961,
+              2.110406016961
+            ],
+            "omega_z_closed": 2.110406016961,
+            "sigma_closed": 2.684007403547,
+            "sigma_numeric": 2.684007403547
+          },
+          "L2": {
+            "A_curvature": 3.617309869263,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 5.669978875989222e-16,
+            "max_real_eigenvalue": 2.349687112931,
+            "nu_closed": 1.975783302746,
+            "nu_numeric_imag": [
+              1.901922676994,
+              1.901922676994
+            ],
+            "omega_z_closed": 1.901922676994,
+            "sigma_closed": 2.349687112931,
+            "sigma_numeric": 2.349687112931
+          },
+          "L3": {
+            "A_curvature": 1.000875401212,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 2.194792968460935e-13,
+            "max_real_eigenvalue": 0.051216712856,
+            "nu_closed": 1.000873493736,
+            "nu_numeric_imag": [
+              1.000437604857,
+              1.000437604857
+            ],
+            "omega_z_closed": 1.000437604857,
+            "sigma_closed": 0.051216712856,
+            "sigma_numeric": 0.051216712856
+          },
+          "L4": {
+            "classification": "stable (center x center)",
+            "gamma": 0.00674325,
+            "max_real_eigenvalue": 0.0,
+            "nu_long_closed": 0.082397483022,
+            "nu_numeric_imag": [
+              0.082397483022,
+              0.082397483022,
+              0.996599545852,
+              0.996599545852,
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": 0.996599545852,
+            "numeric_quartet": [],
+            "quartet_alpha_closed": NaN,
+            "quartet_beta_closed": NaN,
+            "routh_stable": true,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 0.026973,
+          "routh_threshold": 0.038520896505
+        },
+        "mu_1e-6": {
+          "L1": {
+            "A_curvature": 4.041985811381,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.758722084285051e-16,
+            "max_real_eigenvalue": 2.525067569335,
+            "nu_closed": 2.081821418452,
+            "nu_numeric_imag": [
+              2.01046905258,
+              2.01046905258
+            ],
+            "omega_z_closed": 2.01046905258,
+            "sigma_closed": 2.525067569335,
+            "sigma_numeric": 2.525067569335
+          },
+          "L2": {
+            "A_curvature": 3.958777411994,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.7822748588331497e-16,
+            "max_real_eigenvalue": 2.491698783996,
+            "nu_closed": 2.061500768414,
+            "nu_numeric_imag": [
+              1.989667663705,
+              1.989667663705
+            ],
+            "omega_z_closed": 1.989667663705,
+            "sigma_closed": 2.491698783996,
+            "sigma_numeric": 2.491698783996
+          },
+          "L3": {
+            "A_curvature": 1.000000875,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 9.316384466258986e-12,
+            "max_real_eigenvalue": 0.001620184601,
+            "nu_closed": 1.000000874998,
+            "nu_numeric_imag": [
+              1.0000004375,
+              1.0000004375
+            ],
+            "omega_z_closed": 1.0000004375,
+            "sigma_closed": 0.001620184601,
+            "sigma_numeric": 0.001620184601
+          },
+          "L4": {
+            "classification": "stable (center x center)",
+            "gamma": 6.749993e-06,
+            "max_real_eigenvalue": 4.163336342344337e-16,
+            "nu_long_closed": 0.002598083681,
+            "nu_numeric_imag": [
+              0.002598083681,
+              0.002598083681,
+              0.999996624975,
+              0.999996624975,
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": 0.999996624975,
+            "numeric_quartet": [],
+            "quartet_alpha_closed": NaN,
+            "quartet_beta_closed": NaN,
+            "routh_stable": true,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 2.6999973e-05,
+          "routh_threshold": 0.038520896505
+        },
+        "routh_boundary": {
+          "L1": {
+            "A_curvature": 5.793039544639,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 0.0,
+            "max_real_eigenvalue": 3.145101894523,
+            "nu_closed": 2.469539710613,
+            "nu_numeric_imag": [
+              2.406873396055,
+              2.406873396055
+            ],
+            "omega_z_closed": 2.406873396055,
+            "sigma_closed": 3.145101894523,
+            "sigma_numeric": 3.145101894523
+          },
+          "L2": {
+            "A_curvature": 2.868606189092,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 2.2179770972642823e-16,
+            "max_real_eigenvalue": 2.002226309721,
+            "nu_closed": 1.772090292916,
+            "nu_numeric_imag": [
+              1.69369601437,
+              1.69369601437
+            ],
+            "omega_z_closed": 1.69369601437,
+            "sigma_closed": 2.002226309721,
+            "sigma_numeric": 2.002226309721
+          },
+          "L3": {
+            "A_curvature": 1.034310838469,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 2.647738059883867e-15,
+            "max_real_eigenvalue": 0.314482493977,
+            "nu_closed": 1.03178893217,
+            "nu_numeric_imag": [
+              1.017010736654,
+              1.017010736654
+            ],
+            "omega_z_closed": 1.017010736654,
+            "sigma_closed": 0.314482493977,
+            "sigma_numeric": 0.314482493977
+          },
+          "L4": {
+            "classification": "unstable (complex quartet)",
+            "gamma": 0.25,
+            "max_real_eigenvalue": 2.5727e-08,
+            "nu_long_closed": 0.707106781187,
+            "nu_numeric_imag": [
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": 0.707106781187,
+            "numeric_quartet": [
+              [
+                -2.5727e-08,
+                -0.707106788779
+              ],
+              [
+                -2.5727e-08,
+                0.707106788779
+              ],
+              [
+                2.5727e-08,
+                -0.707106773594
+              ],
+              [
+                2.5727e-08,
+                0.707106773594
+              ]
+            ],
+            "quartet_alpha_closed": NaN,
+            "quartet_beta_closed": NaN,
+            "routh_stable": false,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 1.0,
+          "routh_threshold": 0.038520896505
+        },
+        "sun_earth_moon": {
+          "L1": {
+            "A_curvature": 4.061074016621,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 3.506900686632448e-16,
+            "max_real_eigenvalue": 2.532659174198,
+            "nu_closed": 2.086453564312,
+            "nu_numeric_imag": [
+              2.015210663087,
+              2.015210663087
+            ],
+            "omega_z_closed": 2.015210663087,
+            "sigma_closed": 2.532659174198,
+            "sigma_numeric": 2.532659174198
+          },
+          "L2": {
+            "A_curvature": 3.940522184789,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.7875708289012214e-16,
+            "max_real_eigenvalue": 2.484316720043,
+            "nu_closed": 2.057014190689,
+            "nu_numeric_imag": [
+              1.985074856218,
+              1.985074856218
+            ],
+            "omega_z_closed": 1.985074856218,
+            "sigma_closed": 2.484316720043,
+            "sigma_numeric": 2.484316720043
+          },
+          "L3": {
+            "A_curvature": 1.000002660374,
+            "classification": "unstable (saddle x center)",
+            "closed_vs_numeric_rel": 1.0951923687389026e-11,
+            "max_real_eigenvalue": 0.002825083074,
+            "nu_closed": 1.000002660357,
+            "nu_numeric_imag": [
+              1.000001330186,
+              1.000001330186
+            ],
+            "omega_z_closed": 1.000001330186,
+            "sigma_closed": 0.002825083074,
+            "sigma_numeric": 0.002825083074
+          },
+          "L4": {
+            "classification": "stable (center x center)",
+            "gamma": 2.0522796e-05,
+            "max_real_eigenvalue": 5.889495107540709e-17,
+            "nu_long_closed": 0.004530255744,
+            "nu_numeric_imag": [
+              0.004530255744,
+              0.004530255744,
+              0.999989738339,
+              0.999989738339,
+              1.0,
+              1.0
+            ],
+            "nu_short_closed": 0.999989738339,
+            "numeric_quartet": [],
+            "quartet_alpha_closed": NaN,
+            "quartet_beta_closed": NaN,
+            "routh_stable": true,
+            "vertical_freq_numeric": null
+          },
+          "routh_product": 8.2091184e-05,
+          "routh_threshold": 0.038520896505
+        }
+      }
+    },
+    "symmetries_limits": {
+      "equal_mass": {
+        "L4_x": 0.0,
+        "sym_x2_plus_x3": 0.0,
+        "x_L1_exact_zero": 0.0
+      },
+      "half_mass_pi_rotation_max_violation": 1.7763568394002505e-15,
+      "hill_slope_convergence": {
+        "gamma1": [
+          0.006917552365,
+          0.010142517456,
+          0.014863299629,
+          0.021764752734,
+          0.031834793852,
+          0.046486177473,
+          0.067713024498,
+          0.098277835219,
+          0.141921287024
+        ],
+        "mus": [
+          1e-06,
+          3.162278e-06,
+          1e-05,
+          3.1622777e-05,
+          0.0001,
+          0.000316227766,
+          0.001,
+          0.00316227766,
+          0.01
+        ],
+        "pairwise_orders": [
+          0.332386616846,
+          0.331938937953,
+          0.331277009511,
+          0.330296608688,
+          0.32884358801,
+          0.326696753399,
+          0.323566738065,
+          0.319183918593
+        ]
+      },
+      "mirror_field_law_max_violation": 0.0,
+      "singular_limits": {
+        "mu_0.001": {
+          "g1_over_alpha": 0.976590804867,
+          "g1_over_series": 1.000242754066,
+          "g2_over_series": 1.000204622599,
+          "xL3_offset_expected": -0.416666666667,
+          "xL3_plus_1_over_mu": -0.416666612285
+        },
+        "mu_1e-06": {
+          "g1_over_alpha": 0.997683692659,
+          "g1_over_series": 1.000000239125,
+          "g2_over_series": 1.000000205689,
+          "xL3_offset_expected": -0.416666666667,
+          "xL3_plus_1_over_mu": -0.416666666725
+        }
+      }
+    },
+    "tolerances": {
+      "bridge_identity_abs": 1e-13,
+      "dim_crosscheck_rel": 1e-12,
+      "drift_law_rel": 0.0001,
+      "equilibrium_residual_inf": 2e-14,
+      "growth_rate_rel_eps1e-4": 0.005,
+      "inertial_consistency_rel": 1e-10,
+      "jacobi_order_hi": 5.0,
+      "jacobi_order_lo": 3.5,
+      "lp_frequency_rel": 1e-06,
+      "mpmath_anchor_abs": 5e-16,
+      "mutant_signal_min": 0.01,
+      "quintic_residual_rel": 1e-13,
+      "roundtrip_abs": 1e-14,
+      "zvc_bias_rel": 0.01,
+      "zvc_drift_guard": 1e-06
+    },
+    "zero_velocity_structure": {
+      "c_L2": 3.172160448879,
+      "closed_case": {
+        "cj_drift": 0.000147550229,
+        "max_x": 1.144333472573,
+        "never_past_L2": true,
+        "never_past_wall": true
+      },
+      "delta": 0.001,
+      "escape_sweep": {
+        "analytic_v_crit": 0.176039637578,
+        "min_trusted_escape_v_over_vcrit": 1.1,
+        "necessary_condition_honored": true,
+        "v_1.02x_vcrit": {
+          "cj_drift": 10.533675553721,
+          "escaped_within_60tu": true,
+          "t_cross": 8.79,
+          "trusted": false,
+          "v_over_vcrit": 1.02
+        },
+        "v_1.05x_vcrit": {
+          "cj_drift": 1.90211e-07,
+          "escaped_within_60tu": false,
+          "t_cross": null,
+          "trusted": true,
+          "v_over_vcrit": 1.05
+        },
+        "v_1.1x_vcrit": {
+          "cj_drift": 4.036193601564264e-11,
+          "escaped_within_60tu": true,
+          "t_cross": 25.412,
+          "trusted": true,
+          "v_over_vcrit": 1.1
+        },
+        "v_1.2x_vcrit": {
+          "cj_drift": 4.60964599824365e-13,
+          "escaped_within_60tu": true,
+          "t_cross": 0.8785,
+          "trusted": true,
+          "v_over_vcrit": 1.2
+        },
+        "v_1.35x_vcrit": {
+          "cj_drift": 1.8252066524837574e-13,
+          "escaped_within_60tu": true,
+          "t_cross": 0.4285,
+          "trusted": true,
+          "v_over_vcrit": 1.35
+        }
+      },
+      "open_case": {
+        "cj_drift": 74.215136861061,
+        "crossed_decisively": true,
+        "crossing_time": 3.72,
+        "launch_speed": 0.178857356568
+      },
+      "wall_position": 1.144334472573,
+      "x_L2": 1.155682159554
+    }
+  }
+}

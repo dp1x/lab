@@ -149,3 +149,13 @@ Next: 011 Lagrange points per `localdocs/roadmap.md`, reusing `src/lab_utils/`
 and the Exp 002/006/008/009 propagator + element machinery — do not rebuild
 scaffolding; graduating shared machinery to `src/lab_utils/orbits.py` is now
 justified if it stays non-blocking.
+Experiment 011 (Lagrange points / CR3BP — first rotating-frame experiment:
+equilibria, Jacobi integral, Routh stability, nonlinear perturbation signatures,
+dimensional cross-check, adversarial mutant battery) is COMPLETE (2026-08-22) in
+`research/orbital-mechanics/experiments/lagrangePoints/`; shared machinery is now
+graduated: `src/lab_utils/integrators.py` (generic rk4_step/rk4_propagate) and
+`src/lab_utils/orbits.py` (element/Kepler canon, equivalence-pinned vs donors) —
+use these instead of cloning per-experiment copies; CR3BP-specific code remains
+experiment-local until a second consumer appears.
+Next: 012 orbit classes per `localdocs/roadmap.md`, reusing
+`src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
