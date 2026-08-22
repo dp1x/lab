@@ -131,15 +131,21 @@ hosted public document/dataset is fine when it is the source.)
 
 ## Current Priority
 
-Orbital-mechanics flagship: experiments 001–009 are complete (numerics
+Orbital-mechanics flagship: experiments 001–010 are complete (numerics
 foundation, Kepler validation, Kepler solvers, Hohmann transfer, bi-elliptic
 vs Hohmann crossover, combined transfer + plane change, gravity assist,
-ground tracks, J2 precession). Experiment 006 was adversarially audited +
-closed (2026-08-17); a synthesis report for 001–006 is in `localdocs/reports/`.
-Experiment 008 (ground tracks, spherical-Earth) is COMPLETE (2026-08-21) in
-`research/orbital-mechanics/experiments/groundtracks/`; Experiment 009
-(J2 precession, secular nodal/apsidal rates with numerical validation) is
-COMPLETE (2026-08-22) in `research/orbital-mechanics/experiments/j2Precession/`.
-Next: 010 orbit decay, reusing `src/lab_utils/`, the Exp 002 RK4 machinery,
-and the Exp 004–009 closed-form machinery — do not rebuild scaffolding. See
-`localdocs/roadmap.md`.
+ground tracks, J2 precession, orbit decay). Experiment 006 was adversarially
+audited + closed (2026-08-17); a synthesis report for 001–006 is in
+`localdocs/reports/`. Experiment 008 (ground tracks, spherical-Earth) is
+COMPLETE (2026-08-21) in `research/orbital-mechanics/experiments/groundtracks/`;
+Experiment 009 (J2 precession, secular nodal/apsidal rates with numerical
+validation) is COMPLETE (2026-08-22) in
+`research/orbital-mechanics/experiments/j2Precession/`; Experiment 010 (orbit
+decay / atmospheric drag — first non-conservative force: dissipation accounting
++ monotonicity doctrine, erfi/quadrature oracles, structural scalings,
+co-rotation twins, J2 mean-element transient, reentry timing) is COMPLETE
+(2026-08-22) in `research/orbital-mechanics/experiments/orbitDecay/`.
+Next: 011 Lagrange points per `localdocs/roadmap.md`, reusing `src/lab_utils/`
+and the Exp 002/006/008/009 propagator + element machinery — do not rebuild
+scaffolding; graduating shared machinery to `src/lab_utils/orbits.py` is now
+justified if it stays non-blocking.
