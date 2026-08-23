@@ -1,0 +1,487 @@
+{
+  "meta": {
+    "description": "ISS (-125544) Horizons ICRF/TDB geometric-state validation of the two-body / +J2 / +J2+drag hierarchy with decomposition budget",
+    "git_commit": "853fcd1",
+    "name": "jplValidation-013",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-23T22:52:35+00:00"
+  },
+  "results": {
+    "code_sha256": {
+      "experiment.py": "866b8435687df2479c996a4fc94eaa217cff136be3080d6ae5803d2f4a56d628",
+      "fetch_horizons_snapshot.py": "e69051653dd2feabc1835c8c90784911fb2b48e07c40663719c2ada4fafbed47",
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/orbits.py": "2edb9e0d9e9e760657f4e3b04756a79c90d681cf7df0096abce372d05920abae"
+    },
+    "constants": {
+      "R_eq_km": 6378.137,
+      "j2": 0.001082629821,
+      "mu_km3_s2": 398600.4418,
+      "omega_atm_rad_s": 7.2921159e-05,
+      "provenance": "src/lab_utils/orbits.py canon (IAU 2015 nominal GM, WGS-84); atmosphere = Exp 010 declared Vallado layers verbatim"
+    },
+    "contamination_gate": {
+      "flagged_samples": 0,
+      "max_second_difference_m": 41.719047340454,
+      "threshold_m": 100.0,
+      "window_rejected": false
+    },
+    "decision_rule": {
+      "M2_vs_M1": {
+        "ci_high": 0.997868532807,
+        "ci_low": 0.993303100923,
+        "skill_point": 0.993333569948,
+        "verdict": "improvement-exceeds-CI-and-envelope"
+      },
+      "M3_vs_M2": {
+        "ci_high": -2.319194186237,
+        "ci_low": -6.424612729462,
+        "skill_point": -2.279435644327,
+        "verdict": "worse-than-previous-model"
+      },
+      "bootstrap": {
+        "blocks_samples": 720,
+        "draws": 200,
+        "seed": 137
+      },
+      "envelope_km_at_window_end": 12.0,
+      "envelope_rate_km_per_day": 3.0
+    },
+    "error_budget": {
+      "E_constants": {
+        "mu_canon_rms3d_km": 8.216330762265,
+        "mu_de440_variant_rms3d_km": 8.246350994899,
+        "mu_sgp4_wgs72_variant_rms3d_km": 6.611765931756
+      },
+      "E_frame_origin_diagnostic_transverse_rms_km": 0.000930595254,
+      "E_initialization": {
+        "element_roundtrip_max_effect_km": 1.2809e-08,
+        "method": "M2 re-seeded via rv_to_coe_eci -> coe_to_rv_eci round trip"
+      },
+      "E_integration": {
+        "bound_km_max_ric_diff_nsub16_vs_8": 0.019642312919,
+        "headline_nsub": 8,
+        "ladder": [
+          {
+            "dt_s": 120.0,
+            "nsub": 1,
+            "rms_3d_km": 246.559323138656
+          },
+          {
+            "dt_s": 60.0,
+            "max_delta_vs_prev_km": 545.442314217009,
+            "nsub": 2,
+            "rms_3d_km": 3.174546309887
+          },
+          {
+            "dt_s": 30.0,
+            "max_delta_vs_prev_km": 17.434834985067,
+            "nsub": 4,
+            "rms_3d_km": 7.975115778388
+          },
+          {
+            "dt_s": 15.0,
+            "max_delta_vs_prev_km": 0.57254150097,
+            "nsub": 8,
+            "rms_3d_km": 8.216330762265
+          },
+          {
+            "dt_s": 7.5,
+            "max_delta_vs_prev_km": 0.019642312919,
+            "nsub": 16,
+            "rms_3d_km": 8.224719719109
+          }
+        ],
+        "measured_order_selfconvergence": 4.928448627818,
+        "richardson_bound_km": 0.000666934147
+      },
+      "E_interpolation": {
+        "role": "diagnostic only; headline residuals use exact-grid alignment",
+        "strides": {
+          "stride_10": {
+            "analytic_bound_km": 59.196456008557,
+            "cadence_s": 1200.0,
+            "max_error_km": 58.027211424948,
+            "within_bound": true
+          },
+          "stride_5": {
+            "analytic_bound_km": 3.699778500535,
+            "cadence_s": 600.0,
+            "max_error_km": 3.424846095355,
+            "within_bound": true
+          }
+        }
+      },
+      "E_timeshift": {
+        "charge_km": 0.000330871541,
+        "kappa_km_per_s": 7.659063453835,
+        "note": "single TDB scale end-to-end; TT-TDB <= 2 ms never mixed",
+        "tau_uncertainty_s": 4.32e-05
+      }
+    },
+    "findings": [
+      "M1-vs-reference: RMS3D 1346.5 km dominated by a 690.0 km/day transverse drift (constant mean-motion mismatch of the purely-Keplerian model: the mean-vs-osculating a offset at the initialization epoch plus absent J2 secular rates); adding J2 removes skill 0.9933 of the residual (CI [0.9933, 0.9979]) -> improvement-exceeds-CI-and-envelope.",
+      "M3(primary beta=100) WORSENS agreement vs M2: skill -2.2794 (CI [-6.4246, -2.3192], excludes zero on the negative side) -> worse-than-previous-model. Reported verbatim per anti-overfitting doctrine; no atmospheric or beta parameter was retuned.",
+      "[INFERENCE] The beta band responds monotonically (transverse trend c1: {\"beta50\": 43.64, \"beta100\": 18.24, \"beta200\": 5.57, \"beta400\": -0.76} km/day), crossing zero only at the band edge (beta=400 -> RMS3D 3.13 km). The drag signature is detectable, but the compatible effective beta lies AT OR BEYOND the pre-declared band edge; extending the band or picking the nicest member post hoc would be tuning and is deliberately not done. Any refined-beta study must be a separately declared experiment.",
+      "[INFERENCE] M2's leftover secular drift (-7.08 km/day; -5.89 km/day under SGP4-heritage GM) implies the reference mean semilatus evolves as if decaying at -40.3 m/day relative to our non-decaying model (consistent with TLE-B*-absorbed drag plus density-weather; not independently separable).",
+      "SGP4-heritage-GM sensitivity shifts M2 RMS3D by -1.605 km (constants/convention term bounded, canon retained).",
+      "Integration bound (NSUB 16 vs 8): 19.6 m (self-convergence order p = 4.93); reference-interpolation diagnostic bounded by 5.80e+01 km at worst subsampled cadence and never enters headline numbers (exact-grid alignment). Contamination gate: no sample exceeded the 100 m second-difference threshold (max 41.7 m)."
+    ],
+    "limitations": [
+      "Reference is TLE/SGP4-provenance (disclosed in the object sheet); its own error grows ~1-3 km/day from the revision date per JPL documentation, so residuals measure model-vs-reference divergence jointly with reference uncertainty (never separated).",
+      "Constant-beta drag with a static exponential atmosphere idealizes ISS attitude-dependent area and thermospheric weather; no drag-improvement claim is made unless it exceeds both the bootstrap CI and the declared envelope (decision rule applied automatically).",
+      "Unmodelled physics remaining: lunisolar third-body, tesseral/zonal harmonics beyond J2, SRP, relativity -- jointly attributed with reference uncertainty to the remainder.",
+      "TEME->ICRF conversion inside Horizons is undocumented; its effect is inseparable from the reference's own solution and therefore part of the remainder.",
+      "Single 3-day window immediately after one revision date; conclusions are window-scoped."
+    ],
+    "models": {
+      "M1": "two-body point mass",
+      "M2": "two-body + J2",
+      "M3": "two-body + J2 + exponential-atmosphere drag (co-rotating), beta band [50.0, 100.0, 200.0, 400.0] kg/m^2, primary beta = 100.0",
+      "headline_nsub": 8,
+      "initialization": "x(t0) taken verbatim from the reference state at the first snapshot epoch (declared initialization; no parameter fitted against any t > t0 data)"
+    },
+    "provenance": {
+      "header_metadata": {
+        "center_body_name": "Earth (399)                     {source: DE441}",
+        "eop_file": "eop.260821.p261117",
+        "output_type": "GEOMETRIC cartesian states",
+        "output_units": "KM-S",
+        "reference_frame": "ICRF",
+        "target_body_name": "International Space Station (spacecraft) (-125544) {source: iss}"
+      },
+      "network_access_in_experiment": false,
+      "offline_deterministic": true,
+      "query_params": {
+        "objdata": {
+          "COMMAND": "'-125544'",
+          "MAKE_EPHEM": "'NO'",
+          "OBJ_DATA": "'YES'",
+          "format": "text"
+        },
+        "vectors": {
+          "CAL_FORMAT": "'BOTH'",
+          "CENTER": "'500@399'",
+          "COMMAND": "'-125544'",
+          "CSV_FORMAT": "'YES'",
+          "EPHEM_TYPE": "'VECTORS'",
+          "MAKE_EPHEM": "'YES'",
+          "OBJ_DATA": "'NO'",
+          "OUT_UNITS": "'KM-S'",
+          "REF_PLANE": "'FRAME'",
+          "REF_SYSTEM": "'ICRF'",
+          "START_TIME": "'2026-08-24 00:00'",
+          "STEP_SIZE": "'2m'",
+          "STOP_TIME": "'2026-08-27 00:00'",
+          "TIME_DIGITS": "'FRACSEC'",
+          "TIME_TYPE": "'TDB'",
+          "VEC_CORR": "'NONE'",
+          "VEC_TABLE": "'2'",
+          "format": "text"
+        }
+      },
+      "reference_provenance": "tle_sgp4_disclosed",
+      "reference_snapshot_files": {
+        "horizons_-125544_iss_objdata.txt": {
+          "bytes": 667,
+          "sha256": "8032837052bbd1dae8db338201e00e798e8fefec3ce04baaa0bc1edc7d453798"
+        },
+        "horizons_-125544_iss_vectors_2026-08-24_to_2026-08-27_tdb_2min.txt": {
+          "bytes": 426243,
+          "sha256": "d62858c687f2df06b62f4b307710b3be5aaea8283badc63049d1e2e07425b7d1"
+        }
+      },
+      "reference_source": "NASA JPL Horizons API (official REST)",
+      "target": "International Space Station (-125544)",
+      "trajectory_revision_date": "Aug 23, 2026",
+      "window_tdb": {
+        "cadence_s": 120.0,
+        "jdtdb_last": 2461279.5,
+        "rows": 2161,
+        "start": "A.D. 2026-Aug-24 00:00:00.0000"
+      }
+    },
+    "residual_metrics": {
+      "M1": {
+        "along_track_trend": {
+          "c0_km": 17.026151151587,
+          "c1_km_per_day": 690.024401409441,
+          "c2_km_per_day2_quadratic_fit": -12.605318492397,
+          "detrended_linear_rms_km": 24.135699279212,
+          "secular_ratio_c1T_over_detRMS": 85.76810558836
+        },
+        "bias_ric_km": {
+          "cross": 4.418006718274,
+          "radial": -138.476959690228,
+          "transverse": 1052.062753265748
+        },
+        "equivalent_time_err_s": {
+          "end": 267.846906468549,
+          "max_abs": 277.000976318134
+        },
+        "max_res_km": 2491.147718214075,
+        "model": "M1",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 2110.372357521091,
+        "residual_row10_km": 8.7917431535,
+        "ric_end_km": {
+          "cross": -385.451807128035,
+          "radial": -335.677712986121,
+          "transverse": 2047.539710182751
+        },
+        "rms_3d_km": 1346.52247101443,
+        "rms_dv_kms": 1.518723549032,
+        "rms_ric_km": {
+          "cross": 560.910912829942,
+          "radial": 183.445468016136,
+          "transverse": 1210.309659995916
+        }
+      },
+      "M2": {
+        "along_track_trend": {
+          "c0_km": 6.32381891095,
+          "c1_km_per_day": -7.082617755808,
+          "c2_km_per_day2_quadratic_fit": -4.232974891103,
+          "detrended_linear_rms_km": 2.991894354628,
+          "secular_ratio_c1T_over_detRMS": 7.101805996109
+        },
+        "bias_ric_km": {
+          "cross": -0.024581631972,
+          "radial": 0.05193941193,
+          "transverse": -4.300107722761
+        },
+        "equivalent_time_err_s": {
+          "end": -2.480233557906,
+          "max_abs": 2.995049590844
+        },
+        "max_res_km": 23.143949465231,
+        "model": "M2",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 19.239627946218,
+        "residual_row10_km": 0.046322696583,
+        "ric_end_km": {
+          "cross": -3.267735376842,
+          "radial": 0.060667250124,
+          "transverse": -18.959997587041
+        },
+        "rms_3d_km": 8.216330762265,
+        "rms_dv_kms": 0.009216359398,
+        "rms_ric_km": {
+          "cross": 1.477187237773,
+          "radial": 0.475614708231,
+          "transverse": 8.06844468958
+        }
+      },
+      "M2_muDE440": {
+        "along_track_trend": {
+          "c0_km": 6.323820397547,
+          "c1_km_per_day": -7.103559058604,
+          "c2_km_per_day2_quadratic_fit": -4.232969918627,
+          "detrended_linear_rms_km": 2.991902958035,
+          "secular_ratio_c1T_over_detRMS": 7.122783551044
+        },
+        "bias_ric_km": {
+          "cross": -0.0245815034,
+          "radial": 0.052010476326,
+          "transverse": -4.331518190359
+        },
+        "equivalent_time_err_s": {
+          "end": -2.488434099207,
+          "max_abs": 3.003176862057
+        },
+        "max_res_km": 23.205607120173,
+        "model": "M2_muDE440",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 19.301410682873,
+        "residual_row10_km": 0.04625764098,
+        "ric_end_km": {
+          "cross": -3.26774875255,
+          "radial": 0.060700933554,
+          "transverse": -19.022686136185
+        },
+        "rms_3d_km": 8.246350994899,
+        "rms_dv_kms": 0.009250363759,
+        "rms_ric_km": {
+          "cross": 1.477181386344,
+          "radial": 0.47565871733,
+          "transverse": 8.099011585839
+        }
+      },
+      "M2_muWGS72": {
+        "along_track_trend": {
+          "c0_km": 6.323733893126,
+          "c1_km_per_day": -5.890631501155,
+          "c2_km_per_day2_quadratic_fit": -4.233257510758,
+          "detrended_linear_rms_km": 2.991418634091,
+          "secular_ratio_c1T_over_detRMS": 5.907529725887
+        },
+        "bias_ric_km": {
+          "cross": -0.024588948777,
+          "radial": 0.047575219142,
+          "transverse": -2.512213358607
+        },
+        "equivalent_time_err_s": {
+          "end": -2.013455403887,
+          "max_abs": 2.532442738584
+        },
+        "max_res_km": 19.640498636877,
+        "model": "M2_muWGS72",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 15.734741622528,
+        "residual_row10_km": 0.050334997501,
+        "ric_end_km": {
+          "cross": -3.266970915829,
+          "radial": 0.057796927524,
+          "transverse": -15.391739813225
+        },
+        "rms_3d_km": 6.611765931756,
+        "rms_dv_kms": 0.007396538066,
+        "rms_ric_km": {
+          "cross": 1.477520229924,
+          "radial": 0.473106529976,
+          "transverse": 6.427173011347
+        }
+      },
+      "M3_beta100": {
+        "along_track_trend": {
+          "c0_km": -6.339540297193,
+          "c1_km_per_day": 18.236631560882,
+          "c2_km_per_day2_quadratic_fit": 4.216252842546,
+          "detrended_linear_rms_km": 2.969740605924,
+          "secular_ratio_c1T_over_detRMS": 18.422448941674
+        },
+        "bias_ric_km": {
+          "cross": -0.024909530783,
+          "radial": -0.167788204406,
+          "transverse": 21.01540704413
+        },
+        "equivalent_time_err_s": {
+          "end": 7.438436353656,
+          "max_abs": 7.424234522161
+        },
+        "max_res_km": 56.957572951878,
+        "model": "M3_beta100",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 56.957572951878,
+        "residual_row10_km": 0.046494161329,
+        "ric_end_km": {
+          "cross": -3.244363984369,
+          "radial": -0.523895668694,
+          "transverse": 56.862683301386
+        },
+        "rms_3d_km": 26.505783694328,
+        "rms_dv_kms": 0.029859244878,
+        "rms_ric_km": {
+          "cross": 1.482450378666,
+          "radial": 0.479807189037,
+          "transverse": 26.45994510929
+        }
+      },
+      "M3_beta200": {
+        "along_track_trend": {
+          "c0_km": -0.000533207196,
+          "c1_km_per_day": 5.566006303882,
+          "c2_km_per_day2_quadratic_fit": -0.014461812902,
+          "detrended_linear_rms_km": 0.915787231169,
+          "secular_ratio_c1T_over_detRMS": 18.233513575345
+        },
+        "bias_ric_km": {
+          "cross": -0.024745694132,
+          "radial": -0.036588341833,
+          "transverse": 8.348476248628
+        },
+        "equivalent_time_err_s": {
+          "end": 2.474309909702,
+          "max_abs": 2.469585834542
+        },
+        "max_res_km": 19.193402552386,
+        "model": "M3_beta200",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 19.193402552386,
+        "residual_row10_km": 0.046407560633,
+        "ric_end_km": {
+          "cross": -3.256457262291,
+          "radial": -0.12553407566,
+          "transverse": 18.914714611452
+        },
+        "rms_3d_km": 9.807580512094,
+        "rms_dv_kms": 0.011014485501,
+        "rms_ric_km": {
+          "cross": 1.479805305828,
+          "radial": 0.454154175774,
+          "transverse": 9.684655685293
+        }
+      },
+      "M3_beta400": {
+        "along_track_trend": {
+          "c0_km": 3.163483948708,
+          "c1_km_per_day": -0.761066417014,
+          "c2_km_per_day2_quadratic_fit": -2.125254436878,
+          "detrended_linear_rms_km": 1.700617452651,
+          "secular_ratio_c1T_over_detRMS": 1.342570751277
+        },
+        "bias_ric_km": {
+          "cross": -0.024663689938,
+          "radial": 0.012996466428,
+          "transverse": 2.021884323187
+        },
+        "equivalent_time_err_s": {
+          "end": -0.004166679151,
+          "max_abs": 0.619014251046
+        },
+        "max_res_km": 5.436575871412,
+        "model": "M3_beta400",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 3.262358956505,
+        "residual_row10_km": 0.046364910928,
+        "ric_end_km": {
+          "cross": -3.262197957844,
+          "radial": -0.005991615875,
+          "transverse": -0.031851930393
+        },
+        "rms_3d_km": 3.132828543743,
+        "rms_dv_kms": 0.003409512139,
+        "rms_ric_km": {
+          "cross": 1.47849290949,
+          "radial": 0.462318784583,
+          "transverse": 2.723037778383
+        }
+      },
+      "M3_beta50": {
+        "along_track_trend": {
+          "c0_km": -19.060922217546,
+          "c1_km_per_day": 43.643203656238,
+          "c2_km_per_day2_quadratic_fit": 12.713581781047,
+          "detrended_linear_rms_km": 8.579746996272,
+          "secular_ratio_c1T_over_detRMS": 15.260311408437
+        },
+        "bias_ric_km": {
+          "cross": -0.025236443452,
+          "radial": -0.559043872977,
+          "transverse": 46.403883266811
+        },
+        "equivalent_time_err_s": {
+          "end": 17.394985958223,
+          "max_abs": 17.361774588563
+        },
+        "max_res_km": 133.028329591056,
+        "model": "M3_beta50",
+        "note_row0_zero": "row-0 residual is identically zero by declared initialization",
+        "residual_end_km": 133.028329591056,
+        "residual_row10_km": 0.046672533791,
+        "ric_end_km": {
+          "cross": -3.217715539018,
+          "radial": -1.962118494563,
+          "transverse": 132.974933244991
+        },
+        "rms_3d_km": 60.495665460791,
+        "rms_dv_kms": 0.068179520358,
+        "rms_ric_km": {
+          "cross": 1.487822504397,
+          "radial": 0.842517249168,
+          "transverse": 60.471498149328
+        }
+      }
+    }
+  }
+}

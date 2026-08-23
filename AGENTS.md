@@ -175,5 +175,17 @@ Kepler-period excess) is COMPLETE (2026-08-23) in
 `src/lab_utils/orbits.py` (second consumer after Exp 009, equivalence-pinned).
 Next: 013 JPL ephemeris validation per `localdocs/roadmap.md`, reusing
 `src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
-Next: 013 JPL ephemeris validation per `localdocs/roadmap.md`, reusing
-`src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
+Experiment 013 (JPL ephemeris validation — ISS (-125544) vs pinned NASA/JPL Horizons
+ICRF/TDB geometric states over a 3-day window; byte-pinned snapshot under the repo
+(`-text` gitattributes), offline-deterministic analysis, exact-grid alignment,
+reference-built RTN residuals, pre-registered decision rules) is COMPLETE (2026-08-24)
+in `research/orbital-mechanics/experiments/jplValidation/`: J2 removes 99.33% of
+residual RMS (bootstrap CI excludes zero); the declared drag tier WORSENS agreement at
+primary beta=100 and the pre-declared beta band crosses zero only at its edge
+(beta=400 -> 3.13 km vs M2 8.22 km) — documented verbatim without tuning; error budget
+bounds integration/interpolation/time/init/constants before joint attribution of the
+remainder to reference uncertainty + unmodelled physics.
+Next: 014 eclipse timing / launch windows per `localdocs/roadmap.md`, reusing
+`src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`; declared follow-up
+candidates from Exp 013 include a refined effective-drag study (separate experiment)
+and a differential SGP4 arm via Horizons COMMAND='TLE'.

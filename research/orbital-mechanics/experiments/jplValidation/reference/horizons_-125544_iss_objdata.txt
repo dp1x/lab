@@ -1,0 +1,15 @@
+API VERSION: 1.2
+API SOURCE: NASA/JPL Horizons API
+
+*******************************************************************************
+ Revised: Aug 23, 2026  International Space Station (ISS) / (Earth)     -125544
+ 
+ ISS (International Space Station) (1998-067A)
+  Large multi-module manned earth-orbiting space station used for research and
+  development purposes.
+ 
+  Trajectory is TLE-based. Predicts run for 4 weeks into future, but are of
+  low accuracy for times more than a few days past the revision date above.
+ 
+ Launched: 1998-Nov-20 (subsequent assembly in orbit through 2004)
+*******************************************************************************

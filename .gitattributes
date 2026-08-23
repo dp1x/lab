@@ -1,0 +1,4 @@
+# Raw external-data snapshots must never be line-ending-normalized: their
+# identity is the byte-for-byte SHA-256 pinned in MANIFEST.json, and
+# core.autocrlf=true would otherwise corrupt them on fresh clones.
+research/orbital-mechanics/experiments/jplValidation/reference/*.txt -text

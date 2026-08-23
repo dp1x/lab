@@ -1,0 +1,91 @@
+{
+  "acquisition": {
+    "base_url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+    "http_method": "GET",
+    "http_status": {
+      "objdata": 200,
+      "vectors": 200
+    },
+    "query_params": {
+      "objdata": {
+        "COMMAND": "'-125544'",
+        "MAKE_EPHEM": "'NO'",
+        "OBJ_DATA": "'YES'",
+        "format": "text"
+      },
+      "vectors": {
+        "CAL_FORMAT": "'BOTH'",
+        "CENTER": "'500@399'",
+        "COMMAND": "'-125544'",
+        "CSV_FORMAT": "'YES'",
+        "EPHEM_TYPE": "'VECTORS'",
+        "MAKE_EPHEM": "'YES'",
+        "OBJ_DATA": "'NO'",
+        "OUT_UNITS": "'KM-S'",
+        "REF_PLANE": "'FRAME'",
+        "REF_SYSTEM": "'ICRF'",
+        "START_TIME": "'2026-08-24 00:00'",
+        "STEP_SIZE": "'2m'",
+        "STOP_TIME": "'2026-08-27 00:00'",
+        "TIME_DIGITS": "'FRACSEC'",
+        "TIME_TYPE": "'TDB'",
+        "VEC_CORR": "'NONE'",
+        "VEC_TABLE": "'2'",
+        "format": "text"
+      }
+    },
+    "request_order": [
+      "objdata",
+      "vectors"
+    ],
+    "response_sha256": {
+      "objdata": "8032837052bbd1dae8db338201e00e798e8fefec3ce04baaa0bc1edc7d453798",
+      "vectors": "d62858c687f2df06b62f4b307710b3be5aaea8283badc63049d1e2e07425b7d1"
+    },
+    "retrieved_utc": {
+      "objdata": "2026-08-23T21:43:56.902900+00:00",
+      "vectors_complete": "2026-08-23T21:44:06.144447+00:00"
+    },
+    "service": "NASA JPL Horizons"
+  },
+  "experiment": "jplValidation",
+  "manifest_version": 1,
+  "provenance": {
+    "acquisition_script": "fetch_horizons_snapshot.py",
+    "attribution": "Source: NASA/JPL Solar System Dynamics Horizons system (public API, human-use-rate access; see LICENSE-NOTES.md)",
+    "header_metadata": {
+      "center_body_name": "Earth (399)                     {source: DE441}",
+      "center_site_name": "BODY CENTER",
+      "eop_file": "eop.260821.p261117",
+      "output_type": "GEOMETRIC cartesian states",
+      "output_units": "KM-S",
+      "reference_frame": "ICRF",
+      "start_time_echo": "A.D. 2026-Aug-24 00:00:00.0000 TDB",
+      "step_size_echo": "2 minutes",
+      "stop_time_echo": null,
+      "target_body_name": "International Space Station (spacecraft) (-125544) {source: iss}"
+    },
+    "horizons_api_version": "1.2",
+    "single_fetch_policy": "one-shot online acquisition; all numerical runs consume these committed snapshots only and never access the network",
+    "trajectory_revised_date": "Aug 23, 2026",
+    "trajectory_tle_based_disclosed": true
+  },
+  "snapshot": {
+    "files": {
+      "horizons_-125544_iss_objdata.txt": {
+        "bytes": 667,
+        "sha256": "8032837052bbd1dae8db338201e00e798e8fefec3ce04baaa0bc1edc7d453798"
+      },
+      "horizons_-125544_iss_vectors_2026-08-24_to_2026-08-27_tdb_2min.txt": {
+        "bytes": 426243,
+        "sha256": "d62858c687f2df06b62f4b307710b3be5aaea8283badc63049d1e2e07425b7d1"
+      }
+    }
+  },
+  "structure": {
+    "cadence_s": 120.0,
+    "jdtdb_first": 2461276.5,
+    "jdtdb_last": 2461279.5,
+    "rows": 2161
+  }
+}
