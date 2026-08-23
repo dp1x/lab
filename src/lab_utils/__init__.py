@@ -27,6 +27,7 @@ from lab_utils.orbits import (
     solve_kepler,
     steps_per_orbit,
     true_anomaly_from_E,
+    j2_rhs,
 )
 from lab_utils.results import save_json_result
 
@@ -53,4 +54,5 @@ __all__ = [
     "rv_to_coe_eci",
     "seed_state",
     "steps_per_orbit",
+    "j2_rhs",
 ]

@@ -5,6 +5,8 @@ through per-experiment importlib hops (Exp 008/009/010 -> {008, 009, 006, 002}).
 Bodies are transcribed verbatim from the donor experiments; experiments 001-010
 retain frozen local versions pending opportunistic migration, and equivalence is
 pinned by tests in ``src/lab_utils/tests/test_orbits_canon.py``.
+``j2_rhs`` (J2 Cowell right-hand side) graduated at Exp 012 -- second consumer
+after donor Exp 009; pinned against the donor propagator on J2-on and J2-off paths.
 
 Conventions: ECI frame, km / km^3-s^2 / s units, angles in radians.
 """
@@ -29,6 +31,7 @@ __all__ = [
     "rv_to_coe_eci",
     "seed_state",
     "steps_per_orbit",
+    "j2_rhs",
 ]
 
 # --------------------------------------------------------------------------- #
@@ -196,3 +199,34 @@ def steps_per_orbit(e: float, base: int = 512, ecc_base: int = 720) -> int:
     if e <= 0.0:
         return base
     return max(base, int(np.ceil(ecc_base / (1.0 - e) ** 1.5)))
+
+
+def j2_rhs(mu: float, j2: float, R_eq_km: float = R_EARTH_KM):
+    """Build f(t, x6) for r'' = -mu*r/|r|^3 + a_J2(r) in ECI (Z = spin axis).
+
+    a_J2 = -(3 mu J2 R_eq^2)/(2 r^5) * [x(1-5z^2/r^2), y(1-5z^2/r^2), z(3-5z^2/r^2)],
+    the gradient of U_J2 = mu J2 R_eq^2 P2(z/r)/r^3 (sign check pinned by tests).
+
+    Graduated at Exp 012 (second consumer after donor Exp 009). Op order is
+    transcribed verbatim from the donor's inline accel closure -- Kepler term
+    first, j2 == 0 short-circuit preserved, c*(r_i*f) association preserved --
+    so ``rk4_propagate(j2_rhs(...), t, x0)`` is arithmetic-compatible with the
+    verified Exp 006/009 loop structure (equivalence pinned vs donors in
+    ``src/lab_utils/tests/test_orbits_canon.py``). The RHS takes t explicitly
+    (non-autonomous-safe signature required by rk4_propagate).
+    """
+    re2 = R_eq_km ** 2
+
+    def f(_t: float, x: np.ndarray) -> np.ndarray:
+        r = x[:3]
+        rm = np.linalg.norm(r)
+        a_kep = -mu * r / rm**3
+        if j2 == 0.0:
+            return np.concatenate([x[3:], a_kep])
+        z2r2 = (r[2] * r[2]) / (rm * rm)
+        c = -1.5 * j2 * mu * re2 / rm**5
+        g = 1.0 - 5.0 * z2r2
+        a_j2 = c * np.array([r[0] * g, r[1] * g, r[2] * (3.0 - 5.0 * z2r2)])
+        return np.concatenate([x[3:], a_kep + a_j2])
+
+    return f

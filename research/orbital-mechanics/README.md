@@ -26,7 +26,7 @@ checks and real-world data (NASA/JPL Horizons) as ultimate validation.
 | 009 | J2 precession | **complete** (2026-08-22) | Secular Ω̇/ω̇ from Earth's oblateness: full-force RK4 rediscovers first-order rates via independent estimator; model-order residual separated from integration error; LEO/SSO/Molniya/critical-i anchors |
 | 010 | Orbit decay | **complete** (2026-08-22) | Atmospheric drag (first non-conservative force): dissipation accounting + monotonicity doctrine; decay law vs erfi/quadrature oracles (3.6 m / 500 revs); scalings, co-rotation twins, J2 mean-element transient, reentry timing; 39 tests |
 | 011 | Lagrange points | **complete** (2026-08-22) | Rotating-frame CR3BP: L1–L5 equilibria, Jacobi integral, Routh stability boundary, nonlinear perturbation signatures, dimensional cross-check, adversarial mutant battery; first rotating-frame experiment; shared integrators/orbits graduated to `src/lab_utils` |
-| 012 | Orbit classes | planned | Sun-synchronous / Molniya / GTO |
+| 012 | Orbit classes | **complete** (2026-08-23) | Constraint-defined families: SSO inclination lock + finite existence limit (a_max = 12352.5 km); Molniya apsidal freeze + semi-synchronous resonance + dwell geometry (+323 s/orbit short-period Kepler-excess finding near lock); GEO 1:1 fixed point with nonzero-rate negative control; GTO vis-viva budgets anchored to Exp 004; adversarial convention battery; `j2_rhs` graduated to `src/lab_utils` |
 | 013 | JPL ephemeris validation | planned | Propagator vs NASA real positions |
 | 014+ | Eclipse timing, launch windows, trajectory optimization, … | planned | each seeds the next |
 

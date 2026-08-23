@@ -1,0 +1,1341 @@
+{
+  "meta": {
+    "description": "Exp 012 orbit classes: constraint-defined families recovered under two-body + first-order secular J2 + spherical-Earth rotation. SSO inclination lock + finite existence boundary (a_max = 12352.5 km); Molniya apsidal freeze at cos^2 i = 1/5 + semi-synchronous resonance (a = 26561.76 km) + draconitic/anomalistic period split + dwell fractions + stroboscopic apogee drift; GEO 1:1 fixed point (a = 42164.17 km) with nonzero-but-unobservable individual rates; GTO vis-viva budgets anchored to Exp 004; adversarial convention battery.",
+    "git_commit": "78dadef",
+    "name": "orbit_classes",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-23T04:00:32+00:00"
+  },
+  "results": {
+    "adversarial_battery": {
+      "documented_blind_spots": {
+        "M02b_tropical_year": "2.1e-7 deg behavioral separation is below any defensible threshold; pinned by constant literal instead",
+        "M14_refinement_index_on_uniform_grids": "mis-indexed parabolic refinement step is an EQUIVALENT mutant here: all grids are np.linspace-uniform by contract, so t[i]+frac*(t[i]-t[i-1]) == t[i]+frac*(t[i+1]-t[i]) exactly; distinguishable only on non-uniform grids",
+        "M15_dwell_boundary_sign": "flipping the numeric-dwell boundary-correction sign shifts the result ~1e-3, below the 5e-3 corroboration tolerance BY DESIGN: the numeric dwell is a corroborating dual-form layer; the load-bearing dwell claims are the exact closed-form machine literals pinned in L1"
+      },
+      "dwell_linear_mutant": {
+        "error_pp": 42.360661868644,
+        "mutant_fraction": 0.5,
+        "true_fraction": 0.923606618686
+      },
+      "j2_sign_flip_wrong_branch": {
+        "detectable_by": "signed assert i>90 deg AND sign(Omega_dot)==+; omega-dot tests are BLIND here (even in cos i)",
+        "i_wrong_branch_deg": 82.212353208803,
+        "produced_Omega_dot_true_J2_deg_day": -0.985647332099
+      },
+      "p_equals_a_mutant": {
+        "K_shrink_factor": 0.20466576,
+        "Omega_dot_distortion_factor": 4.88601513023,
+        "detectable_by": "ABSOLUTE Omega_dot value assert (frozen-null tests map zero to zero and survive)"
+      },
+      "solar_halfday_resonance_mutant": {
+        "a_mutant_km": 26610.22280531012,
+        "a_true_km": 26561.762328167155,
+        "delta_km": 48.460477142966,
+        "detectable_by": "absolute-a assert at <=1e-9 rel; period-only asserts are blind (mutant is periodic too)"
+      },
+      "unwrap_guard_policy": {
+        "max_step_allowed_rad": 0.785398163397,
+        "molniya_law_spp": 5431,
+        "note": "guard enforced before every unwrap-based regression (fail loud, never silent wrap)"
+      }
+    },
+    "constants": {
+      "J2": 0.001082629821,
+      "J2_provenance": "WGS-84 TR8350.2: J2 = sqrt(5)*|C20_bar|, C20_bar = -0.484166774985e-3; EGM2008 1.08262668e-3 NOT used",
+      "P_sidereal_s": 86164.09000273276,
+      "R_E_km": 6378.137,
+      "R_E_provenance": "WGS-84 equatorial radius, NIMA TR8350.2",
+      "frame_convention": "ECI pseudo-inertial (Z=Earth spin axis) for dynamics/secular rates; ECEF via uniform rotation theta(t)=omega_E*t (spherical Earth, Exp 008 convention) for ground-track quantities",
+      "mu_km3_s2": 398600.4418,
+      "mu_provenance": "IAU 2015 Resolution B3 nominal GM_E; JPL DE440 planet-only 398600.435507 differs 1.5e-8 relative",
+      "omega_E_provenance": "WGS-84 / Vallado Table 3-1; MASTER sidereal constant, P_sidereal derived as 2*pi/omega_E",
+      "omega_E_rad_s": 7.2921159e-05,
+      "sso_convention": "mean SOLAR year 365.2422 d: 360/365.2422 = 0.985647332099 deg/day (Exp 009 continuity). Tropical-year variant differs 2.8e-8 deg/day (behaviorally indistinguishable, documented blindness). Sidereal-year rate 0.98560912 and Julian-year rate 0.98564685 deg/day are WRONG targets (separations 3.0e-4 / 1.7e-4 deg in i_SSO at 600 km).",
+      "sso_target_deg_day": 0.985647332099,
+      "units": "km, km^3/s^2, s; angles internal rad, I/O deg",
+      "year_julian_days_rejected": 365.25,
+      "year_mean_solar_days": 365.2422,
+      "year_sidereal_days_not_used_for_SSO": 365.25636,
+      "year_tropical_days_documented_not_used": 365.24219
+    },
+    "contract": {
+      "antisymmetry_ratio_tol": 0.02,
+      "apogee_drift_tol_deg_day": 0.05,
+      "claims_guards": "omega-dot trends claimed only for e>=0.01 seeds; Omega undefined at i in {0,180}; no silent arccos clipping",
+      "dual_path_agreement_tol_rel": 0.01,
+      "dual_path_note": "element-regression vs node-crossing rates agree <=1e-2 rel at 25-50-orbit windows (leakage-bias scale); both independently within the 1% model-order band of target",
+      "dwell_numeric_tol_abs": 0.005,
+      "i_sso_tolerance_deg": 5e-05,
+      "i_sso_tolerance_justification": "< half the binding solar-vs-Julian-year separation 1.67e-4 deg",
+      "model_residual_policy": "converged numeric vs first-order theory = model-order residual, never called integration error; plateau-under-h-halving proof required",
+      "omega_null_bound_deg_day": 0.005,
+      "period_ladder_policy": "report-only near i_crit: short-period event jitter gives a ~0.5 s floor; integrator order is proven by the state-space ladder instead",
+      "rates_kind": "SECULAR first-order J2; numeric estimates are orbit-averaged osculating regressions",
+      "spp_cap_policy": "family/sweep runs capped at 2048 spp (documented deviation); anchor runs use the full steps_per_orbit law"
+    },
+    "convergence": {
+      "period_metric": {
+        "T_peri_s": [
+          42871.75603775775,
+          42869.94320186457,
+          42870.84961981115,
+          42870.396410837864
+        ],
+        "errors_s": [
+          1.359626919882,
+          0.453208973297,
+          0.453208973289
+        ],
+        "finest_gap_ms": 453.208973289293,
+        "mean_order": 0.792481250368,
+        "orders_per_interval": [
+          1.584962500713,
+          2.3161574479207806e-11
+        ],
+        "spp_list": [
+          1358,
+          2716,
+          5432,
+          10864
+        ]
+      },
+      "rate_metric": {
+        "errors_deg_day": [
+          8.4126e-08,
+          3.562e-09,
+          1.61e-10
+        ],
+        "mean_order": 4.512955655697,
+        "orders_per_interval": [
+          4.561706498628,
+          4.464204812765
+        ],
+        "spp_list": [
+          256,
+          512,
+          1024,
+          2048
+        ]
+      },
+      "state_space": {
+        "max_pos_err_km": [
+          0.007274804808,
+          0.000406151562,
+          2.4069257e-05,
+          1.465322e-06
+        ],
+        "mean_order": 4.092491779905,
+        "orders_per_interval": [
+          4.162818440499,
+          4.076754687874,
+          4.037902211343
+        ],
+        "spp_list": [
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    "critical_sweep": {
+      "analytic_null_value_deg_day": 7.334324568573714e-17,
+      "antisym_ratio_pm05deg": 0.006746235635,
+      "offset_set": [
+        {
+          "delta_deg": -2.0,
+          "inc_deg": 61.434948822922,
+          "omega_dot_deg_day": 0.023352114534
+        },
+        {
+          "delta_deg": -1.0,
+          "inc_deg": 62.434948822922,
+          "omega_dot_deg_day": 0.011492319298
+        },
+        {
+          "delta_deg": -0.5,
+          "inc_deg": 62.934948822922,
+          "omega_dot_deg_day": 0.005670641869
+        },
+        {
+          "delta_deg": 0.5,
+          "inc_deg": 63.934948822922,
+          "omega_dot_deg_day": -0.005747672508
+        },
+        {
+          "delta_deg": 1.0,
+          "inc_deg": 64.434948822922,
+          "omega_dot_deg_day": -0.011340939874
+        },
+        {
+          "delta_deg": 2.0,
+          "inc_deg": 65.434948822922,
+          "omega_dot_deg_day": -0.02228745249
+        }
+      ],
+      "plateau_at_lock_by_spp": {
+        "1024": -2.6991817e-05,
+        "2048": -5.7715828e-05,
+        "4096": -5.9640356e-05
+      },
+      "slope_fit_deg_day_per_deg": -0.011411576229,
+      "slope_theory_deg_day_per_deg": -0.011529945722,
+      "spp_policy": "min(law, 2048) documented deviation; anchor runs use full law",
+      "stage_A": [
+        {
+          "inc_deg": 61.5,
+          "omega_dot_deg_day": 0.022553303363
+        },
+        {
+          "inc_deg": 62.0,
+          "omega_dot_deg_day": 0.016607057597
+        },
+        {
+          "inc_deg": 62.5,
+          "omega_dot_deg_day": 0.01073182386
+        },
+        {
+          "inc_deg": 63.0,
+          "omega_dot_deg_day": 0.004929342359
+        },
+        {
+          "inc_deg": 63.5,
+          "omega_dot_deg_day": -0.000798669617
+        },
+        {
+          "inc_deg": 64.0,
+          "omega_dot_deg_day": -0.006450518154
+        },
+        {
+          "inc_deg": 64.5,
+          "omega_dot_deg_day": -0.012024533164
+        },
+        {
+          "inc_deg": 65.0,
+          "omega_dot_deg_day": -0.017519068824
+        },
+        {
+          "inc_deg": 65.5,
+          "omega_dot_deg_day": -0.022932504021
+        }
+      ],
+      "stage_B": [
+        {
+          "inc_deg": 62.95,
+          "omega_dot_deg_day": 0.005506267534
+        },
+        {
+          "inc_deg": 63.0,
+          "omega_dot_deg_day": 0.004929342359
+        },
+        {
+          "inc_deg": 63.05,
+          "omega_dot_deg_day": 0.004353161898
+        },
+        {
+          "inc_deg": 63.099999999999994,
+          "omega_dot_deg_day": 0.003777727857
+        },
+        {
+          "inc_deg": 63.14999999999999,
+          "omega_dot_deg_day": 0.003203041937
+        },
+        {
+          "inc_deg": 63.19999999999999,
+          "omega_dot_deg_day": 0.002629105838
+        },
+        {
+          "inc_deg": 63.249999999999986,
+          "omega_dot_deg_day": 0.002055921257
+        },
+        {
+          "inc_deg": 63.29999999999998,
+          "omega_dot_deg_day": 0.001483489891
+        },
+        {
+          "inc_deg": 63.34999999999998,
+          "omega_dot_deg_day": 0.000911813431
+        },
+        {
+          "inc_deg": 63.39999999999998,
+          "omega_dot_deg_day": 0.000340893568
+        },
+        {
+          "inc_deg": 63.449999999999974,
+          "omega_dot_deg_day": -0.00022926801
+        },
+        {
+          "inc_deg": 63.49999999999997,
+          "omega_dot_deg_day": -0.000798669617
+        },
+        {
+          "inc_deg": 63.54999999999997,
+          "omega_dot_deg_day": -0.001367309571
+        },
+        {
+          "inc_deg": 63.599999999999966,
+          "omega_dot_deg_day": -0.001935186189
+        },
+        {
+          "inc_deg": 63.64999999999996,
+          "omega_dot_deg_day": -0.002502297793
+        },
+        {
+          "inc_deg": 63.69999999999996,
+          "omega_dot_deg_day": -0.003068642708
+        },
+        {
+          "inc_deg": 63.74999999999996,
+          "omega_dot_deg_day": -0.00363421926
+        },
+        {
+          "inc_deg": 63.799999999999955,
+          "omega_dot_deg_day": -0.004199025777
+        },
+        {
+          "inc_deg": 63.84999999999995,
+          "omega_dot_deg_day": -0.00476306059
+        },
+        {
+          "inc_deg": 63.89999999999995,
+          "omega_dot_deg_day": -0.005326322033
+        },
+        {
+          "inc_deg": 63.949999999999946,
+          "omega_dot_deg_day": -0.005888808442
+        }
+      ],
+      "zero_crossing_localized_deg": 63.42989447034195
+    },
+    "figures": [
+      "f1_sso_existence.png",
+      "f2_omegadot_vs_inclination.png",
+      "f3_molniya_dwell.png",
+      "f4_gto_budget.png",
+      "f5_convergence.png",
+      "f6_repeat_tracks.png"
+    ],
+    "geo": {
+      "Omega_dot_deg_day_i0": -0.013414107081,
+      "a_geo_km": 42164.169461861835,
+      "figure8_center_drift_deg_day": 0.013210413773,
+      "h_geo_km": 35786.03246186183,
+      "inclined_i5_T_node_num_minus_sid_ms": -10199.347775036586,
+      "inclined_i5_T_node_pred_minus_sid_ms": -9507.152001766372,
+      "mean_element_sync_shift_km": 2.088946040793,
+      "model_boundary_note": "Keplerian n=omega_E radius is the class anchor (42,164.169 km). The mean-element longitude-rate condition lambda_dot=M_dot+omega_dot+Omega_dot=omega_E shifts the synchronous radius by the recorded km-scale amount (first-order disclosure; real GEO fights tesseral+luni-solar drift outside this model).",
+      "omega_dot_deg_day_i0": 0.026828214162,
+      "period_match_rel_err": 8.444303901953428e-16,
+      "relation_omegadot_eq_minus2Omegadot_i0_rel_err": 0.0,
+      "stationarity_residual_deg_day_keplerian_a": 0.026828214162
+    },
+    "gto": {
+      "bugs": {
+        "bug_X_altitude_as_radius": {
+          "circular_period_at_wrong_apogee_hours": 18.714524932905,
+          "dv_total_km_s": 3.769955566634,
+          "note": "r_a := 35786.033 km (altitude) instead of 42164.17 km (radius)"
+        },
+        "bug_Y_radius_as_altitude": {
+          "dv_total_km_s": 3.974428181064,
+          "note": "r_a := R_E + 42164.17 km"
+        },
+        "circular_v_mutant_errors_km_s": {
+          "at_molniya_apogee": 2.376378421392,
+          "at_molniya_perigee": -6.147570958356
+        },
+        "swap_mutant_note": "dv1<->dv2 swap leaves the TOTAL invariant; per-burn signed asserts required",
+        "swap_mutant_total_km_s": 3.892557017752
+      },
+      "canonical_flight": {
+        "arrival": {
+          "j2_on": {
+            "arrival_radius_km": 41983.73574906362,
+            "arrival_rel_err": 0.004279313813,
+            "tof_hours": 5.275064047216
+          },
+          "kepler_only": {
+            "arrival_radius_km": 42164.16946100998,
+            "arrival_rel_err": 2.0203281042304966e-11,
+            "tof_hours": 5.275064047216
+          }
+        },
+        "e": 0.72654293035,
+        "hp_km": 300.0,
+        "spp": 5035
+      },
+      "exp004_anchor": {
+        "dv_total_km_s": 3.931859594283,
+        "exp004_recorded_km_s": 3.9319,
+        "hp_km": 200.0,
+        "note": "continuity anchor: same vis-viva forms already validated vs RK4 to <=4.2e-9 in Exp 004"
+      },
+      "rows": [
+        {
+          "a_km": 24371.15323093092,
+          "dv1_km_s": 2.45458790131,
+          "dv2_km_s": 1.477271692974,
+          "dv_total_km_s": 3.931859594283,
+          "e": 0.730085115888,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 200.0,
+          "tof_hours": 5.258872050589,
+          "va_km_s": 1.597388412458,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.784261748566,
+          "vp_km_s": 10.238849649876
+        },
+        {
+          "a_km": 24396.15323093092,
+          "dv1_km_s": 2.44008450892,
+          "dv2_km_s": 1.472034140079,
+          "dv_total_km_s": 3.912118648998,
+          "e": 0.728312208189,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 250.0,
+          "tof_hours": 5.266965974805,
+          "va_km_s": 1.602625965353,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.754845497373,
+          "vp_km_s": 10.194930006293
+        },
+        {
+          "a_km": 24421.15323093092,
+          "dv1_km_s": 2.425732698207,
+          "dv2_km_s": 1.466824319545,
+          "dv_total_km_s": 3.892557017752,
+          "e": 0.72654293035,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 300.0,
+          "tof_hours": 5.275064047216,
+          "va_km_s": 1.607835785887,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.725760232077,
+          "vp_km_s": 10.151492930284
+        },
+        {
+          "a_km": 24471.15323093092,
+          "dv1_km_s": 2.397473053457,
+          "dv2_km_s": 1.456486675566,
+          "dv_total_km_s": 3.853959729023,
+          "e": 0.723015219755,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 400.0,
+          "tof_hours": 5.291272628129,
+          "va_km_s": 1.618173429865,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.668558175407,
+          "vp_km_s": 10.066031228864
+        },
+        {
+          "a_km": 24521.15323093092,
+          "dv1_km_s": 2.369788104813,
+          "dv2_km_s": 1.446256414218,
+          "dv_total_km_s": 3.816044519031,
+          "e": 0.719501895558,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 500.0,
+          "tof_hours": 5.307497776377,
+          "va_km_s": 1.628403691213,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.612608173224,
+          "vp_km_s": 9.982396278037
+        },
+        {
+          "a_km": 24571.15323093092,
+          "dv1_km_s": 2.342658020768,
+          "dv2_km_s": 1.436131270794,
+          "dv_total_km_s": 3.778789291562,
+          "e": 0.716002869934,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 600.0,
+          "tof_hours": 5.32373947506,
+          "va_km_s": 1.638528834637,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.557865206533,
+          "vp_km_s": 9.9005232273
+        },
+        {
+          "a_km": 24671.15323093092,
+          "dv1_km_s": 2.289987888379,
+          "dv2_km_s": 1.416187665531,
+          "dv_total_km_s": 3.70617555391,
+          "e": 0.709047366663,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 800.0,
+          "tof_hours": 5.356272456393,
+          "va_km_s": 1.6584724399,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.451831333486,
+          "vp_km_s": 9.741819221865
+        },
+        {
+          "a_km": 24771.15323093092,
+          "dv1_km_s": 2.239322265277,
+          "dv2_km_s": 1.396639237437,
+          "dv_total_km_s": 3.635961502714,
+          "e": 0.702148021482,
+          "h_conservation_rp_vp_over_ra_va": 1.0,
+          "hp_km": 1000.0,
+          "tof_hours": 5.388871437959,
+          "va_km_s": 1.678020867994,
+          "vcirc_ra_km_s": 3.074660105431,
+          "vcirc_rp_km_s": 7.350138629613,
+          "vp_km_s": 9.58946089489
+        }
+      ]
+    },
+    "headline": {
+      "a_geo_km": 42164.169461861835,
+      "a_semisync_km": 26561.762328167155,
+      "antisym_ratio_pm05deg": 0.006746235635,
+      "apogee_event_rate_measured_deg_day": 355.460235485893,
+      "apogee_event_rate_pred_deg_day": 355.465273868066,
+      "apogee_mean_line_disclosure_deg_day": -1.133368081634,
+      "critical_inclination_deg": 63.434948822922,
+      "geo_inclined_i5_nodal_shift_num_ms": -10199.347775036586,
+      "geo_period_match_rel_err": 8.444303901953428e-16,
+      "geo_stationarity_residual_deg_day": 0.026828214162,
+      "gto_arrival_rel_err_j2": 0.004279313813,
+      "gto_arrival_rel_err_kepler": 2.0203281042304966e-11,
+      "gto_dv_total_300km_km_s": 3.892557017752,
+      "gto_exp004_anchor_km_s": 3.931859594283,
+      "i_SSO_500km_deg": 97.401785943095,
+      "i_SSO_600km_deg": 97.787646791197,
+      "i_SSO_800km_deg": 98.603085267154,
+      "lock_omega_dot_regression_deg_day": -5.9727401e-05,
+      "molniya_dwell90_abs_err_numeric": 0.00098250744,
+      "molniya_dwell90_fraction": 0.923606618686,
+      "molniya_hp_ha_km": [
+        527.921205323461,
+        39839.329451010846
+      ],
+      "molniya_kepler_excess_peri_ms": 323005.16084601986,
+      "molniya_kepler_machinery_rel_err": 6.755443121562742e-16,
+      "molniya_split_first_order_disclosure_ms": 24.059563336778,
+      "pathological_all_ok": true,
+      "period_finest_gap_ms": 453.208973289293,
+      "rate_order_mean": 4.512955655697,
+      "repeat_corrected_radius_km": 26553.420404899953,
+      "slope_fit_deg_day_per_deg": -0.011411576229,
+      "sso_existence_a_max_km": 12352.505076188283,
+      "sso_existence_h_max_km": 5974.368076188283,
+      "sso_target_deg_day": 0.985647332099,
+      "state_order_mean": 4.092491779905,
+      "worst_sso_dual_path_disagreement_rel": 0.005195085035,
+      "worst_sso_numeric_closure_rel": 0.006143428213,
+      "zero_crossing_localized_deg": 63.42989447034195
+    },
+    "molniya_family": {
+      "p_scaling_exponent_target": 1.0,
+      "p_scaling_loglog_slope": 1.0,
+      "rows": [
+        {
+          "T_node_minus_T_sid_half_ms": 88074.45025709603,
+          "T_peri_minus_T_sid_half_ms": 88190.03352514119,
+          "analytic_Omega_dot_deg_day": -0.073810839001,
+          "analytic_omega_dot_deg_day": 3.664758574008329e-17,
+          "dwell90_closed": 0.857621510067,
+          "dwell90_numeric": 0.860101216267,
+          "dwell_abs_err": 0.0024797062,
+          "e": 0.6,
+          "ha_km": 36120.68272506745,
+          "hp_km": 4246.567931266863,
+          "invariants": {
+            "energy_drift_rel": 1.481e-09,
+            "hz_range_rel": 1.02e-10
+          },
+          "law_steps_per_orbit": 2847,
+          "measured_Omega_dot_deg_day": -0.073428455064,
+          "measured_omega_dot_deg_day": -1.613642e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 121686.06460719457,
+          "T_peri_minus_T_sid_half_ms": 120784.51511636376,
+          "analytic_Omega_dot_deg_day": -0.086733603897,
+          "analytic_omega_dot_deg_day": 4.306382678162856e-17,
+          "dwell90_closed": 0.877597714874,
+          "dwell90_numeric": 0.880375989093,
+          "dwell_abs_err": 0.002778274219,
+          "e": 0.64,
+          "ha_km": 37183.15321819414,
+          "hp_km": 3184.097438140177,
+          "invariants": {
+            "energy_drift_rel": 3.566e-09,
+            "hz_range_rel": 2.21e-10
+          },
+          "law_steps_per_orbit": 3334,
+          "measured_Omega_dot_deg_day": -0.0862021974,
+          "measured_omega_dot_deg_day": -2.5893549e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 172820.10239427473,
+          "T_peri_minus_T_sid_half_ms": 173028.1522767691,
+          "analytic_Omega_dot_deg_day": -0.104607198131,
+          "analytic_omega_dot_deg_day": 5.193818840714755e-17,
+          "dwell90_closed": 0.896724530422,
+          "dwell90_numeric": 0.896781451686,
+          "dwell_abs_err": 5.6921264e-05,
+          "e": 0.68,
+          "ha_km": 38245.62371132082,
+          "hp_km": 2121.626945013489,
+          "invariants": {
+            "energy_drift_rel": 9.519e-09,
+            "hz_range_rel": 5.29e-10
+          },
+          "law_steps_per_orbit": 3978,
+          "measured_Omega_dot_deg_day": -0.103823014569,
+          "measured_omega_dot_deg_day": -2.691382e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 210361.54785819235,
+          "T_peri_minus_T_sid_half_ms": 210361.54785819963,
+          "analytic_Omega_dot_deg_day": -0.116235754152,
+          "analytic_omega_dot_deg_day": 5.771184590210732e-17,
+          "dwell90_closed": 0.905939797813,
+          "dwell90_numeric": 0.906121456951,
+          "dwell_abs_err": 0.000181659138,
+          "e": 0.7,
+          "ha_km": 38776.85895788416,
+          "hp_km": 1590.391698450147,
+          "invariants": {
+            "energy_drift_rel": 1.6303e-08,
+            "hz_range_rel": 8.55e-10
+          },
+          "law_steps_per_orbit": 4382,
+          "measured_Omega_dot_deg_day": -0.115254971048,
+          "measured_omega_dot_deg_day": -2.9968671e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 258444.1873686519,
+          "T_peri_minus_T_sid_half_ms": 258790.9371728092,
+          "analytic_Omega_dot_deg_day": -0.130348828823,
+          "analytic_omega_dot_deg_day": 6.471908387780847e-17,
+          "dwell90_closed": 0.91490536424,
+          "dwell90_numeric": 0.91571148814,
+          "dwell_abs_err": 0.0008061239,
+          "e": 0.72,
+          "ha_km": 39308.0942044475,
+          "hp_km": 1059.156451886804,
+          "invariants": {
+            "energy_drift_rel": 2.8987e-08,
+            "hz_range_rel": 1.428e-09
+          },
+          "law_steps_per_orbit": 4860,
+          "measured_Omega_dot_deg_day": -0.129092911612,
+          "measured_omega_dot_deg_day": -3.935353e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 323725.617165539,
+          "T_peri_minus_T_sid_half_ms": 323517.56728303735,
+          "analytic_Omega_dot_deg_day": -0.147718502865,
+          "analytic_omega_dot_deg_day": 7.334324568573714e-17,
+          "dwell90_closed": 0.923606618686,
+          "dwell90_numeric": 0.924589126127,
+          "dwell_abs_err": 0.00098250744,
+          "e": 0.74,
+          "ha_km": 39839.329451010846,
+          "hp_km": 527.921205323461,
+          "invariants": {
+            "energy_drift_rel": 5.3809e-08,
+            "hz_range_rel": 2.478e-09
+          },
+          "law_steps_per_orbit": 5431,
+          "measured_Omega_dot_deg_day": -0.146065376756,
+          "measured_omega_dot_deg_day": -5.7715828e-05,
+          "spp_cap_used": 2048
+        },
+        {
+          "T_node_minus_T_sid_half_ms": 363809.8945266538,
+          "T_peri_minus_T_sid_half_ms": 364202.87763803935,
+          "analytic_Omega_dot_deg_day": -0.157951580238,
+          "analytic_omega_dot_deg_day": 7.84240384999869e-17,
+          "dwell90_closed": 0.927853193593,
+          "dwell90_numeric": 0.928156175913,
+          "dwell_abs_err": 0.00030298232,
+          "e": 0.75,
+          "ha_km": 40104.94707429252,
+          "hp_km": 262.303582041789,
+          "invariants": {
+            "energy_drift_rel": 7.4665e-08,
+            "hz_range_rel": 3.319e-09
+          },
+          "law_steps_per_orbit": 5760,
+          "measured_Omega_dot_deg_day": -0.156032308555,
+          "measured_omega_dot_deg_day": -7.1005488e-05,
+          "spp_cap_used": 2048
+        }
+      ],
+      "scaling_note": "omega_dot prop-to (R/p)^2: log|w| vs log((1-e^2)^-2) slope must be 1"
+    },
+    "molniya_periods": {
+      "apogee_drift": {
+        "days_propagated": 12.5,
+        "event_rate_abs_err_deg_day": 0.005038382172813272,
+        "event_rate_measured_deg_day": 355.460235485893,
+        "event_rate_predicted_deg_day": 355.465273868066,
+        "fit_residual_rms_deg": 0.009223011847,
+        "mean_line_drift_disclosure_deg_day": -1.133368081634,
+        "n_apogees": 25
+      },
+      "at_exact_lock": {
+        "node_crossing_Omega_dot_deg_day": -0.149044401535,
+        "omega_dot_element_regression_deg_day": -5.9727401e-05,
+        "omega_dot_null_bound_deg_day": 0.005
+      },
+      "kepler_machinery_check": {
+        "T_node_rel_err_vs_kepler": 6.755443121562742e-16,
+        "T_peri_rel_err_vs_kepler": 6.755443121562742e-16
+      },
+      "naive_radius_km": 26561.762328167155,
+      "near_critical_63p4": {
+        "convergence_ratio_excess": 1.000072579475,
+        "kepler_excess_node_ms": 322968.35967242805,
+        "kepler_excess_peri_ms": 323005.16084601986,
+        "omega_dot_analytic_deg_day": 0.000403142276,
+        "orbits_used": 32,
+        "split_detection_note": "first-order split ~ +24 ms is BELOW the short-period event-jitter floor (~tens of ms here); recorded as theory disclosure, NOT claimed as detected",
+        "split_ms_first_order_theory_disclosure": 24.059563336778,
+        "split_ms_measured": 36.801173591812
+      },
+      "repeat_corrected_radius_km": 26553.420404899953,
+      "repeat_lattice_keplerian": [
+        {
+          "a_res_km": 42164.169461861835,
+          "closure_deg_after_m_orbits": 7.44e-10,
+          "m_per_k_days": "1:1"
+        },
+        {
+          "a_res_km": 26561.762328167155,
+          "closure_deg_after_m_orbits": 1.513e-09,
+          "m_per_k_days": "2:1"
+        },
+        {
+          "a_res_km": 20270.41842957966,
+          "closure_deg_after_m_orbits": 2.307e-09,
+          "m_per_k_days": "3:1"
+        },
+        {
+          "a_res_km": 66931.4469591249,
+          "closure_deg_after_m_orbits": 7.47e-10,
+          "m_per_k_days": "1:2"
+        }
+      ]
+    },
+    "pathological": {
+      "all_ok": true,
+      "es_tested": [
+        0.0,
+        0.05,
+        0.2,
+        0.74
+      ],
+      "incs_tested_deg": [
+        0.0,
+        63.434948822922,
+        90.0,
+        116.565051177078,
+        180.0
+      ],
+      "rows": [
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.0,
+          "energy_drift_rel": 1.48e-10,
+          "inc_deg": 0.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 6878.137,
+          "r_min_km": 6858.927357718797
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.05,
+          "energy_drift_rel": 3.0156596516610387e-11,
+          "inc_deg": 0.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 7200.691902525533,
+          "r_min_km": 6534.230150000001
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.2,
+          "energy_drift_rel": 4.9223817629735824e-11,
+          "inc_deg": 0.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 8222.113474446693,
+          "r_min_km": 5502.509599999999
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.74,
+          "energy_drift_rel": 3.45e-10,
+          "inc_deg": 0.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 11261.6959608548,
+          "r_min_km": 1788.31562
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.0,
+          "energy_drift_rel": 1.46e-10,
+          "inc_deg": 63.434948822922,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 6878.137000000001,
+          "r_min_km": 6872.377341708274
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.05,
+          "energy_drift_rel": 3.0500885559635284e-11,
+          "inc_deg": 63.434948822922,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 7218.668864621985,
+          "r_min_km": 6534.230150000001
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.2,
+          "energy_drift_rel": 5.069528274367874e-11,
+          "inc_deg": 63.434948822922,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 8246.44071013335,
+          "r_min_km": 5502.5096
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.74,
+          "energy_drift_rel": 4.36e-10,
+          "inc_deg": 63.434948822922,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 11688.243992930169,
+          "r_min_km": 1788.31562
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.0,
+          "energy_drift_rel": 1.45e-10,
+          "inc_deg": 90.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 6882.05611291436,
+          "r_min_km": 6874.260818867462
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.05,
+          "energy_drift_rel": 3.0604403040394103e-11,
+          "inc_deg": 90.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 7223.208821110622,
+          "r_min_km": 6534.23015
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.2,
+          "energy_drift_rel": 5.104220358128279e-11,
+          "inc_deg": 90.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 8252.57681703364,
+          "r_min_km": 5502.509599999999
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.74,
+          "energy_drift_rel": 4.56e-10,
+          "inc_deg": 90.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 11799.380778379973,
+          "r_min_km": 1788.31562
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.0,
+          "energy_drift_rel": 1.46e-10,
+          "inc_deg": 116.565051177078,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 6878.137,
+          "r_min_km": 6872.377341708262
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.05,
+          "energy_drift_rel": 3.04986795511889e-11,
+          "inc_deg": 116.565051177078,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 7218.668864621982,
+          "r_min_km": 6534.23015
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.2,
+          "energy_drift_rel": 5.067335163779858e-11,
+          "inc_deg": 116.565051177078,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 8246.440710133369,
+          "r_min_km": 5502.509599999999
+        },
+        {
+          "Omega_all_nan": false,
+          "Omega_all_nan_expected": false,
+          "aei_finite": true,
+          "e": 0.74,
+          "energy_drift_rel": 4.36e-10,
+          "inc_deg": 116.565051177078,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 11688.243992930284,
+          "r_min_km": 1788.31562
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.0,
+          "energy_drift_rel": 1.48e-10,
+          "inc_deg": 180.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 6878.137,
+          "r_min_km": 6858.927357718755
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.05,
+          "energy_drift_rel": 3.0154636896328564e-11,
+          "inc_deg": 180.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 7200.691902525567,
+          "r_min_km": 6534.23015
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.2,
+          "energy_drift_rel": 4.922553104385871e-11,
+          "inc_deg": 180.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 8222.113474446727,
+          "r_min_km": 5502.509599999999
+        },
+        {
+          "Omega_all_nan": true,
+          "Omega_all_nan_expected": true,
+          "aei_finite": true,
+          "e": 0.74,
+          "energy_drift_rel": 3.45e-10,
+          "inc_deg": 180.0,
+          "ok": true,
+          "r_bounded": true,
+          "r_max_km": 11261.695960854848,
+          "r_min_km": 1788.31562
+        }
+      ]
+    },
+    "sso": {
+      "a_max_km": 12352.505076188283,
+      "anchors_deg": {
+        "500km": 97.401785943095,
+        "600km": 97.787646791197,
+        "800km": 98.603085267154
+      },
+      "bracket": [
+        {
+          "a_over_amax": 0.5,
+          "i_SSO_deg": 95.07089668284,
+          "status": "OK"
+        },
+        {
+          "a_over_amax": 0.9,
+          "i_SSO_deg": 133.756113158107,
+          "status": "OK"
+        },
+        {
+          "a_over_amax": 0.99,
+          "i_SSO_deg": 164.891794915187,
+          "status": "OK"
+        },
+        {
+          "a_over_amax": 0.999999,
+          "i_SSO_deg": 179.848409666724,
+          "status": "OK"
+        },
+        {
+          "a_over_amax": 1.000001,
+          "i_SSO_deg": null,
+          "status": "NO_REAL_SOLUTION"
+        },
+        {
+          "a_over_amax": 1.001,
+          "i_SSO_deg": null,
+          "status": "NO_REAL_SOLUTION"
+        }
+      ],
+      "convention_probes": {
+        "amax_sidereal_year_km": 12352.64190050463,
+        "earth_rotation_confusion_status": "NO_REAL_SOLUTION",
+        "eccentric_example_e02_rp600km": {
+          "a_km": 8722.67125,
+          "i_SSO_deg": 105.824545386036,
+          "rp_km": 6978.137
+        },
+        "eccentric_extension_note": "a_max(e) = a_max(0) * (1-e^2)^(-4/7)",
+        "i600_julian_year_deg": 97.787479452436,
+        "i600_mean_solar_deg": 97.787646791197,
+        "i600_sidereal_year_deg": 97.787343012323,
+        "i600_tropical_year_deg": 97.787647005739,
+        "julian_year_separation_deg": 0.000167338761,
+        "mean_solar_target_deg_day": 0.985647332099,
+        "sidereal_year_separation_deg": 0.000303778874
+      },
+      "h_max_km": 5974.368076188283,
+      "identity_cos_neg_apow72": {
+        "1200": -0.180853092558,
+        "400": -0.122389329453,
+        "800": -0.14958858585
+      },
+      "table": {
+        "e_0.00": [
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 400,
+            "i_SSO_deg": 97.030017713106,
+            "margin": 0.877610670547,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 450,
+            "i_SSO_deg": 97.214162255093,
+            "margin": 0.874421541358,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 500,
+            "i_SSO_deg": 97.401785943095,
+            "margin": 0.871173492513,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 550,
+            "i_SSO_deg": 97.592932653917,
+            "margin": 0.867865875658,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 600,
+            "i_SSO_deg": 97.787646791197,
+            "margin": 0.864498040081,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 650,
+            "i_SSO_deg": 97.985973305432,
+            "margin": 0.861069332718,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 700,
+            "i_SSO_deg": 98.187957715024,
+            "margin": 0.857579098159,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 750,
+            "i_SSO_deg": 98.393646128384,
+            "margin": 0.85402667866,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 800,
+            "i_SSO_deg": 98.603085267154,
+            "margin": 0.85041141415,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 850,
+            "i_SSO_deg": 98.8163224906,
+            "margin": 0.846732642237,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 900,
+            "i_SSO_deg": 99.03340582124,
+            "margin": 0.842989698221,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 950,
+            "i_SSO_deg": 99.254383971771,
+            "margin": 0.839181915095,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1000,
+            "i_SSO_deg": 99.47930637336,
+            "margin": 0.83530862356,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1050,
+            "i_SSO_deg": 99.708223205369,
+            "margin": 0.831369152029,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1100,
+            "i_SSO_deg": 99.941185426608,
+            "margin": 0.827362826635,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1150,
+            "i_SSO_deg": 100.17824480817,
+            "margin": 0.82328897124,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1200,
+            "i_SSO_deg": 100.419453967963,
+            "margin": 0.819146907442,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1500,
+            "i_SSO_deg": 101.956917127532,
+            "margin": 0.792823874218,
+            "status": "OK"
+          }
+        ],
+        "e_0.02": [
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 400,
+            "i_SSO_deg": 97.024366470463,
+            "margin": 0.877708562428,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 450,
+            "i_SSO_deg": 97.20836142951,
+            "margin": 0.874521984033,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 500,
+            "i_SSO_deg": 97.395832583319,
+            "margin": 0.871276533106,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 550,
+            "i_SSO_deg": 97.586823762431,
+            "margin": 0.867971561816,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 600,
+            "i_SSO_deg": 97.781379323122,
+            "margin": 0.864606419969,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 650,
+            "i_SSO_deg": 97.979544167379,
+            "margin": 0.861180455023,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 700,
+            "i_SSO_deg": 98.181363763888,
+            "margin": 0.857693012093,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 750,
+            "i_SSO_deg": 98.386884170078,
+            "margin": 0.854143433962,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 800,
+            "i_SSO_deg": 98.596152055279,
+            "margin": 0.850531061085,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 850,
+            "i_SSO_deg": 98.809214725049,
+            "margin": 0.846855231601,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 900,
+            "i_SSO_deg": 99.026120146733,
+            "margin": 0.84311528134,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 950,
+            "i_SSO_deg": 99.246916976311,
+            "margin": 0.839310543832,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1000,
+            "i_SSO_deg": 99.471654586613,
+            "margin": 0.83544035031,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1050,
+            "i_SSO_deg": 99.700383096965,
+            "margin": 0.831504029726,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1100,
+            "i_SSO_deg": 99.933153404343,
+            "margin": 0.827500908752,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1150,
+            "i_SSO_deg": 100.170017216127,
+            "margin": 0.82343031179,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1200,
+            "i_SSO_deg": 100.411027084529,
+            "margin": 0.819291560979,
+            "status": "OK"
+          },
+          {
+            "Omega_dot_check_deg_day": 0.985647332099,
+            "alt_km": 1500,
+            "i_SSO_deg": 101.947212385542,
+            "margin": 0.79298958197,
+            "status": "OK"
+          }
+        ]
+      }
+    },
+    "sso_numeric_closure": {
+      "600km": {
+        "dual_path_agreement_rel": 0.005195085035,
+        "i_SSO_deg": 97.787646791197,
+        "invariants": {
+          "energy_drift_rel": 2.377e-09,
+          "hz_range_rel": 1.186e-09
+        },
+        "orbits": 50,
+        "path_A_Omega_dot_deg_day": 0.979592078471,
+        "path_B_node_crossing_deg_day": 0.984681142618,
+        "residual_rel_path_A": 0.006143428213,
+        "spp": 512,
+        "target_deg_day": 0.985647332099
+      },
+      "800km": {
+        "dual_path_agreement_rel": 0.004031996495,
+        "i_SSO_deg": 98.603085267154,
+        "invariants": {
+          "energy_drift_rel": 1.429e-09,
+          "hz_range_rel": 7.13e-10
+        },
+        "orbits": 30,
+        "path_A_Omega_dot_deg_day": 0.979907536416,
+        "path_B_node_crossing_deg_day": 0.983858520168,
+        "residual_rel_path_A": 0.005823376674,
+        "spp": 512,
+        "target_deg_day": 0.985647332099
+      }
+    }
+  }
+}

@@ -159,3 +159,13 @@ use these instead of cloning per-experiment copies; CR3BP-specific code remains
 experiment-local until a second consumer appears.
 Next: 012 orbit classes per `localdocs/roadmap.md`, reusing
 `src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
+Experiment 012 (orbit classes — constraint-defined families: SSO inclination lock +
+finite existence boundary a_max = 12352.505 km, Molniya apsidal freeze + semi-synchronous
+resonance + dwell geometry, GEO 1:1 fixed point with nonzero-rate negative control,
+GTO budgets anchored to Exp 004, adversarial convention battery; finding: small-divisor
+short-period dynamics near the critical inclination give a measured +323 s/orbit
+Kepler-period excess) is COMPLETE (2026-08-23) in
+`research/orbital-mechanics/experiments/orbitClasses/`; `j2_rhs` graduated into
+`src/lab_utils/orbits.py` (second consumer after Exp 009, equivalence-pinned).
+Next: 013 JPL ephemeris validation per `localdocs/roadmap.md`, reusing
+`src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.

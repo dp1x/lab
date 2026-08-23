@@ -116,3 +116,57 @@ def test_orbital_period_value_anchor():
     expected = 2 * math.pi * math.sqrt(7000.0**3 / 398600.4418)
     assert abs(orbits.orbital_period(7000.0) - expected) < 1e-9
     assert 5820 < expected < 5835
+
+
+# --------------------------------------------------------------------------- #
+# J2 RHS graduation (donor: Exp 009 inline accel inside propagate_3d_rk4_j2)
+# --------------------------------------------------------------------------- #
+def test_j2_rhs_trajectory_matches_donor_j2_on():
+    """Full-force J2 Cowell trajectory: rk4_propagate(j2_rhs) vs donor loop."""
+    from lab_utils.integrators import rk4_propagate
+
+    mu = orbits.MU_EARTH_KM3S2
+    a, e, inc = orbits.R_EARTH_KM + 550.0, 0.05, np.radians(51.6)
+    r0, v0, _ = orbits.seed_state(a, e, inc, 0.3, 1.1, 0.7, mu)
+    T = orbits.orbital_period(a, mu)
+    t = np.linspace(0.0, 3.0 * T, 3 * 512 + 1)
+    mine = rk4_propagate(orbits.j2_rhs(mu, orbits.J2_EARTH), t,
+                         np.concatenate([r0, v0]))
+    theirs = j2009.propagate_3d_rk4_j2(r0, v0, mu, t, orbits.J2_EARTH)
+    rel = np.max(np.abs(mine - theirs)) / np.max(np.abs(theirs))
+    assert rel < 1e-12, f"J2-on donor equivalence broken: {rel:.3e}"
+
+
+def test_j2_rhs_bit_exact_vs_donor_j2_off():
+    """j2 == 0 path must reproduce the Kepler-only donor loop bit-for-bit."""
+    from lab_utils.integrators import rk4_propagate
+
+    mu = orbits.MU_EARTH_KM3S2
+    a, e, inc = orbits.R_EARTH_KM + 420.0, 0.01, np.radians(97.8)
+    r0, v0, _ = orbits.seed_state(a, e, inc, 0.0, 0.0, 0.0, mu)
+    T = orbits.orbital_period(a, mu)
+    t = np.linspace(0.0, 2.0 * T, 2 * 512 + 1)
+    x0 = np.concatenate([r0, v0])
+    mine = rk4_propagate(orbits.j2_rhs(mu, 0.0), t, x0)
+    theirs = j2009.propagate_3d_rk4_j2(r0, v0, mu, t, 0.0)
+    assert np.array_equal(mine, theirs), "J2=0 path not bit-equal to donor"
+
+
+def test_j2_rhs_acceleration_sign_structure():
+    """Inline gradient sign check: bulge pulls equatorially, thins polar radius."""
+    from lab_utils.integrators import rk4_step
+
+    mu, j2 = orbits.MU_EARTH_KM3S2, orbits.J2_EARTH
+    rhs = orbits.j2_rhs(mu, j2)
+    v = np.array([0.0, 7.0, 0.0])
+    # Equatorial point: J2 adds inward radial pull (|a| > mu/r^2).
+    x_eq = np.array([orbits.R_EARTH_KM + 500.0, 0.0, 0.0])
+    a_eq = rhs(0.0, np.concatenate([x_eq, v]))[3:]
+    rm = np.linalg.norm(x_eq)
+    assert np.linalg.norm(a_eq) > mu / rm**2
+    # Polar point: z-pull reduced by the exact bulge factor (1 - 3 J2 (R/r)^2).
+    x_pol = np.array([0.0, 0.0, orbits.R_EARTH_KM + 500.0])
+    a_pol = rhs(0.0, np.concatenate([x_pol, v]))[3:]
+    a_kep_z = -mu / (rm**2)
+    expected_z = a_kep_z * (1.0 - 3.0 * j2 * (orbits.R_EARTH_KM / rm) ** 2)
+    assert abs(a_pol[2] - expected_z) <= 1e-14 * abs(expected_z)
