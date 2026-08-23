@@ -107,7 +107,7 @@ verified against a specific printing; citation != truth)
 
 - Script: `experiment.py`
 - Language/runtime: Python 3.12, numpy, matplotlib (Agg before pyplot import)
-- Runtime: `C:\Users\Dhane\lab\.venv\Scripts\python.exe research/orbital-mechanics/experiments/j2Precession/experiment.py` (~53 s single core)
+- Runtime: `$REPO_ROOT\.venv\Scripts\python.exe research/orbital-mechanics/experiments/j2Precession/experiment.py` (~53 s single core)
 - Determinism: pure float64, no RNG, fixed grids; two full runs byte-identical apart from `meta.timestamp_utc`; figure MD5s identical across runs
 - Reuse: Exp 006 `propagate_3d_rk4` (importlib `pcm_006_for_j2`, J2=0 bit-exact oracle); Exp 008 Kepler/element helpers + constants (importlib `groundtracks_for_j2`); `src/lab_utils/results.py` save_json_result; `src/lab_utils/metrics.py` convergence_rate (eps-guarded). No scaffolding rebuilt; no previous experiment modified.
 - Dependencies: numpy, matplotlib only (already pinned in uv.lock).
@@ -202,7 +202,7 @@ Figures (`results/figures/`, regenerated deterministically from results.json dat
 ### Reproducibility Notes
 
 * `uv.lock` pins exact dependency versions.
-* Command: `C:\Users\Dhane\lab\.venv\Scripts\python.exe -m pytest && C:\Users\Dhane\lab\.venv\Scripts\python.exe research/orbital-mechanics/experiments/j2Precession/experiment.py`
+* Command: `$REPO_ROOT\.venv\Scripts\python.exe -m pytest && $REPO_ROOT\.venv\Scripts\python.exe research/orbital-mechanics/experiments/j2Precession/experiment.py`
   (generic `uv sync && uv run pytest && uv run python ...` when uv is on PATH).
 * Figures regenerate deterministically from recorded data in results.json (Agg, fixed grids, no RNG).
 * Provenance: `results/results.json:meta` stores name, description, timestamp_utc, git_commit,

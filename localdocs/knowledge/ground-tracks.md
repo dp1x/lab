@@ -65,7 +65,7 @@ Uses Exp 002 Kepler solver logic (`solve_kepler`, `true_anomaly_from_E`), Exp 00
 
 ## Source Experiments
 
-* `research/orbital-mechanics/experiments/groundtracks/` — spherical-Earth ground tracks: Kepler ECI to ECEF lat/lon, dual-algebra `2.3e-13 deg`, invariants, 3-D RK4 `≤6.5e-04 deg`, order-4, pathological grid. Runnable: `C:\Users\Dhane\lab\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py` (or `uv run python ...`)
+* `research/orbital-mechanics/experiments/groundtracks/` — spherical-Earth ground tracks: Kepler ECI to ECEF lat/lon, dual-algebra `2.3e-13 deg`, invariants, 3-D RK4 `≤6.5e-04 deg`, order-4, pathological grid. Runnable: `$REPO_ROOT\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py` (or `uv run python ...`)
 * `research/orbital-mechanics/experiments/keplerOrbitValidation/` (Exp 002) — RK4 foundation, `solve_kepler`, `orbital_elements`, `STEPS_PER_ORBIT ∝ (1−e)^{−3/2}` law, IAU constants.
 * `research/orbital-mechanics/experiments/planeChangeManeuvers/` (Exp 006) — 3-D Cowell `propagate_3d_rk4` reused here.
 * `research/orbital-mechanics/experiments/gravityAssist/` (Exp 007) — B-plane rotation and `importlib` reuse pattern, cancellation-safe trig.

@@ -150,7 +150,7 @@ For LEO 400 km, `T ≈ 5553 s → Δλ ≈ −23.20°`; ISS 420 km `T ≈ 5578 s
 
 * Script: `experiment.py`
 * Language/runtime: Python 3.12, numpy 2.5.1, matplotlib 3.11.1, mpmath 1.4.1 (mpmath not required at runtime; used only in prior exps)
-* Runtime: `C:\Users\Dhane\lab\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py`  (~15 s single core)
+* Runtime: `$REPO_ROOT\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py`  (~15 s single core)
 * Determinism: pure float64, no RNG, fixed grids, `Agg`, single-hop `importlib` reuse of `planeChangeManeuvers/experiment.py:516` `propagate_3d_rk4` (identical vetting as Exp 007 reuse of same function)
 * Reuse: `src/lab_utils/results.py:53` `save_json_result` (provenance envelope), `src/lab_utils/metrics.py:30` `convergence_rate`, Kepler solver logic from `keplerOrbitValidation/experiment.py:133`, 3-D Cowell RK4 from `planeChangeManeuvers` — no scaffolding rebuilt.
 * Dependencies: numpy, matplotlib (both already in `uv.lock` from Exp 001–007); no `cartopy`/`poliastro`/`astropy` (would add >200 MB, non-determinism, scope creep — see Exp 009/013).
@@ -221,7 +221,7 @@ Figures (`results/figures/`):
 ### Reproducibility Notes
 
 * `uv.lock` pins exact dependency versions.
-* Command to reproduce: `C:\Users\Dhane\lab\.venv\Scripts\python.exe -m pytest && C:\Users\Dhane\lab\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py`
+* Command to reproduce: `$REPO_ROOT\.venv\Scripts\python.exe -m pytest && $REPO_ROOT\.venv\Scripts\python.exe research/orbital-mechanics/experiments/groundtracks/experiment.py`
   (generic `uv sync && uv run pytest && uv run python research/orbital-mechanics/experiments/groundtracks/experiment.py` when `uv` is on PATH)
 * Figures regenerate deterministically via `make_figures` from `results.json` (Agg, fixed `t` grids, no RNG).
 * Provenance: `results/results.json:meta` stores `name`, `description`, `timestamp_utc`, `git_commit`, `python_version` via `src/lab_utils/results.py:53` `save_json_result`.
