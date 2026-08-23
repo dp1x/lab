@@ -91,6 +91,12 @@ hosted public document/dataset is fine when it is the source.)
 - **`C:`** — permanent state (source, docs, tests, committed results). Keep lean.
 - **`R:`** — disposable local scratch (venvs, caches, temp downloads, large sweeps).
   Check free space at runtime before large operations; never hard-code capacity.
+- **Durable storage.** The repository root is the sole durable record: all
+  reproducible source, knowledge, tests, contracts, provenance, results, figures,
+  acquisition recipes, checksums, and valuable recovery state live under it.
+  `R:` is never a runtime dependency of reproducibility and never the only
+  location of anything worthwhile; if autonomous work is interrupted or blocked,
+  recovery/handoff state is written under the repository (e.g. `AUTONOMOUS_HANDOFF_<exp>.md`).
 - **Colab** — optional, ephemeral remote compute only for workloads that would
   otherwise cause excessive local SSD/CPU pressure. Hardware-as-available (no assumed
   GPU/CPU); never evade Colab limits; checkpoint long runs so they remain resumable
@@ -167,5 +173,7 @@ short-period dynamics near the critical inclination give a measured +323 s/orbit
 Kepler-period excess) is COMPLETE (2026-08-23) in
 `research/orbital-mechanics/experiments/orbitClasses/`; `j2_rhs` graduated into
 `src/lab_utils/orbits.py` (second consumer after Exp 009, equivalence-pinned).
+Next: 013 JPL ephemeris validation per `localdocs/roadmap.md`, reusing
+`src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
 Next: 013 JPL ephemeris validation per `localdocs/roadmap.md`, reusing
 `src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`.
