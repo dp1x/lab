@@ -1,0 +1,979 @@
+{
+  "meta": {
+    "description": "Earth-satellite eclipse entry/exit timing (conical+cylindrical shadows, dual formulations, typed grazing sentinels) and eclipse-constrained launch windows (insertion-RAAN definition)",
+    "git_commit": "ae2e37a",
+    "name": "eclipseTiming-014",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-28T02:31:19+00:00"
+  },
+  "results": {
+    "adversarial_battery": {
+      "cylinder_substituted_for_cone": "caught by GEO 63 s/boundary pin",
+      "degrees_for_radians": "caught by apparent-radius roundtrip firewall",
+      "documented_blind_spots": {
+        "gmst_polynomial_truncation": "T^2/T^3 terms pinned literally; sub-second for decades around J2000",
+        "grazing_completeness": "sign-scan completeness for even-multiplicity roots is mathematically unprovable; compensating discriminator = |g|-minima monitor + typed sentinel"
+      },
+      "entry_exit_swapped": "caught by signed alternation discriminator",
+      "hidden_hemisphere_removed": "caught by dayside-point negative control",
+      "negated_sun_direction": "caught by antisun-midpoint invariant test",
+      "obliquity_dropped": "caught by GEO-season existence + solstice z test",
+      "occultation_branch_swap": "caught by partial-band width pins",
+      "step_end_without_refinement": "caught by step-lag discriminator (>dt/4)",
+      "swapped_radii_RS_RE": "caught by cone-half-angle provenance test"
+    },
+    "cases": {
+      "geo": {
+        "a_km": 42164.169462,
+        "e": 0.0,
+        "inc_deg": 0.0,
+        "period_s": 86164.09000315619
+      },
+      "gps26562": {
+        "a_km": 26561.762,
+        "e": 0.0,
+        "inc_deg": 55.0,
+        "period_s": 43082.04420295666
+      },
+      "iss420": {
+        "a_km": 6798.137,
+        "e": 0.0,
+        "inc_deg": 51.63,
+        "period_s": 5578.222707272112
+      },
+      "molniya": {
+        "a_km": 26561.762,
+        "e": 0.74,
+        "inc_deg": 63.4,
+        "period_s": 43082.04420295666
+      },
+      "sso600": {
+        "a_km": 6978.137,
+        "e": 0.0,
+        "inc_deg": 97.787647,
+        "period_s": 5801.231785926518
+      }
+    },
+    "code_sha256": {
+      "experiment.py": "25b38b82c0481e0a6b441ea2e469dd9917da2142c5831188a9b377e1bafb2568",
+      "fetch_horizons_sun_snapshot.py": "fd7f9fbf4946ea612c67f78b3c7ab63ff847f9cafad38049f03756e98f63dc32",
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/orbits.py": "2edb9e0d9e9e760657f4e3b04756a79c90d681cf7df0096abce372d05920abae",
+      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd",
+      "reference/MANIFEST.json": "42dc95e3d2e0c1ae07a00f755addebc5a385b66c56cbe8d12397c210bcf3335f"
+    },
+    "constants": {
+      "AU_km": 149597870.7,
+      "AU_provenance": "IAU 2012 Resolution B2 (exact)",
+      "J2": 0.001082629821,
+      "R_shadow_km": 6378.137,
+      "R_shadow_provenance": "WGS-84 equatorial radius as declared spherical shadow radius (canon); mean-radius alternative would shift boundaries 7.13 km",
+      "R_sun_km": 695700.0,
+      "R_sun_provenance": "IAU 2015 Resolution B3 nominal",
+      "dut1_frozen_s": 0.0,
+      "mu_km3_s2": 398600.4418,
+      "mu_provenance": "IAU 2015 nominal GM_E (lab canon)",
+      "omega_E_rad_s": 7.2921159e-05,
+      "tt_minus_utc_s": 69.184
+    },
+    "contract": {
+      "event_definitions": "penumbra entry/exit = external tangency; umbra entry/exit = internal tangency; entry = decreasing illumination; grazing = typed sentinel",
+      "finder": "anomaly-space scan -> sign-change brackets -> bisection to bracket width <= 1e-08 s; kappa reported; DEGENERATE beyond 10000 s/rad",
+      "frame": "geocentric pseudo-inertial lab ECI; Sun direction geometric, mean equator/equinox OF DATE consumed directly; IAU-1976 precession used ONLY to map the pinned ICRF Horizons snapshot into of-date for validation",
+      "launch_window_definition": "window = connected component of {t_L : zero umbra entries in first N_rev revs}; insertion at ascending node over declared site longitude; RAAN(t_L) = GMST(t_L) + lon_ref",
+      "shadow_model_control": "cylindrical (Form A/B equivalence asserted)",
+      "shadow_model_primary": "conical apparent-radii (umbra+penumbra+lens fraction)",
+      "time_system": "uniform TT-like seconds since J2000; UTC = TT-69.184 s at I/O; GMST IAU-1982 with UT1:=UTC (DUT1:=0, +/-0.9 s envelope); equation of equinoxes excluded (<=1.1 s)",
+      "tolerances": {
+        "kappa_max_s_per_rad": 10000.0,
+        "tau_graze_rad": 1e-08,
+        "tau_subdivide_rad": 1e-06,
+        "xtol_time_s": 1e-08
+      },
+      "units": "km, km^3/s^2, s since J2000 (TT-like), radians internal; degrees at I/O"
+    },
+    "epochs_tdb_like_s": {
+      "equinox_autumn_2026_tdb_s": 843394606.0054135,
+      "equinox_spring_2026_tdb_s": 827289497.8483071,
+      "solstice_june_2026_tdb_s": 835302249.7486231
+    },
+    "figures": [
+      "f1_shadow_geometry.png",
+      "f2_fraction_vs_beta.png",
+      "f3_models_vs_altitude.png",
+      "f4_launch_windows_year.png",
+      "f5_event_convergence.png",
+      "f6_iss_pinned_illumination.png"
+    ],
+    "figures_note": "matplotlib Agg, dpi=150, deterministic; MD5-stable across runs",
+    "findings": [
+      "FINDING: event times come from closed-form g evaluated anywhere in time; detection decouples from integration-step size entirely (architecture claim, verified by the density ladder).",
+      "FINDING: analytic Sun model agrees with the byte-pinned Horizons ICRF snapshot to 0.6774 deg (after declared IAU-1976 of-date rotation).",
+      "FINDING: GEO three-tier durations reproduce the pre-registered 67.3/69.4/71.6 min umbra-cone/cylindrical/penumbra-inclusive bands.",
+      "FINDING: pinned-ISS arm max |dt| = 308.18234646320343 s against the +/-15 s pre-registered band (real NASA trajectory).",
+      "FINDING: cylindrical-vs-conical timing gap grows monotonically with altitude (seconds in LEO, minutes at GEO) \u2014 neither model is 'more correct' in general; the gap IS the result."
+    ],
+    "limitations": [
+      "Spherical Earth with WGS-84 equatorial radius as shadow radius; flattening and atmospheric-refraction shadow inflation are excluded by declaration (literature quotes percent-level shadow-radius allowances operationally; unverified here, hence excluded rather than approximated).",
+      "Sun model is the Astronomical Almanac low-precision analytic form (claimed ~0.01 deg): bounded by the pinned-Horizons gate at 2026 epochs; validity outside +-decades around J2000 is not established here.",
+      "Sun direction is geometric, mean-equator-of-date: annual aberration + light-time nearly cancel for the Sun (~0.4 arcsec residual, <= 2 ms event impact); nutation to true-of-date (<= ~17 arcsec) is excluded and folded into the validation gate tolerance.",
+      "Launch windows assume impulsive insertion at the ascending node over a declared reference longitude; ascent-trajectory shaping, parking coasts, and site latitude constraints are out of scope.",
+      "Mission-arm J2 treatment is first-order secular nodal drift on mean elements (validated against Cowell to first order); short-period J2 signatures on event times within one rev are report-only.",
+      "Penumbra events use the tangent-plane (flat-sky) disk-overlap approximation; sky-curvature corrections are O(alpha^3)."
+    ],
+    "studies": {
+      "anchors": {
+        "epoch_equinox_s": 827289497.8483071,
+        "geo": {
+          "closed_form_cone_min": 67.298020760974,
+          "closed_form_cyl_min": 69.413801577781,
+          "delta_cone_minus_cyl_s_per_boundary": -64.26278758049,
+          "dur_cone_min": 67.41855888168,
+          "dur_cyl_min": 69.56065180103,
+          "dur_pen_incl_min": 71.702652317286
+        },
+        "iss420_beta0": {
+          "closed_form_min": 36.028333148434,
+          "dur_cyl_measured_min": 36.035492177804,
+          "period_s": 5578.222707272112
+        },
+        "pre_registered_bands": {
+          "geo_tier_band_min": 0.3,
+          "geo_tiers_min": {
+            "cone": 67.3,
+            "cyl": 69.4,
+            "pen_incl": 71.6
+          }
+        }
+      },
+      "convergence": {
+        "dsun_x1000_recovery_s": 0.042123675346,
+        "dt_ladder": [
+          {
+            "entry_shift_s": -0.283797264099,
+            "n_events": 3,
+            "nodes_per_rev": 512,
+            "stride": 1
+          },
+          {
+            "entry_shift_s": -0.283797264099,
+            "n_events": 3,
+            "nodes_per_rev": 256,
+            "stride": 2
+          },
+          {
+            "entry_shift_s": -0.283797264099,
+            "n_events": 3,
+            "nodes_per_rev": 128,
+            "stride": 4
+          },
+          {
+            "entry_shift_s": -0.283797264099,
+            "n_events": 3,
+            "nodes_per_rev": 64,
+            "stride": 8
+          },
+          {
+            "entry_shift_s": -0.283797264099,
+            "n_events": 3,
+            "nodes_per_rev": 32,
+            "stride": 16
+          }
+        ],
+        "dt_ladder_max_shift_s": 0.283797264099,
+        "max_bracket_width_s": null,
+        "origin_shift_err_s": 1.19209e-07,
+        "symmetry_asym_s": 1.19209e-07,
+        "xtol_time_s": 1e-08
+      },
+      "fraction_vs_beta": {
+        "max_abs_err_fraction": 5.2476526e-05,
+        "orbit_a_km": 6798.137,
+        "rows": [
+          {
+            "beta_deg": -75.0,
+            "fraction_closed_form": 0.0,
+            "fraction_measured": 0.0
+          },
+          {
+            "beta_deg": -70.0,
+            "fraction_closed_form": 0.0,
+            "fraction_measured": 0.0
+          },
+          {
+            "beta_deg": -65.0,
+            "fraction_closed_form": 0.194634555504,
+            "fraction_measured": 0.194687032031
+          },
+          {
+            "beta_deg": -60.0,
+            "fraction_closed_form": 0.256691196724,
+            "fraction_measured": 0.256726475035
+          },
+          {
+            "beta_deg": -55.0,
+            "fraction_closed_form": 0.293848609196,
+            "fraction_measured": 0.293876443823
+          },
+          {
+            "beta_deg": -50.0,
+            "fraction_closed_form": 0.319048400849,
+            "fraction_measured": 0.319071906036
+          },
+          {
+            "beta_deg": -45.0,
+            "fraction_closed_form": 0.337223190079,
+            "fraction_measured": 0.337243838235
+          },
+          {
+            "beta_deg": -40.0,
+            "fraction_closed_form": 0.350807727349,
+            "fraction_measured": 0.350826357865
+          },
+          {
+            "beta_deg": -35.0,
+            "fraction_closed_form": 0.361173208325,
+            "fraction_measured": 0.361190357401
+          },
+          {
+            "beta_deg": -30.0,
+            "fraction_closed_form": 0.369157037671,
+            "fraction_measured": 0.369173076159
+          },
+          {
+            "beta_deg": -25.0,
+            "fraction_closed_form": 0.375298438477,
+            "fraction_measured": 0.375313639125
+          },
+          {
+            "beta_deg": -20.0,
+            "fraction_closed_form": 0.379956334949,
+            "fraction_measured": 0.37997090903
+          },
+          {
+            "beta_deg": -15.0,
+            "fraction_closed_form": 0.383373248662,
+            "fraction_measured": 0.383387367722
+          },
+          {
+            "beta_deg": -10.0,
+            "fraction_closed_form": 0.385711826168,
+            "fraction_measured": 0.385725635967
+          },
+          {
+            "beta_deg": -5.0,
+            "fraction_closed_form": 0.387076287636,
+            "fraction_measured": 0.387089917783
+          },
+          {
+            "beta_deg": 0.0,
+            "fraction_closed_form": 0.387524862729,
+            "fraction_measured": 0.387538433938
+          },
+          {
+            "beta_deg": 5.0,
+            "fraction_closed_form": 0.387076287636,
+            "fraction_measured": 0.387089917783
+          },
+          {
+            "beta_deg": 10.0,
+            "fraction_closed_form": 0.385711826168,
+            "fraction_measured": 0.385725635967
+          },
+          {
+            "beta_deg": 15.0,
+            "fraction_closed_form": 0.383373248662,
+            "fraction_measured": 0.383387367722
+          },
+          {
+            "beta_deg": 20.0,
+            "fraction_closed_form": 0.379956334949,
+            "fraction_measured": 0.37997090903
+          },
+          {
+            "beta_deg": 25.0,
+            "fraction_closed_form": 0.375298438477,
+            "fraction_measured": 0.375313639125
+          },
+          {
+            "beta_deg": 30.0,
+            "fraction_closed_form": 0.369157037671,
+            "fraction_measured": 0.369173076159
+          },
+          {
+            "beta_deg": 35.0,
+            "fraction_closed_form": 0.361173208325,
+            "fraction_measured": 0.361190357401
+          },
+          {
+            "beta_deg": 40.0,
+            "fraction_closed_form": 0.350807727349,
+            "fraction_measured": 0.350826357865
+          },
+          {
+            "beta_deg": 45.0,
+            "fraction_closed_form": 0.337223190079,
+            "fraction_measured": 0.337243838235
+          },
+          {
+            "beta_deg": 50.0,
+            "fraction_closed_form": 0.319048400849,
+            "fraction_measured": 0.319071906036
+          },
+          {
+            "beta_deg": 55.0,
+            "fraction_closed_form": 0.293848609196,
+            "fraction_measured": 0.293876443823
+          },
+          {
+            "beta_deg": 60.0,
+            "fraction_closed_form": 0.256691196724,
+            "fraction_measured": 0.256726475035
+          },
+          {
+            "beta_deg": 65.0,
+            "fraction_closed_form": 0.194634555504,
+            "fraction_measured": 0.194687032031
+          },
+          {
+            "beta_deg": 70.0,
+            "fraction_closed_form": 0.0,
+            "fraction_measured": 0.0
+          },
+          {
+            "beta_deg": 75.0,
+            "fraction_closed_form": 0.0,
+            "fraction_measured": 0.0
+          }
+        ]
+      },
+      "iss_arm": {
+        "band_respected_report_only": null,
+        "contamination_max_second_diff_m": 276.031728195449,
+        "max_abs_dt_s": 308.182346463203,
+        "model_two_body_events": 92,
+        "pairs": [
+          {
+            "dt_vs_snapshot_s": 7.147122859955,
+            "model_kind": "increasing",
+            "t_model": 840804723.8192408
+          },
+          {
+            "dt_vs_snapshot_s": 5.467535376549,
+            "model_kind": "decreasing",
+            "t_model": 840806859.2076333
+          },
+          {
+            "dt_vs_snapshot_s": 13.533944964409,
+            "model_kind": "increasing",
+            "t_model": 840810293.681468
+          },
+          {
+            "dt_vs_snapshot_s": 11.084362864494,
+            "model_kind": "decreasing",
+            "t_model": 840812428.9700508
+          },
+          {
+            "dt_vs_snapshot_s": 19.933904290199,
+            "model_kind": "increasing",
+            "t_model": 840815863.5440707
+          },
+          {
+            "dt_vs_snapshot_s": 16.689450144768,
+            "model_kind": "decreasing",
+            "t_model": 840817998.7326211
+          },
+          {
+            "dt_vs_snapshot_s": 26.339268088341,
+            "model_kind": "increasing",
+            "t_model": 840821433.4070492
+          },
+          {
+            "dt_vs_snapshot_s": 22.28588783741,
+            "model_kind": "decreasing",
+            "t_model": 840823568.4953444
+          },
+          {
+            "dt_vs_snapshot_s": 32.758702397346,
+            "model_kind": "increasing",
+            "t_model": 840827003.2704043
+          },
+          {
+            "dt_vs_snapshot_s": 27.872792720795,
+            "model_kind": "decreasing",
+            "t_model": 840829138.2582219
+          },
+          {
+            "dt_vs_snapshot_s": 39.184048652649,
+            "model_kind": "increasing",
+            "t_model": 840832573.1341361
+          },
+          {
+            "dt_vs_snapshot_s": 33.449379324913,
+            "model_kind": "decreasing",
+            "t_model": 840834708.0212538
+          },
+          {
+            "dt_vs_snapshot_s": 45.623730897903,
+            "model_kind": "increasing",
+            "t_model": 840838142.9982455
+          },
+          {
+            "dt_vs_snapshot_s": 39.018837571144,
+            "model_kind": "decreasing",
+            "t_model": 840840277.784441
+          },
+          {
+            "dt_vs_snapshot_s": 52.070674777031,
+            "model_kind": "increasing",
+            "t_model": 840843712.862733
+          },
+          {
+            "dt_vs_snapshot_s": 44.576450228691,
+            "model_kind": "decreasing",
+            "t_model": 840845847.5477841
+          },
+          {
+            "dt_vs_snapshot_s": 58.531527519226,
+            "model_kind": "increasing",
+            "t_model": 840849282.727599
+          },
+          {
+            "dt_vs_snapshot_s": 50.128783345222,
+            "model_kind": "decreasing",
+            "t_model": 840851417.3112841
+          },
+          {
+            "dt_vs_snapshot_s": 65.0014128685,
+            "model_kind": "increasing",
+            "t_model": 840854852.592844
+          },
+          {
+            "dt_vs_snapshot_s": 55.668392300606,
+            "model_kind": "decreasing",
+            "t_model": 840856987.0749414
+          },
+          {
+            "dt_vs_snapshot_s": 71.48434817791,
+            "model_kind": "increasing",
+            "t_model": 840860422.4584687
+          },
+          {
+            "dt_vs_snapshot_s": 61.203808307648,
+            "model_kind": "decreasing",
+            "t_model": 840862556.838757
+          },
+          {
+            "dt_vs_snapshot_s": 77.978452205658,
+            "model_kind": "increasing",
+            "t_model": 840865992.3244733
+          },
+          {
+            "dt_vs_snapshot_s": 66.726627826691,
+            "model_kind": "decreasing",
+            "t_model": 840868126.6027313
+          },
+          {
+            "dt_vs_snapshot_s": 84.484800934792,
+            "model_kind": "increasing",
+            "t_model": 840871562.1908586
+          },
+          {
+            "dt_vs_snapshot_s": 72.245339035988,
+            "model_kind": "decreasing",
+            "t_model": 840873696.3668652
+          },
+          {
+            "dt_vs_snapshot_s": 91.004336833954,
+            "model_kind": "increasing",
+            "t_model": 840877132.0576249
+          },
+          {
+            "dt_vs_snapshot_s": 77.752560853958,
+            "model_kind": "decreasing",
+            "t_model": 840879266.1311592
+          },
+          {
+            "dt_vs_snapshot_s": 97.535224556923,
+            "model_kind": "increasing",
+            "t_model": 840882701.9247732
+          },
+          {
+            "dt_vs_snapshot_s": 83.254700303078,
+            "model_kind": "decreasing",
+            "t_model": 840884835.8956141
+          },
+          {
+            "dt_vs_snapshot_s": 104.081380605698,
+            "model_kind": "increasing",
+            "t_model": 840888271.7923034
+          },
+          {
+            "dt_vs_snapshot_s": 88.747289419174,
+            "model_kind": "decreasing",
+            "t_model": 840890405.6602306
+          },
+          {
+            "dt_vs_snapshot_s": 110.638102173805,
+            "model_kind": "increasing",
+            "t_model": 840893841.6602165
+          },
+          {
+            "dt_vs_snapshot_s": 94.233223795891,
+            "model_kind": "decreasing",
+            "t_model": 840895975.4250096
+          },
+          {
+            "dt_vs_snapshot_s": 117.211925268173,
+            "model_kind": "increasing",
+            "t_model": 840899411.5285127
+          },
+          {
+            "dt_vs_snapshot_s": 99.711984395981,
+            "model_kind": "decreasing",
+            "t_model": 840901545.1899517
+          },
+          {
+            "dt_vs_snapshot_s": 123.79603266716,
+            "model_kind": "increasing",
+            "t_model": 840904981.3971927
+          },
+          {
+            "dt_vs_snapshot_s": 105.182341814041,
+            "model_kind": "decreasing",
+            "t_model": 840907114.9550574
+          },
+          {
+            "dt_vs_snapshot_s": 130.39864385128,
+            "model_kind": "increasing",
+            "t_model": 840910551.266257
+          },
+          {
+            "dt_vs_snapshot_s": 110.648008108139,
+            "model_kind": "decreasing",
+            "t_model": 840912684.7203275
+          },
+          {
+            "dt_vs_snapshot_s": 137.011586427689,
+            "model_kind": "increasing",
+            "t_model": 840916121.1357062
+          },
+          {
+            "dt_vs_snapshot_s": 116.103698015213,
+            "model_kind": "decreasing",
+            "t_model": 840918254.4857628
+          },
+          {
+            "dt_vs_snapshot_s": 143.643893003464,
+            "model_kind": "increasing",
+            "t_model": 840921691.0055405
+          },
+          {
+            "dt_vs_snapshot_s": 121.556648254395,
+            "model_kind": "decreasing",
+            "t_model": 840923824.2513641
+          },
+          {
+            "dt_vs_snapshot_s": 150.287284016609,
+            "model_kind": "increasing",
+            "t_model": 840927260.8757607
+          },
+          {
+            "dt_vs_snapshot_s": 126.998791456223,
+            "model_kind": "decreasing",
+            "t_model": 840929394.0171318
+          },
+          {
+            "dt_vs_snapshot_s": 156.950291275978,
+            "model_kind": "increasing",
+            "t_model": 840932830.746367
+          },
+          {
+            "dt_vs_snapshot_s": 132.439206361771,
+            "model_kind": "decreasing",
+            "t_model": 840934963.7830669
+          },
+          {
+            "dt_vs_snapshot_s": 163.625894665718,
+            "model_kind": "increasing",
+            "t_model": 840938400.6173602
+          },
+          {
+            "dt_vs_snapshot_s": 137.869142055511,
+            "model_kind": "decreasing",
+            "t_model": 840940533.5491698
+          },
+          {
+            "dt_vs_snapshot_s": 170.320755004883,
+            "model_kind": "increasing",
+            "t_model": 840943970.4887409
+          },
+          {
+            "dt_vs_snapshot_s": 143.297134995461,
+            "model_kind": "decreasing",
+            "t_model": 840946103.3154415
+          },
+          {
+            "dt_vs_snapshot_s": 177.030078649521,
+            "model_kind": "increasing",
+            "t_model": 840949540.3605095
+          },
+          {
+            "dt_vs_snapshot_s": 148.716140985489,
+            "model_kind": "decreasing",
+            "t_model": 840951673.0818825
+          },
+          {
+            "dt_vs_snapshot_s": 183.758000850677,
+            "model_kind": "increasing",
+            "t_model": 840955110.2326665
+          },
+          {
+            "dt_vs_snapshot_s": 154.131986379623,
+            "model_kind": "decreasing",
+            "t_model": 840957242.8484936
+          },
+          {
+            "dt_vs_snapshot_s": 190.502500653267,
+            "model_kind": "increasing",
+            "t_model": 840960680.1052121
+          },
+          {
+            "dt_vs_snapshot_s": 159.54105079174,
+            "model_kind": "decreasing",
+            "t_model": 840962812.6152756
+          },
+          {
+            "dt_vs_snapshot_s": 197.264822244644,
+            "model_kind": "increasing",
+            "t_model": 840966249.9781474
+          },
+          {
+            "dt_vs_snapshot_s": 164.945155858994,
+            "model_kind": "decreasing",
+            "t_model": 840968382.382229
+          },
+          {
+            "dt_vs_snapshot_s": 204.045934557915,
+            "model_kind": "increasing",
+            "t_model": 840971819.8514725
+          },
+          {
+            "dt_vs_snapshot_s": 170.345132470131,
+            "model_kind": "decreasing",
+            "t_model": 840973952.1493548
+          },
+          {
+            "dt_vs_snapshot_s": 210.844192743301,
+            "model_kind": "increasing",
+            "t_model": 840977389.7251879
+          },
+          {
+            "dt_vs_snapshot_s": 175.738463640213,
+            "model_kind": "decreasing",
+            "t_model": 840979521.9166533
+          },
+          {
+            "dt_vs_snapshot_s": 217.663330554962,
+            "model_kind": "increasing",
+            "t_model": 840982959.5992944
+          },
+          {
+            "dt_vs_snapshot_s": 181.129957914352,
+            "model_kind": "decreasing",
+            "t_model": 840985091.6841254
+          },
+          {
+            "dt_vs_snapshot_s": 224.499009609222,
+            "model_kind": "increasing",
+            "t_model": 840988529.4737923
+          },
+          {
+            "dt_vs_snapshot_s": 186.513431668282,
+            "model_kind": "decreasing",
+            "t_model": 840990661.4517721
+          },
+          {
+            "dt_vs_snapshot_s": 231.357499957085,
+            "model_kind": "increasing",
+            "t_model": 840994099.3486822
+          },
+          {
+            "dt_vs_snapshot_s": 191.896934390068,
+            "model_kind": "decreasing",
+            "t_model": 840996231.2195935
+          },
+          {
+            "dt_vs_snapshot_s": 238.232180356979,
+            "model_kind": "increasing",
+            "t_model": 840999669.2239642
+          },
+          {
+            "dt_vs_snapshot_s": 197.271765470505,
+            "model_kind": "decreasing",
+            "t_model": 841001800.987591
+          },
+          {
+            "dt_vs_snapshot_s": 245.13134598732,
+            "model_kind": "increasing",
+            "t_model": 841005239.0996394
+          },
+          {
+            "dt_vs_snapshot_s": 202.647471427917,
+            "model_kind": "decreasing",
+            "t_model": 841007370.7557648
+          },
+          {
+            "dt_vs_snapshot_s": 252.046816825867,
+            "model_kind": "increasing",
+            "t_model": 841010808.9757081
+          },
+          {
+            "dt_vs_snapshot_s": 208.015285611153,
+            "model_kind": "decreasing",
+            "t_model": 841012940.5241158
+          },
+          {
+            "dt_vs_snapshot_s": 258.987943649292,
+            "model_kind": "increasing",
+            "t_model": 841016378.8521708
+          },
+          {
+            "dt_vs_snapshot_s": 213.383387088776,
+            "model_kind": "decreasing",
+            "t_model": 841018510.2926445
+          },
+          {
+            "dt_vs_snapshot_s": 265.946027040482,
+            "model_kind": "increasing",
+            "t_model": 841021948.7290279
+          },
+          {
+            "dt_vs_snapshot_s": 218.745353341103,
+            "model_kind": "decreasing",
+            "t_model": 841024080.061352
+          },
+          {
+            "dt_vs_snapshot_s": 272.930347800255,
+            "model_kind": "increasing",
+            "t_model": 841027518.60628
+          },
+          {
+            "dt_vs_snapshot_s": 224.106207251549,
+            "model_kind": "decreasing",
+            "t_model": 841029649.8302386
+          },
+          {
+            "dt_vs_snapshot_s": 279.932796239853,
+            "model_kind": "increasing",
+            "t_model": 841033088.4839275
+          },
+          {
+            "dt_vs_snapshot_s": 229.463400244713,
+            "model_kind": "decreasing",
+            "t_model": 841035219.5993055
+          },
+          {
+            "dt_vs_snapshot_s": 286.96170771122,
+            "model_kind": "increasing",
+            "t_model": 841038658.3619709
+          },
+          {
+            "dt_vs_snapshot_s": 234.817666888237,
+            "model_kind": "decreasing",
+            "t_model": 841040789.3685529
+          },
+          {
+            "dt_vs_snapshot_s": 294.010529279709,
+            "model_kind": "increasing",
+            "t_model": 841044228.2404107
+          },
+          {
+            "dt_vs_snapshot_s": 240.171067714691,
+            "model_kind": "decreasing",
+            "t_model": 841046359.1379817
+          },
+          {
+            "dt_vs_snapshot_s": 301.085475087166,
+            "model_kind": "increasing",
+            "t_model": 841049798.1192478
+          },
+          {
+            "dt_vs_snapshot_s": 245.5197224617,
+            "model_kind": "decreasing",
+            "t_model": 841051928.9075928
+          },
+          {
+            "dt_vs_snapshot_s": 308.182346463203,
+            "model_kind": "increasing",
+            "t_model": 841055367.9984821
+          },
+          {
+            "dt_vs_snapshot_s": 250.869950294495,
+            "model_kind": "decreasing",
+            "t_model": 841057498.6773864
+          }
+        ],
+        "pre_registered_band_s": 15.0,
+        "reference_revision": "Aug 23, 2026",
+        "rows": 2161,
+        "snapshot_umbra_events": 92,
+        "status": "CONTAMINATED_REPORT_ONLY",
+        "window_days": 3.0
+      },
+      "launch_windows": {
+        "fine_equinox_day": {
+          "leo28ish": [],
+          "sso600": [
+            {
+              "close_s": 827315963.9648438,
+              "open_s": 827283775.4882812,
+              "width_min": 536.474609375
+            },
+            {
+              "close_s": 827359103.6132812,
+              "open_s": 827326904.5898438,
+              "width_min": 536.650390625
+            }
+          ]
+        },
+        "gmst_recurrence_arcsec": 0.007447600256,
+        "site_lon_deg_declared": -80.6039,
+        "sso_next_day_open_edge_repeat_s": {
+          "sso600": 14.6484375
+        },
+        "year_sweep": [
+          {
+            "day_of_year": 0,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 1072.2802734375
+          },
+          {
+            "day_of_year": 30,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 1128.28125
+          },
+          {
+            "day_of_year": 60,
+            "leo28ish_open_total_min": -79.9072265625,
+            "sso600_open_total_min": 1267.3388671875
+          },
+          {
+            "day_of_year": 90,
+            "leo28ish_open_total_min": -128.2177734375,
+            "sso600_open_total_min": 0.0
+          },
+          {
+            "day_of_year": 120,
+            "leo28ish_open_total_min": -95.712890625,
+            "sso600_open_total_min": 0.0
+          },
+          {
+            "day_of_year": 150,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 1150.078125
+          },
+          {
+            "day_of_year": 180,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 1074.1552734375
+          },
+          {
+            "day_of_year": 210,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 552.4658203125
+          },
+          {
+            "day_of_year": 240,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": -177.890625
+          },
+          {
+            "day_of_year": 270,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": -154.86328125
+          },
+          {
+            "day_of_year": 300,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": -167.0068359375
+          },
+          {
+            "day_of_year": 330,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 576.3134765625
+          },
+          {
+            "day_of_year": 360,
+            "leo28ish_open_total_min": 0.0,
+            "sso600_open_total_min": 537.01171875
+          }
+        ]
+      },
+      "models_vs_altitude": {
+        "gap_increasing_trend": true,
+        "gap_nonneg": true,
+        "rows": [
+          {
+            "altitude_km": 300.0,
+            "closed_form_cone_err_s": 0.407869281614,
+            "delta_cyl_minus_cone_s": 8.074361920357,
+            "dur_cone_s": 2187.784419536591,
+            "dur_cyl_s": 2195.858781456947
+          },
+          {
+            "altitude_km": 400.0,
+            "closed_form_cone_err_s": 0.403864817303,
+            "delta_cyl_minus_cone_s": 8.256514906883,
+            "dur_cone_s": 2158.63862156868,
+            "dur_cyl_s": 2166.895136475563
+          },
+          {
+            "altitude_km": 500.0,
+            "closed_form_cone_err_s": 0.403366208216,
+            "delta_cyl_minus_cone_s": 8.439966678619,
+            "dur_cone_s": 2137.219523787498,
+            "dur_cyl_s": 2145.659490466118
+          },
+          {
+            "altitude_km": 700.0,
+            "closed_form_cone_err_s": 0.408211887208,
+            "delta_cyl_minus_cone_s": 8.810706973076,
+            "dur_cone_s": 2108.789236426353,
+            "dur_cyl_s": 2117.599943399429
+          },
+          {
+            "altitude_km": 1000.0,
+            "closed_form_cone_err_s": 0.422721776662,
+            "delta_cyl_minus_cone_s": 9.376881480217,
+            "dur_cone_s": 2087.218984603882,
+            "dur_cyl_s": 2096.595866084099
+          },
+          {
+            "altitude_km": 1500.0,
+            "closed_form_cone_err_s": 0.456852141344,
+            "delta_cyl_minus_cone_s": 10.346251249313,
+            "dur_cone_s": 2080.069591283798,
+            "dur_cyl_s": 2090.415842533112
+          },
+          {
+            "altitude_km": 2000.0,
+            "closed_form_cone_err_s": 0.498010122236,
+            "delta_cyl_minus_cone_s": 11.347009897232,
+            "dur_cone_s": 2091.282219409943,
+            "dur_cyl_s": 2102.629229307175
+          }
+        ]
+      },
+      "sun_validation": {
+        "dist_rel_err_max": 8.483468e-05,
+        "gate_passed": true,
+        "nutation_excluded_band_deg": 0.7,
+        "rows": 366,
+        "sep_max_deg": 0.67740721515,
+        "sep_mean_deg": 0.648727677062,
+        "snapshot_sha256": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec"
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "acquired_utc": "2026-08-26T01:25:32+00:00",
+  "acquisition": {
+    "base_url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+    "http_method": "GET",
+    "http_status": {
+      "vectors": 200
+    },
+    "query_params": {
+      "vectors": {
+        "CAL_FORMAT": "'BOTH'",
+        "CENTER": "'500@399'",
+        "COMMAND": "'10'",
+        "CSV_FORMAT": "'YES'",
+        "EPHEM_TYPE": "'VECTORS'",
+        "MAKE_EPHEM": "'YES'",
+        "OBJ_DATA": "'NO'",
+        "OUT_UNITS": "'KM-S'",
+        "REF_PLANE": "'FRAME'",
+        "REF_SYSTEM": "'ICRF'",
+        "START_TIME": "'2026-01-01 00:00'",
+        "STEP_SIZE": "'1d'",
+        "STOP_TIME": "'2027-01-01 00:00'",
+        "TIME_TYPE": "'TDB'",
+        "VEC_CORR": "'NONE'",
+        "VEC_TABLE": "'2'",
+        "format": "text"
+      }
+    },
+    "request_order": [
+      "vectors"
+    ],
+    "request_spacing_s": 3.0,
+    "response_bytes": {
+      "vectors": 76204
+    },
+    "response_sha256": {
+      "vectors": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec"
+    },
+    "validation": {
+      "dist_max_km": 152087750.14341196,
+      "dist_min_km": 147099933.12539324,
+      "header": {
+        "center_body_name": "Earth (399)                     {source: DE441}",
+        "center_site_name": "BODY CENTER",
+        "output_type": "GEOMETRIC cartesian states",
+        "output_units": "KM-S",
+        "reference_frame": "ICRF",
+        "start_time_echo": "A.D. 2026-Jan-01 00:00:00.0000 TDB",
+        "step_size_echo": "1440 minutes",
+        "stop_time_echo": "A.D. 2027-Jan-01 00:00:00.0000 TDB",
+        "target_body_name": "Sun (10)                        {source: DE441}"
+      },
+      "rows": 366
+    }
+  },
+  "schema": "lab.acquisition.manifest/v1",
+  "snapshot": {
+    "files": {
+      "horizons_sun_geocentric_vectors_2026_icrf_tdb_daily.txt": {
+        "bytes": 76204,
+        "role": "validation-only oracle for the analytic low-precision solar ephemeris; never a runtime input",
+        "sha256": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec"
+      }
+    }
+  }
+}
