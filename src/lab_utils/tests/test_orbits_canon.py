@@ -170,3 +170,80 @@ def test_j2_rhs_acceleration_sign_structure():
     a_kep_z = -mu / (rm**2)
     expected_z = a_kep_z * (1.0 - 3.0 * j2 * (orbits.R_EARTH_KM / rm) ** 2)
     assert abs(a_pol[2] - expected_z) <= 1e-14 * abs(expected_z)
+
+
+# --------------------------------------------------------------------------- #
+# SSO inclination graduation (donor: Exp 012 orbitClasses.solve_sso_inclination)
+# --------------------------------------------------------------------------- #
+def test_sso_inclination_anchors_match_orbit_classes():
+    """i_SSO at canonical altitudes matches the orbitClasses donor literals.
+
+    Pinned by Exp 012 results.json and orbit-classes.md knowledge note.
+    The lab_utils version is the same closed form with the no-silent-clip
+    contract enforced via ValueError (no `np.clip` of cos_i).
+    """
+    oc012 = _load("oc012_for_sso", _EXPERIMENTS_DIR / "orbitClasses" / "experiment.py")
+    for h_km, expected_deg in [
+        (500.0, 97.401785943095),
+        (600.0, 97.787646791197),
+        (800.0, 98.603085267154),
+    ]:
+        a = orbits.R_EARTH_KM + h_km
+        mine_deg = np.degrees(orbits.sso_inclination_rad(a, 0.0))
+        donor = oc012.solve_sso_inclination(a, 0.0)
+        assert donor["status"] == "OK"
+        donor_deg = np.degrees(donor["incl_rad"])
+        # The lab_utils implementation uses np.arccos(-ratio) directly while
+        # the orbitClasses donor uses the same np.arccos; they should agree
+        # to machine precision.
+        assert abs(mine_deg - donor_deg) < 5e-5, (
+            f"h={h_km} km: lab_utils {mine_deg} vs donor {donor_deg} deg"
+        )
+        # And the canonical pinned literal
+        assert abs(mine_deg - expected_deg) < 5e-5, (
+            f"h={h_km} km: {mine_deg} vs pinned {expected_deg} deg"
+        )
+
+
+def test_sso_inclination_retrograde_branch_strictly_above_90():
+    for h_km in (500.0, 600.0, 700.0, 800.0):
+        a = orbits.R_EARTH_KM + h_km
+        i = orbits.sso_inclination_rad(a, 0.0)
+        assert i > np.pi / 2, f"h={h_km} km: i = {np.degrees(i)} deg <= 90"
+
+
+def test_sso_inclination_no_clip_raises_above_a_max():
+    """Above a_max the cos_i exceeds [-1, 1] -> no real SSO solution exists.
+    The lab_utils version raises ValueError; the orbitClasses version returns
+    a typed `NO_REAL_SOLUTION` sentinel. Both reject the impossible case.
+    """
+    a_max = orbits.sso_existence_max_sma(0.0)
+    # a_max itself gives cos i = -1 (i = 180 deg) -- the boundary
+    # (within float64 ULP at the arccos singularity, ~3.4e-6 deg).
+    i_at_max = orbits.sso_inclination_rad(a_max, 0.0)
+    assert abs(np.degrees(i_at_max) - 180.0) < 1e-4
+    # a > a_max must raise
+    import pytest
+    with pytest.raises(ValueError, match="no real SSO solution"):
+        orbits.sso_inclination_rad(a_max * 1.001, 0.0)
+
+
+def test_sso_existence_max_sma_value_pin():
+    """a_max at e=0 is the lab's pinned 12352.505076 km (Exp 012 headline)."""
+    a_max = orbits.sso_existence_max_sma(0.0)
+    assert abs(a_max - 12352.505076) < 1e-3, f"a_max = {a_max} km"
+
+
+def test_sso_target_deg_day_pinned_literal():
+    """SSO_TARGET_DEG_DAY is the mean-solar-year rate 360/365.2422.
+
+    Documented convention firewall: sidereal year (365.256) gives
+    0.98560912 deg/day, Julian year (365.25) gives 0.98564685 deg/day;
+    these would shift i_SSO at 600 km by 3.0e-4 and 1.7e-4 deg, caught
+    at 5e-5 tolerance. Tropical year (365.24219) is 2.1e-7 below behavior
+    discrimination; pinned by literal.
+    """
+    expected = 360.0 / 365.2422
+    assert abs(orbits.SSO_TARGET_DEG_DAY - expected) < 1e-15
+    # and the textbook value
+    assert abs(orbits.SSO_TARGET_DEG_DAY - 0.985647332099) < 1e-9

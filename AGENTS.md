@@ -189,3 +189,32 @@ Next: 014 eclipse timing / launch windows per `localdocs/roadmap.md`, reusing
 `src/lab_utils/orbits.py` + `src/lab_utils/integrators.py`; declared follow-up
 candidates from Exp 013 include a refined effective-drag study (separate experiment)
 and a differential SGP4 arm via Horizons COMMAND='TLE'.
+
+Experiment 014 (eclipse timing / launch windows) is COMPLETE (2026-08-28) in
+`research/orbital-mechanics/experiments/eclipseTiming/`: conical (primary) + cylindrical
+(control) shadow geometry via dual algebraic formulations, closed-form event finder on
+analytic Kepler states (event error decouples from integration step), pinned-ISS arm
+(first 4 event epochs agree to 5.5-13.5 s vs real NASA trajectory; 3-day tail drift to
+308 s = TLE/SGP4 reference envelope), Sun model gated against byte-pinned 2026 Horizons
+snapshot to 0.65 deg; 40 new tests, 525 total.
+
+Experiment 015 (dawn-dusk SSO launch-window targeting) is COMPLETE (2026-08-29) in
+`research/orbital-mechanics/experiments/dawnDuskSSO/`: first end-to-end multi-constraint
+mission analysis. Composes the SSO inclination lock (Exp 012), LST-at-ascending-node
+condition (a NEW quantity, not carried from Exp 014), first-order J2 secular nodal drift
+(Exp 009/012), eclipse event-finder (Exp 014), and the lab's analytic Sun model + GMST
+polynomial. Year-long feasible launch-time search for dawn-dusk SSO at h in {500, 600,
+700, 800} km from Eastern Range; 266-295 connected components per altitude (monotone
+in h); total feasible width 710 h at h=600; held-out equinox weeks dominate feasibility
+(36.7 vs 11.9/day main, equinoxes are the most eclipse-favorable for h=600); LST at the
+ascending node drifts through 24 h/year at the sidereal-solar differential (4 min/day) —
+the "LST-constant" intuition from the host research track was wrong; 6 figures; 34 new
+tests, 581 total (547 baseline + 34 new). Shared machinery graduated to `src/lab_utils`:
+`sso_inclination_rad` (3rd consumer after Exp 012 + Exp 014-implicit + Exp 015) in
+`lab_utils/orbits`; `gmst_rad_iau1982`, `sun_unit_and_dist_km`, `subsolar_lon_rad`,
+`eci_to_ecef`, `ecef_to_latlon`, `spherical_trig_latlon`, `lst_at_node_hours`,
+`node_lon_from_raan_gmst` (2nd consumer after Exp 014 for the Sun/GMST, 2nd consumer
+after Exp 008 for the ECI-to-lat/lon layer) in the new `lab_utils/earth_frames` module.
+Next: 016 eclipse-aware station-keeping for dawn-dusk SSOs per `localdocs/roadmap.md`,
+reusing the Exp 015 feasible-set table; declared follow-up candidates include a refined
+J2 mean-vs-osculating coupling study and a multi-year LST-drift compensation budget.

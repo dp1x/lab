@@ -22,6 +22,7 @@ __all__ = [
     "J2_EARTH",
     "NODE_GUARD_REL",
     "ECC_GUARD_ABS",
+    "SSO_TARGET_DEG_DAY",
     "solve_kepler",
     "true_anomaly_from_E",
     "orbital_period",
@@ -32,7 +33,14 @@ __all__ = [
     "seed_state",
     "steps_per_orbit",
     "j2_rhs",
+    "sso_inclination_rad",
+    "sso_existence_max_sma",
 ]
+
+# Mean-solar-year sun rate (Gregorian mean-solar year, 365.2422 d). Pinned by
+# Exp 012 / orbit-classes; see `localdocs/knowledge/orbit-classes.md:36-41`
+# for the convention firewall (sidereal/tropical/tropical vs mean).
+SSO_TARGET_DEG_DAY = 360.0 / 365.2422
 
 # --------------------------------------------------------------------------- #
 # Physical constants (provenance as pinned by Exp 008/009)
@@ -199,6 +207,51 @@ def steps_per_orbit(e: float, base: int = 512, ecc_base: int = 720) -> int:
     if e <= 0.0:
         return base
     return max(base, int(np.ceil(ecc_base / (1.0 - e) ** 1.5)))
+
+
+def sso_inclination_rad(a_km: float, e: float = 0.0,
+                        target_deg_day: float = SSO_TARGET_DEG_DAY,
+                        mu: float = MU_EARTH_KM3S2, j2: float = J2_EARTH,
+                        R_eq_km: float = R_EARTH_KM) -> float:
+    """Solve Omega_dot(a, e, i) = +target for inclination, retrograde branch (rad).
+
+    Closed-form first-order secular J2 lock: ``cos i = -(a/a_max)^(7/2)`` for
+    the circular case; the eccentric case uses ``a_max(e) = a_max(0)·(1-e^2)^(2/7)``.
+
+    NO silent clipping: raises ``ValueError`` when ``a > a_max(e)`` (no real
+    retrograde-SSO solution exists). This is the strict no-silent-clip contract
+    the orbitClasses donor (which graduated here) enforces, preventing the
+    pre-existing `j2Precession.sun_sync_inclination_rad` silent-`np.clip`
+    failure mode where `arccos` of an out-of-bounds argument would silently
+    return NaN or 0/pi.
+
+    Graduated at Exp 015 (third consumer: Exp 012 + Exp 014-implicit + Exp 015).
+    """
+    n = mean_motion(a_km, mu)
+    p = a_km * (1.0 - e * e)
+    tgt_rad_s = np.radians(target_deg_day) / 86400.0
+    K = 1.5 * n * j2 * (R_eq_km / p) ** 2
+    ratio = tgt_rad_s / K  # = -cos(i) on the retrograde branch
+    if abs(ratio) > 1.0:
+        raise ValueError(
+            f"no real SSO solution at a={a_km} km, e={e} (target {target_deg_day} deg/day "
+            f"exceeds maximum deliverable rate; a > a_max({e}))"
+        )
+    return float(np.arccos(-ratio))
+
+
+def sso_existence_max_sma(e: float = 0.0,
+                           target_deg_day: float = SSO_TARGET_DEG_DAY,
+                           mu: float = MU_EARTH_KM3S2, j2: float = J2_EARTH,
+                           R_eq_km: float = R_EARTH_KM) -> float:
+    """Maximum semi-major axis admitting an SSO solution (km).
+
+    a_max^(7/2) = 1.5 J2 sqrt(mu) R^2 / (lambda (1-e^2)^2), lambda = sun rate [rad/s].
+    Eccentricity EXTENDS the limit via (1-e^2)^(-4/7). Beyond this radius no
+    retrograde SSO exists at any inclination.
+    """
+    lam = np.radians(target_deg_day) / 86400.0
+    return float((1.5 * j2 * np.sqrt(mu) * R_eq_km**2 / (lam * (1.0 - e * e) ** 2)) ** (2.0 / 7.0))
 
 
 def j2_rhs(mu: float, j2: float, R_eq_km: float = R_EARTH_KM):
