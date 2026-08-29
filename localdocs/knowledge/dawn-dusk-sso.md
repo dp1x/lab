@@ -30,24 +30,39 @@ increasing with h.
 
 ## Content
 
-### The LST at the ascending node of a dawn-dusk SSO drifts through 24 h/year
+### The LST at the ORBIT-PLANE ascending node is approximately constant (CORRECTED 2026-08-29)
 
-The most important physical finding: the LST at the ascending node of
-a dawn-dusk SSO drifts through 24 h over the year. The drift rate is
-`dOmega/dt - d(Subsolar)/dt = 360.9856 deg/day - 360.0 deg/day = 0.9856 deg/day = 4 min/day`.
-The LST passes through 18:00 once per year, and through 6:00 (the
-opposite terminator) once per year.
+**PRE-REMEDIATION TEXT (RED):** the original "drifts through 24 h/year at
+4 min/day" claim was a frame/convention error. It subtracted an
+inertial RAAN rate from an ECEF subsolar rate and conflated Earth's
+sidereal rotation rate (360.9856 deg/day) with the SSO nodal rate
+(~0.9856 deg/day). The two 360 deg/day figures are both Earth-rotation
+artefacts (sidereal and mean-solar day rates); their difference is the
+SSO design rate, which the SSO *implements* -- it is NOT an LST drift.
 
-This means:
+**CORRECTED FINDING:** the LST at the ORBIT-PLANE ascending node of a
+true dawn-dusk SSO is approximately **constant**, oscillating only
+with the equation-of-time envelope (~+/-12 min, ~24 min peak-to-peak,
+periodic not secular). The drift rate is **zero** to first order by
+SSO design: `dLST/dt = (dOmega/dt - d(alpha_sun)/dt)/15 = 0` because
+`dOmega/dt = SSO_TARGET_DEG_DAY = d(alpha_sun)/dt` by construction.
 
-- A "dawn-dusk SSO" is well-defined only at specific t_L when the LST
-  pass-through aligns with the eclipse-favorable season.
-- The launch-window "strip" is the LST pass-through modulated by the
-  eclipse constraint.
-- A multi-year dawn-dusk mission needs station-keeping. Exp 012
-  documents the J2 closure residual of +2.2 deg LST drift per year at
-  SSO 600 km; Exp 015 finds the same drift directly from the LST
-  formula.
+The "24 h/year" sweep observed in `lst_at_insertion_node_at_t` is the
+LAUNCH-TIME CLOCK sweeping through the day as `t_L` varies over a year
+(the LST at a fixed geodetic launch-site longitude, -80.6039 deg),
+NOT a satellite property. The launch-window "strip" is this launch-time
+sweep modulated by the eclipse constraint.
+
+Station-keeping over a multi-year mission IS still required, but for
+the J2 closure residual (~0.006 deg/day = ~2.2 deg/year, ~130-290 m/s/year)
+and Lunisolar/SRP perturbations beyond J2, NOT for a "sidereal-solar
+differential" that the SSO design cancels by construction. Exp 012
+documents the J2 closure residual.
+
+See `localdocs/reports/audit-015-lst-drift-2026-08-29.md` for the
+independent first-principles derivation, and
+`localdocs/reports/audit-015-adversarial-2026-08-29.md` for the
+hostile review.
 
 The LST target 18:00 in this experiment corresponds to the
 **DUSK-ascending terminator** (the satellite is at the sun-setting
@@ -80,14 +95,17 @@ card and the knowledge note.
 The host research track (Exp 015 mathematics) initially predicted
 the LST is approximately constant, with the equation-of-time envelope
 of ~16 min. The actual measurement shows the LST passes through all
-24 h of the day, with the 16-min EoT envelope being a *secondary*
-correction to the 4-min/day sidereal-vs-solar drift.
+24 h of the day in the **launch-time clock** (LST at a fixed geodetic
+launch-site longitude as `t_L` sweeps over a year), with the 16-min
+EoT envelope being the *secondary* correction at the orbit-plane
+ascending node. The "24 h/year" sweep is a property of `t_L` as a
+free parameter, not of the satellite's node LST.
 
 ### Eclipse constraint is the discriminator; LST constraint discretizes
 
 The feasible set cardinality (266-295 per altitude) is roughly the
-number of LST pass-throughs (20 min wide each, 5 days per pass-through
-at the 4-min/day drift rate) modulated by the eclipse constraint.
+number of LST pass-throughs (in the launch-time clock; ~10-min wide
+each, ~1 day per pass-through) modulated by the eclipse constraint.
 At h=600 km:
 
 - Total True t_L in the eclipse-free season (the LST strip when
@@ -177,7 +195,8 @@ declares this explicitly (per the hostile review's finding F-0).
 - The cone-vs-cylinder eclipse disagreement is a structural model
   spread, not a bug.
 - The +2.2 deg LST drift per year at SSO 600 km (from Exp 012) is
-  consistent with the 4-min/day direct measurement from Exp 015.
+  the J2 closure residual (~0.006 deg/day); this is the secular
+  component of station-keeping, not a "drift through 24 h/year".
 - The "convention firewall" between apparent and mean LST
   (EoT-correction) is below the 10-min LST tolerance.
 
@@ -198,8 +217,14 @@ declares this explicitly (per the hostile review's finding F-0).
 1. Multi-constraint mission analysis is feasible by composing
    previously-validated pieces; the lab's "anti-rebuild" doctrine
    scales.
-2. The LST at the ascending node of a dawn-dusk SSO is NOT
-   constant; it drifts at the sidereal-solar differential (4 min/day).
+2. (CORRECTED 2026-08-29) The LST at the ORBIT-PLANE ascending
+   node of a true dawn-dusk SSO is approximately CONSTANT, bounded
+   by the EoT envelope (~+/-12 min). The "24 h/year drift" seen in
+   `lst_at_insertion_node_at_t` is the launch-time clock sweeping
+   through the day, not a satellite property. Station-keeping over
+   a multi-year mission addresses the J2 closure residual (~2.2 deg/
+   year) plus Lunisolar/SRP, not a sidereal-solar differential that
+   the SSO cancels by design.
 3. The eclipse constraint is the discriminator; the LST constraint
    is the discretizer.
 4. The host research track's prediction that the LST is

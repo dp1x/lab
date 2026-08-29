@@ -72,13 +72,13 @@
       }
     },
     "code_sha256": {
-      "eclipseTiming/experiment.py": "25b38b82c0481e0a6b441ea2e469dd9917da2142c5831188a9b377e1bafb2568",
-      "experiment.py": "f68c300a461ca9325a8c00e7aa5189c5af322faac5352df75aa15f802c43807a",
-      "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
-      "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
-      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "experiment.py": "d24f090d17b81caa12db4b2cbbcca7961fd2342c6b9b23022d98e5500f7d8875",
       "lab_utils/orbits.py": "29683012a01cc7629a43d7acf84ad4b15a466fd92999ece5b8efb9609efa5295",
-      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd"
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
+      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd",
+      "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
+      "eclipseTiming/experiment.py": "25b38b82c0481e0a6b441ea2e469dd9917da2142c5831188a9b377e1bafb2568"
     },
     "constants": {
       "AU_km": 149597870.7,
@@ -12244,12 +12244,13 @@
     ],
     "figures_note": "matplotlib Agg, dpi=150, deterministic; MD5-stable across runs",
     "findings": [
-      "FINDING: the LST at the ascending node of a dawn-dusk SSO drifts through 24 h over the year. The drift rate is |dOmega/dt| - |dSubsolar/dt| = 360.9856 - 360.0 = 0.9856 deg/day = 4 min/day. The LST passes through 18:00 (and through 6:00, the opposite terminator) once per year. This is the textbook LST drift physics (Vallado, Curtis); the dawn-dusk SSO design only fixes the LST modulo the sidereal-vs-solar differential. A multi-year dawn-dusk mission needs station-keeping to maintain the LST within the design tolerance, consistent with the Exp 012 finding of +2.2 deg LST drift per year at SSO 600 km.",
-      "FINDING: the LST target 18:00 in this experiment corresponds to the DUSK-ascending terminator in physical LST (the satellite is at the sun-setting terminator at the ascending node crossing). The lab's LST formula LST = 12 + (node_lon - subsolar_lon_ecef) / 15 deg/h is the apparent LST at the geodetic node longitude, validated against the textbook formula LST = 12 + (Omega - alpha_sun) / 15.",
-      "FINDING: for a dawn-dusk SSO at h in {500, 600, 700, 800} km launched from the Eastern Range, the year-long feasible cardinality is 260-290 components per altitude, monotonically increasing with h. The LST constraint provides the discretization (each LST pass-through is a set of candidate t_L); the eclipse constraint is the discriminator and is most permissive near the equinoxes for h=600 km (where the SSO beta angle is at its minimum, |delta_sun| ~ 0).",
-      "FINDING: the held-out equinox weeks (255/7 day = 36.4 feasible/day vs 4142/(365-7) = 11.6 feasible/day main) confirm the equinox-favorable pattern. The intuition: at h=600 km, the orbit is ALWAYS in some umbra passes (|beta| in [7.79 deg, 31.2 deg] is well below beta* = 66 deg), but the umbra duration is shortest near the equinoxes when the Sun's declination is small.",
-      "FINDING: the SSO inclination lock is exact (analytic closed form); the first-order J2 secular nodal drift tracks the Sun by construction. The LST drift (4 min/day) is a real, measurable effect that the dawn-dusk SSO design does not eliminate; it only fixes the LST modulo the sidereal-vs-solar differential.",
-      "FINDING: the cylindrical beta-cutout fast check (necessary condition) disagrees with the slow event-finder (sufficient condition) on the best candidates; this is the documented cone-vs-cylinder ambiguity at the window edges (Exp 014 disclosure). The disagreement is reported verbatim and does not invalidate the result."
+      "FINDING (CORRECTED, audit 2026-08-29): the LST at the ascending node of a true dawn-dusk SSO is approximately CONSTANT, with the drift bounded by the equation-of-time (EoT) envelope. The side-by-side formula `dLST/dt = (dOmega/dt - d(alpha_sun)/dt)/15` is zero to first order by SSO construction. The PREVIOUSLY PUBLISHED `4 min/day = 24 h/year` claim was a frame/convention error (frame-inconsistent subtraction of inertial RAAN rate from ECEF subsolar rate; confusion of Earth's sidereal rotation rate 360.9856 deg/day with the SSO nodal rate ~0.9856 deg/day). The actual drift at the orbit-plane node of a J2-propagated SSO at h=600 km is approximately 0 min/day (modulo EoT envelope ~+/-12 min, ~24 min peak-to-peak, periodic not secular). The 24 h/year sweep seen in `lst_at_insertion_node_at_t` is the LAUNCH-TIME CLOCK sweeping through the day as t_L varies over a year, NOT a satellite property. See localdocs/reports/audit-015-lst-drift-2026-08-29.md for the derivation.",
+      "FINDING: the LST target 18:00 in this experiment corresponds to the DUSK-ascending terminator in physical LST. The lab's LST formula LST = 12 + (node_lon - subsolar_lon_ecef) / 15 deg/h is the apparent LST at the geodetic node longitude, validated against the textbook formula LST = 12 + (Omega - alpha_sun) / 15.",
+      "FINDING: for a dawn-dusk SSO at h in {500, 600, 700, 800} km launched from the Eastern Range, the year-long feasible cardinality is 260-290 components per altitude, monotonically increasing with h.",
+      "FINDING: the held-out equinox weeks are MORE eclipse-favorable than the rest of the year for h=600 km (36.4 vs 11.6 feasible/day main; equinoxes dominate).",
+      "FINDING: the SSO inclination lock is exact (analytic closed form); the first-order J2 secular nodal drift tracks the Sun by construction. The LST at the orbit-plane ascending node is approximately constant (modulo EoT), as expected for a true Sun-synchronous orbit.",
+      "FINDING: the cylindrical beta-cutout fast check (necessary condition) disagrees with the slow event-finder (sufficient condition) on the best candidates; this is the documented cone-vs-cylinder ambiguity at the window edges (Exp 014 disclosure).",
+      "REMEDIATION NOTE (audit 2026-08-29): the previously-published headline claim `LST drift at fixed ascending node = 4 min/day = 24 h/year` was retracted as RED. The actual drift at the orbit-plane ascending node of a true SSO is approximately 0 min/day, bounded by the equation-of-time envelope. The feasible-set cardinality, held-out equinox finding, sensitivity matrix, and all structural conclusions are unchanged; only the LST-drift narrative was corrected. See localdocs/reports/audit-015-* for the independent verification."
     ],
     "held_out_validation": {
       "altitude_out_h600": {
@@ -12619,6 +12620,26 @@
       ],
       "site_lon_kourou_deg": -52.0,
       "site_lon_vandenberg_deg": -120.0
+    },
+    "audit_2026_08_29_remediation": {
+      "audit_reports": [
+        "localdocs/reports/audit-015-lst-drift-2026-08-29.md",
+        "localdocs/reports/audit-015-implementation-2026-08-29.md",
+        "localdocs/reports/audit-015-numerical-falsifier-2026-08-29.md",
+        "localdocs/reports/audit-015-adversarial-2026-08-29.md",
+        "localdocs/reports/audit-015-equivalence-chain-2026-08-29.md",
+        "localdocs/reports/audit-015-follow-up-candidates-2026-08-29.md",
+        "localdocs/reports/audit-015-portfolio-2026-08-29.md",
+        "localdocs/reports/audit-015-literature-2026-08-29.md"
+      ],
+      "redacted_claim": "LST drift at fixed ascending node = 4 min/day = 24 h/year. Cause: frame-inconsistent subtraction (inertial RAAN rate from ECEF subsolar rate); confusion of Earth's sidereal rotation rate (360.9856 deg/day) with the SSO nodal rate (~0.9856 deg/day).",
+      "corrected_claim": "LST at orbit-plane ascending node of true dawn-dusk SSO is approximately constant, oscillating with the equation-of-time envelope (~+/-12 min, ~24 min peak-to-peak, periodic not secular).",
+      "structural_results_preserved": [
+        "feasible component cardinality 260-290 per altitude",
+        "held-out equinox dominance (36.4 vs 11.6 feasible/day main)",
+        "sensitivity matrix structure",
+        "i_SSO closed form vs numerical anchors"
+      ]
     }
   }
 }
