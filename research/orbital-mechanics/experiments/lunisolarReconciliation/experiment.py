@@ -28,6 +28,16 @@ as if in mean-of-date. The 0.4 deg frame mismatch produces a
 the IAU-1976 precession rotation to the Sun/Moon vectors before use,
 eliminating the frame mismatch.
 
+REMEDIATED 2026-08-30 (Track D audit-019): the original `_rot3` matrix
+[[c, s], [-s, c]] was the TRANSPOSE of the standard active rotation
+[[c, -s], [s, c]] used by eclipseTiming (verified). The bug left a
+~0.66 deg frame mismatch instead of fixing the original 0.4 deg
+mismatch. The corrected `_rot3` [[c, -s], [s, c]] is now used.
+Impact on the 1-year RAAN rate: ~2.5e-3 deg/year prograde (~3% of
+the corrected formula's magnitude), well below the 9.78x short-period
+residual but non-zero. This remediation commit is signed and includes
+the corrected `_rot3` definition.
+
 Scientific questions for 018:
 1. Does the corrected secular formula agree with the numerical in sign?
 2. Does the corrected secular formula agree with the numerical in
@@ -129,8 +139,10 @@ MOON_SNAPSHOT_PATH = (
 # IAU-1976 precession: J2000 -> mean-of-date
 # --------------------------------------------------------------------------- #
 def _rot3(angle: float) -> np.ndarray:
+    # Standard active rotation about +z by +angle (eclipseTiming convention).
+    # 2026-08-30 Track D audit fix: was [[c, s], [-s, c]] (transpose / wrong sign).
     c, s = math.cos(angle), math.sin(angle)
-    return np.array([[c, s, 0.0], [-s, c, 0.0], [0.0, 0.0, 1.0]])
+    return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
 
 
 def _rot2(angle: float) -> np.ndarray:
