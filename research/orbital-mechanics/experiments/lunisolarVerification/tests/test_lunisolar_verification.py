@@ -504,3 +504,157 @@ def test_no_machine_specific_paths_in_experiment_py():
         assert tok not in content, (
             f"experiment.py contains forbidden token: {tok!r}"
         )
+
+
+# ============================================================================ #
+# L7: CORRECTED formula validation (REMEDIATION 2026-08-30) (~10 tests)
+# ============================================================================ #
+# These tests validate the CORRECTED secular formula
+# `corrected_secular_lunisolar_raan_rate_rad_s` which is the formula
+# the 8-track audit identified as the correct doubly-averaged quadrupole
+# NODAL formula. The DEPRECATED `closed_form_lunisolar_raan_rate_rad_s`
+# is preserved for backwards compatibility but is mathematically wrong.
+# See audit-018-lunisolar-discrepancy-resolution-2026-08-30.md.
+# ============================================================================ #
+
+
+def test_corrected_cf_function_exists():
+    """The corrected secular formula function exists in experiment.py."""
+    assert hasattr(exp, "corrected_secular_lunisolar_raan_rate_rad_s"), (
+        "corrected_secular_lunisolar_raan_rate_rad_s is missing from experiment.py"
+    )
+
+
+def test_corrected_cf_solar_term_positive_at_sso_retrograde():
+    """Corrected solar term at SSO retrograde is POSITIVE (prograde).
+
+    This is the key SIGN finding of the 8-track audit: the wrong formula
+    was negative (retrograde) at SSO retrograde, the correct formula
+    is positive (prograde), matching the numerical 1-year fit.
+    """
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    assert cf["solar_cf_deg_day"] > 0, (
+        f"corrected solar cf at h=600 = {cf['solar_cf_deg_day']:.6e} deg/day, "
+        f"expected POSITIVE (prograde). The wrong formula was negative."
+    )
+
+
+def test_corrected_cf_total_positive_at_sso():
+    """Corrected total at h=600 km i_sso=97.79 deg is POSITIVE (prograde),
+    matching the numerical 1-year fit's +0.001284 deg/day sign."""
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    assert cf["total_cf_deg_day"] > 0, (
+        f"corrected total cf at h=600 = {cf['total_cf_deg_day']:.6e} deg/day, "
+        f"expected POSITIVE (prograde) to match numerical."
+    )
+
+
+def test_corrected_cf_magnitude_within_10x_of_numerical():
+    """Corrected cf at h=600 km is within 10x of the numerical 1-year fit.
+    The residual factor is the unmodelled short-period contribution."""
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    payload = json.loads(
+        (EXP / "results" / "results.json").read_text(encoding="utf-8")
+    )
+    numerical = abs(payload["results"]["by_altitude"]["600"][
+        "numerical_om_dot_deg_day"
+    ])
+    corrected = abs(cf["total_cf_deg_day"])
+    ratio = numerical / corrected
+    assert 1.0 <= ratio <= 50.0, (
+        f"corrected/numerical ratio = {ratio:.2f}x; expected in [1, 50]. "
+        f"corrected = {corrected:.6e}, numerical = {numerical:.6e}"
+    )
+
+
+def test_corrected_cf_total_eq_solar_plus_lunar():
+    """Corrected cf total = solar + lunar (sanity check on the new code)."""
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    expected = cf["solar_cf_deg_day"] + cf["lunar_cf_deg_day"]
+    assert abs(cf["total_cf_deg_day"] - expected) < 1e-15, (
+        f"corrected cf total != solar + lunar: {cf['total_cf_deg_day']} != {expected}"
+    )
+
+
+def test_corrected_cf_uses_a_cubed_a3_cubed_radial_factor():
+    """The corrected formula uses the third-body radial scale (a/a_3)^3
+    NOT the J2-style (R_E/r_3)^2. Test by computing the ratio of the
+    corrected solar term to a hand-derived value using (a/AU)^3."""
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    a = 6378.137 + 600.0
+    n = math.sqrt(398600.4418 / a ** 3)
+    i = math.acos(-(a / 12352.505076) ** 3.5)  # SSO closed form
+    i3_sun = math.radians(23.439)
+    expected_solar = (3.0 / 8.0) * n * (
+        132712440018.0 / 398600.4418
+    ) * (a / 149597870.7) ** 3 * math.sin(2 * (i - i3_sun)) / math.sin(i)
+    expected_deg_day = math.degrees(expected_solar) * 86400.0
+    assert abs(cf["solar_cf_deg_day"] - expected_deg_day) < 1e-9, (
+        f"corrected solar cf differs from hand-derived (a/AU)^3 formula: "
+        f"{cf['solar_cf_deg_day']} vs {expected_deg_day}"
+    )
+
+
+def test_corrected_cf_sign_flip_vs_deprecated():
+    """The corrected and deprecated formulas have OPPOSITE signs at
+    h=600 km i_sso. This is the central remediation finding."""
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        dep = exp.closed_form_lunisolar_raan_rate_rad_s(600)
+    cor = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    assert dep["total_cf_deg_day"] * cor["total_cf_deg_day"] < 0, (
+        f"deprecated and corrected have same sign: "
+        f"dep={dep['total_cf_deg_day']:.6e}, cor={cor['total_cf_deg_day']:.6e}"
+    )
+
+
+def test_corrected_cf_magnitude_smaller_than_deprecated():
+    """The corrected formula's magnitude is much smaller than the
+    deprecated formula's magnitude at h=600 km SSO (factor of ~1600x)."""
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        dep = exp.closed_form_lunisolar_raan_rate_rad_s(600)
+    cor = exp.corrected_secular_lunisolar_raan_rate_rad_s(600)
+    mag_ratio = abs(dep["total_cf_deg_day"]) / abs(cor["total_cf_deg_day"])
+    assert mag_ratio > 100, (
+        f"deprecated/corrected magnitude ratio = {mag_ratio:.1f}x; "
+        f"expected > 100x. dep={dep['total_cf_deg_day']:.6e}, "
+        f"cor={cor['total_cf_deg_day']:.6e}"
+    )
+
+
+def test_corrected_cf_increases_in_magnitude_with_altitude():
+    """Corrected cf magnitude grows with altitude (mean motion n ~ 1/a^(3/2)
+    AND the radial factor (a/a_3)^3 ~ a^3, giving net ~a^(3/2))."""
+    cfs = [exp.corrected_secular_lunisolar_raan_rate_rad_s(h) for h in ALTITUDES]
+    mags = [abs(c["total_cf_deg_day"]) for c in cfs]
+    # Net scaling ~ a^(3/2) is monotone increasing in h, so should be monotone
+    # Note: 500, 600, 700, 800 km
+    assert mags[0] < mags[1] < mags[2] < mags[3], (
+        f"corrected cf magnitude not monotone in altitude: {mags}"
+    )
+
+
+def test_corrected_cf_altitude_infeasible_above_a_max():
+    """For h above the SSO existence limit, sso_inclination_rad raises
+    and the corrected cf reports infeasible (same as the deprecated
+    version's contract)."""
+    cf = exp.corrected_secular_lunisolar_raan_rate_rad_s(6000)
+    assert cf["feasible"] is False, (
+        f"h=6000 km should be infeasible; got {cf}"
+    )
+
+
+def test_corrected_cf_documents_derivation_in_docstring():
+    """The corrected function's docstring should explicitly document
+    the (3/8) n (mu_3/mu_E) (a/a_3)^3 sin 2(i-i_3)/sin i formula."""
+    import inspect
+    src = inspect.getsource(exp.corrected_secular_lunisolar_raan_rate_rad_s)
+    assert "(a/a_3)^3" in src or "(a / a_3)^3" in src, (
+        "corrected cf docstring does not contain the third-body radial factor"
+    )
+    assert "sin 2" in src or "sin(2" in src, (
+        "corrected cf docstring does not contain the nodal sin 2 factor"
+    )

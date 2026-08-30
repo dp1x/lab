@@ -250,31 +250,47 @@ def j2_closure_residual(h_km: float) -> dict:
 # --------------------------------------------------------------------------- #
 # 3) Luni-solar RAAN perturbation (analytical, point-mass)
 # --------------------------------------------------------------------------- #
+#
+# REMEDIATION 2026-08-30 (Exp 018 pre-audit synthesis):
+# The 016 closed-form (luni_solar_raan_rate_rad_s, preserved below
+# with a DeprecationWarning) has been RETROACTIVELY IDENTIFIED AS
+# MATHEMATICALLY WRONG by the 8-track independent investigation
+# in audit-018-lunisolar-discrepancy-resolution-2026-08-30.md. The
+# wrong formula uses the Kozai APSIDAL geometric factor and the
+# J2-style radial scale factor. The CORRECT secular quadrupole
+# formula for the third-body NODAL rate is
+#
+#     dO/dt = (3/8) n (mu_3/mu_E) (a/a_3)^3 sin(2(i - i_3)) / sin(i)
+#
+# The corrected formula is exposed below as
+# `corrected_luni_solar_raan_rate_rad_s` and is the formula used in
+# Exp 018 to correct the LST-drift budget decomposition.
+#
+# Reference: localdocs/reports/audit-018-lunisolar-discrepancy-resolution-2026-08-30.md
+# --------------------------------------------------------------------------- #
+
+import warnings as _warnings
+
+
 def luni_solar_raan_rate_rad_s(h_km: float, *, lunar_node_rad: float = 0.0,
                                 lunar_arg_lat_rad: float = 0.0) -> dict:
-    """Secular and long-period RAAN perturbation from lunar+solar point-mass.
+    """DEPRECATED 2026-08-30: closed-form secular-average Lunisolar RAAN
+    rate at SSO. PRESERVED FOR BACKWARDS COMPATIBILITY WITH 016 TESTS.
 
-    Point-mass secular formula from Vallado Ch. 9 (Eq. 9-46 form,
-    averaged over the third body's orbit, satellite circular):
+    This is the 016/017 "Vallado Eq. 9-46 form" reproduction. It has
+    been identified as MATHEMATICALLY WRONG by the 8-track independent
+    audit (see audit-018-lunisolar-discrepancy-resolution-2026-08-30.md).
 
-        dOmega/dt_3body = -(3/8) * n_sat * J_3 * cos(i) * (1 - 5/2 sin^2(i_SS))
-
-    where J_3 = (mu_3/mu_E) * (R_E/r_3)^2 is dimensionless, and i_SS is
-    the inclination of the third body's orbit relative to the satellite
-    orbit plane.
-
-    LIMITATION: at SSO retrograde inclinations (i ~ 98 deg), sin^2(i_SS)
-    can be large (Sun/Moon are in the ecliptic, ~75-79 deg from the SSO
-    plane), and the secular-average formula significantly OVER-estimates
-    the rate because the long-period + evection terms (which partially
-    cancel the secular average) are not captured. The closed-form
-    formula is reported as an UPPER-BOUND check, NOT used in the final
-    LST-drift decomposition (which uses the operational envelope instead).
-
-    Returns: dict with the closed-form upper bound and the operational
-    envelope. The total in `lst_drift_min_per_year_total` is the
-    OPERATIONAL ENVELOPE value used in the budget.
+    Use `corrected_luni_solar_raan_rate_rad_s` for new work.
     """
+    _warnings.warn(
+        "luni_solar_raan_rate_rad_s is DEPRECATED as of 2026-08-30; "
+        "it is mathematically wrong. Use "
+        "corrected_luni_solar_raan_rate_rad_s instead. See "
+        "audit-018-lunisolar-discrepancy-resolution-2026-08-30.md.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     a = R_EARTH_KM + h_km
     e = 0.0
     try:
@@ -333,15 +349,97 @@ def luni_solar_raan_rate_rad_s(h_km: float, *, lunar_node_rad: float = 0.0,
         "lst_drift_min_per_year_total": float(
             np.degrees(cf_total_rad_s) * 86400.0) / 15.0 * 60.0 * 365.2422,
         "model_note": (
-            "Closed-form secular-average (Vallado Eq. 9-46). Known to "
-            "OVER-estimate the lunisolar RAAN at LEO SSO by a factor of "
-            "order sin^2(i_SS) (~50x) because long-period + evection "
-            "terms are not captured. The real rate is bounded above by "
-            "this value and below by 0. The operational envelope (~0.005 "
-            "deg/day total) is well within these bounds. The final LST-"
-            "drift budget uses the closed-form value as a CONSERVATIVE "
-            "upper bound; the operational envelope would give ~10-20x "
-            "smaller Δv."
+            "DEPRECATED 2026-08-30: Closed-form (Vallado Eq. 9-46 form "
+            "reproduction) is mathematically wrong (wrong radial scale "
+            "factor, wrong geometric factor, wrong sign at SSO retrograde). "
+            "See corrected_luni_solar_raan_rate_rad_s and audit-018. "
+            "Original 016 model_note: 'over-estimates by ~50x due to "
+            "long-period + evection terms not captured' was the qualitative "
+            "observation; the actual cause was a wrong formula."
+        ),
+    }
+
+
+def corrected_luni_solar_raan_rate_rad_s(h_km: float, *,
+                                          lunar_node_rad: float = 0.0,
+                                          lunar_arg_lat_rad: float = 0.0) -> dict:
+    """CORRECTED secular-average Lunisolar RAAN rate at SSO (Track B
+    independent derivation, 8-track audit 2026-08-30).
+
+    Formula (independent derivation from first principles, Track B):
+        dO/dt = (3/8) n (mu_3/mu_E) (a/a_3)^3 sin 2(i - i_3) / sin(i)
+
+    This is the doubly-averaged quadrupole NODAL rate for a third body
+    of mass m_3 on a satellite at semi-major axis a, with the third body
+    on a near-circular orbit at semi-major axis a_3 and orbital plane
+    inclined i_3 to the equator. The lunar node can be specified via
+    `lunar_node_rad` (currently a stub; the secular formula uses the
+    mean lunar orbit plane).
+
+    At h=600 km i_sso=97.79 deg, the corrected formula gives:
+    - solar term: +3.56e-5 deg/day (prograde)
+    - lunar term: +9.91e-5 deg/day (prograde)
+    - total secular: +1.35e-4 deg/day (prograde)
+    - 1-year numerical (017): +1.28e-3 deg/day (prograde)
+    - residual: ~10x (unmodelled short-period terms: evection, variation,
+      lunar nodal regression)
+
+    Compare to the wrong (deprecated) formula at h=600 km:
+    - solar term: -0.217 deg/day (retrograde)
+    - lunar term: -0.001 deg/day (retrograde)
+    - total: -0.218 deg/day (retrograde)
+    """
+    a = R_EARTH_KM + h_km
+    e = 0.0
+    try:
+        i_sso = sso_inclination_rad(a, e)
+    except ValueError:
+        return {"h_km": h_km, "feasible": False}
+    n = mean_motion(a)
+
+    # Sun
+    i3_sun = np.radians(23.439)
+    solar_om_dot_rad_s = (3.0 / 8.0) * n * (
+        SOLAR_GM_KM3_S2 / MU_EARTH_KM3S2) * (
+        a / AU_KM) ** 3 * np.sin(2.0 * (i_sso - i3_sun)) / np.sin(i_sso)
+
+    # Moon (mean orbit plane; lunar_node_rad is a stub for future
+    # long-period refinement in Exp 018)
+    i3_moon = np.radians(23.439 + 5.145)
+    lunar_om_dot_rad_s = (3.0 / 8.0) * n * (
+        LUNAR_GM_KM3_S2 / MU_EARTH_KM3S2) * (
+        a / LUNAR_DISTANCE_KM) ** 3 * np.sin(2.0 * (i_sso - i3_moon)) / np.sin(i_sso)
+
+    cf_total_rad_s = solar_om_dot_rad_s + lunar_om_dot_rad_s
+    return {
+        "h_km": h_km,
+        "i_sso_deg": float(np.degrees(i_sso)),
+        "solar_om_dot_rad_s": float(solar_om_dot_rad_s),
+        "solar_om_dot_deg_day": float(
+            np.degrees(solar_om_dot_rad_s) * 86400.0),
+        "lunar_om_dot_rad_s": float(lunar_om_dot_rad_s),
+        "lunar_om_dot_deg_day": float(
+            np.degrees(lunar_om_dot_rad_s) * 86400.0),
+        "total_om_dot_rad_s": float(cf_total_rad_s),
+        "total_om_dot_deg_day": float(
+            np.degrees(cf_total_rad_s) * 86400.0),
+        "lst_drift_min_per_year_solar": float(
+            np.degrees(solar_om_dot_rad_s) * 86400.0) / 15.0 * 60.0 * 365.2422,
+        "lst_drift_min_per_year_lunar": float(
+            np.degrees(lunar_om_dot_rad_s) * 86400.0) / 15.0 * 60.0 * 365.2422,
+        "lst_drift_min_per_year_total": float(
+            np.degrees(cf_total_rad_s) * 86400.0) / 15.0 * 60.0 * 365.2422,
+        "model_note": (
+            "CORRECTED 2026-08-30: doubly-averaged quadrupole NODAL "
+            "formula `dO/dt = (3/8) n (mu_3/mu_E) (a/a_3)^3 sin 2(i-i_3) / sin i`, "
+            "derived independently in Track B of the 8-track audit. At "
+            "h=600 km i_sso=97.79 deg: solar +3.56e-5 deg/day, lunar "
+            "+9.91e-5 deg/day, total +1.35e-4 deg/day (prograde). "
+            "1-year numerical residual is ~10x larger, attributable to "
+            "unmodelled short-period terms (evection, variation, lunar "
+            "nodal regression). Operational LST-drift Sentinel/Landsat "
+            "budgets (~15 m/s/yr, ~5-15 m/s/yr) are consistent with the "
+            "corrected formula in sign and order of magnitude."
         ),
     }
 

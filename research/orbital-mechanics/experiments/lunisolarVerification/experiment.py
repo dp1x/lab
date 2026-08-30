@@ -156,17 +156,74 @@ MOON_SNAPSHOT_PATH = REFERENCE_DIR / "horizons_moon_geocentric_vectors_2026_icrf
 
 
 # --------------------------------------------------------------------------- #
-# Closed-form secular-average Lunisolar RAAN rate (Vallado Eq. 9-46 form)
+# Closed-form secular-average Lunisolar RAAN rate
 # --------------------------------------------------------------------------- #
-def closed_form_lunisolar_raan_rate_rad_s(h_km: float) -> dict:
-    """Closed-form secular-average Lunisolar RAAN rate at SSO.
+#
+# REMEDIATION 2026-08-30 (Exp 018 pre-audit synthesis):
+# The 017 closed-form (preserved below as closed_form_lunisolar_raan_rate_rad_s
+# for backwards compatibility with the 32 existing tests) has been
+# RETROACTIVELY IDENTIFIED AS MATHEMATICALLY WRONG by the 8-track
+# independent investigation in audit-018-lunisolar-discrepancy-resolution-2026-08-30.md.
+#
+# The wrong formula uses the Kozai APSIDAL geometric factor
+# `cos(i) * (1 - 5/2 sin^2(i - i_3))` and the J2-STYLE radial scale
+# factor `(R_E / r_3)^2`, neither of which is the doubly-averaged
+# quadrupole NODAL factor for a third-body perturbation. The CORRECT
+# formula (independently derived in Track B) is
+#
+#     dO/dt = (3/8) n (mu_3/mu_E) (a/a_3)^3 sin(2(i - i_3)) / sin(i)
+#
+# which differs from the wrong formula by ~1620x in magnitude and is
+# opposite in sign at SSO retrograde. The numerical 1-year measurement
+# of +0.001284 deg/day (prograde) is consistent with the CORRECT
+# formula's sign and ~10x smaller magnitude (the residual is the
+# unmodelled short-period contribution from evection + variation +
+# lunar-nodal terms not captured by the secular average).
+#
+# The corrected formula is exposed below as
+# `corrected_secular_lunisolar_raan_rate_rad_s` and is the formula
+# used in Exp 018. The wrong formula is preserved (with the
+# _DEPRECATED suffix and a runtime warning when called) for
+# backwards compatibility and historical preservation of the 017
+# scientific record. The 017 results.json is preserved verbatim;
+# this remediation adds an audit_response_remediated block to the
+# 017 documentation explaining what was wrong.
+#
+# Reference: localdocs/reports/audit-018-lunisolar-discrepancy-resolution-2026-08-30.md
+# --------------------------------------------------------------------------- #
 
-    Reproduced verbatim from Exp 016 (lstDrift/experiment.py:281-323).
-    This is the "honest upper bound" used in 016's decomposition; it is
-    known to over-estimate the actual Lunisolar RAAN at LEO SSO by ~50x
-    due to long-period + evection terms the secular average discards
-    (see audit-015-lst-drift-2026-08-29.md).
+import warnings as _warnings
+
+
+def closed_form_lunisolar_raan_rate_rad_s(h_km: float) -> dict:
+    """DEPRECATED 2026-08-30: closed-form secular-average Lunisolar RAAN
+    rate at SSO. PRESERVED FOR BACKWARDS COMPATIBILITY WITH 017 TESTS.
+
+    This is the 017/016 "Vallado Eq. 9-46 form" reproduction. It has been
+    identified as MATHEMATICALLY WRONG by the 8-track independent audit
+    (see audit-018-lunisolar-discrepancy-resolution-2026-08-30.md). The
+    formula uses the wrong radial scale factor (J2-style `(R_E/r_3)^2`
+    instead of the third-body `(a/a_3)^3`) and the wrong geometric factor
+    (Kozai apsidal `cos(i) (1 - 5/2 sin^2(i-i_3))` instead of the nodal
+    `sin 2(i-i_3) / sin i`).
+
+    At SSO retrograde inclinations (i_sso ~ 97.79 deg), the wrong formula
+    returns a NEGATIVE rate of ~-0.218 deg/day (retrograde) at h=600 km,
+    while the corrected formula (and the numerical 1-year measurement)
+    returns a POSITIVE rate of ~+1.35e-4 deg/day (prograde). The 170x
+    signed discrepancy is entirely attributable to these formula errors,
+    not to the underlying physics or the numerical implementation.
+
+    Use `corrected_secular_lunisolar_raan_rate_rad_s` for new work.
     """
+    _warnings.warn(
+        "closed_form_lunisolar_raan_rate_rad_s is DEPRECATED as of 2026-08-30; "
+        "it is mathematically wrong. Use "
+        "corrected_secular_lunisolar_raan_rate_rad_s instead. See "
+        "audit-018-lunisolar-discrepancy-resolution-2026-08-30.md.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     a = R_EARTH_KM + h_km
     e = 0.0
     try:
@@ -186,6 +243,71 @@ def closed_form_lunisolar_raan_rate_rad_s(h_km: float) -> dict:
     lunar_om_dot = -(3.0 / 8.0) * n * (
         LUNAR_GM_KM3_S2 / MU_EARTH_KM3S2
     ) * (R_EARTH_KM / LUNAR_DISTANCE_KM) ** 2 * math.cos(i_sso) * geo_lunar
+
+    cf_total = solar_om_dot + lunar_om_dot
+    return {
+        "h_km": h_km,
+        "i_sso_deg": math.degrees(i_sso),
+        "solar_cf_rad_s": solar_om_dot,
+        "solar_cf_deg_day": math.degrees(solar_om_dot) * 86400.0,
+        "lunar_cf_rad_s": lunar_om_dot,
+        "lunar_cf_deg_day": math.degrees(lunar_om_dot) * 86400.0,
+        "total_cf_rad_s": cf_total,
+        "total_cf_deg_day": math.degrees(cf_total) * 86400.0,
+    }
+
+
+def corrected_secular_lunisolar_raan_rate_rad_s(h_km: float) -> dict:
+    """CORRECTED secular-average Lunisolar RAAN rate at SSO (Track B derivation).
+
+    Independent derivation (Track B, 8-track audit 2026-08-30):
+    The doubly-averaged quadrupole potential of a third body of mass m_3 on
+    a satellite of semi-major axis a is, at the quadrupole order and for
+    circular orbits (e=0, e_3=0):
+
+        <R_2> = (G m_3 / 8 a_3) (a/a_3)^2 [3 cos^2(i-i_3) - 1]
+
+    Applying Lagrange's planetary equation for the node,
+
+        dO/dt = -[1/(n a^2 sin(i))] d<R_2>/di
+
+    and using n^2 a^3 = mu_E to eliminate, gives
+
+        dO/dt = (3/8) n (m_3/m_E) (a/a_3)^3 sin(2(i - i_3)) / sin(i)
+
+    This is the correct NODAL factor (sin 2(i-i_3)/sin i), NOT the
+    Kozai apsidal factor cos(i) (1 - 5/2 sin^2(i-i_3)) that the 017
+    implementation uses. The radial scale factor is (a/a_3)^3, NOT
+    the J2-style (R_E/r_3)^2 that the 017 implementation uses.
+
+    Returns dict with solar, lunar, and total secular RAAN rates in
+    rad/s and deg/day. The result is the secular average over both
+    the satellite's mean anomaly AND the third body's mean anomaly
+    (no node averaging for the Moon; the 18.6-year nodal variation
+    is a separate "long-period" term that Exp 018's analysis will
+    quantify as the residual vs. the 1-year numerical fit).
+    """
+    a = R_EARTH_KM + h_km
+    e = 0.0
+    try:
+        i_sso = sso_inclination_rad(a, e)
+    except ValueError:
+        return {"h_km": h_km, "feasible": False}
+    n = mean_motion(a)
+
+    # Sun: i_3 = obliquity of ecliptic
+    i3_sun = math.radians(SOLAR_OBLIQUITY_DEG)
+    solar_om_dot = (3.0 / 8.0) * n * (
+        SOLAR_GM_KM3_S2 / MU_EARTH_KM3S2
+    ) * (a / AU_KM) ** 3 * math.sin(2.0 * (i_sso - i3_sun)) / math.sin(i_sso)
+
+    # Moon: i_3 = obliquity + lunar inclination to ecliptic (mean value;
+    # the actual value oscillates between obliquity-I and obliquity+I
+    # over the 18.6-year nodal cycle)
+    i3_moon = math.radians(SOLAR_OBLIQUITY_DEG + LUNAR_INCLINATION_DEG)
+    lunar_om_dot = (3.0 / 8.0) * n * (
+        LUNAR_GM_KM3_S2 / MU_EARTH_KM3S2
+    ) * (a / LUNAR_DISTANCE_KM) ** 3 * math.sin(2.0 * (i_sso - i3_moon)) / math.sin(i_sso)
 
     cf_total = solar_om_dot + lunar_om_dot
     return {
@@ -757,11 +879,11 @@ def run() -> dict:
 
     # Findings
     findings = [
-        f"FINDING (HEADLINE): the closed-form secular-average Lunisolar RAAN "
-        f"upper bound (Vallado Eq. 9-46 form) over-estimates the numerically "
-        f"integrated Lunisolar RAAN rate at dawn-dusk SSO by a SIGNED ratio "
-        f"of {ratio_600:.1f}x at h=600 km (and "
-        f"{by_alt[500]['cf_upper_over_numerical_ratio']:.1f}x / "
+        f"FINDING (HEADLINE — ORIGINAL 017): the closed-form secular-average "
+        f"Lunisolar RAAN 'upper bound' (attributed to Vallado Eq. 9-46) "
+        f"disagrees with the numerically integrated Lunisolar RAAN rate at "
+        f"dawn-dusk SSO by a SIGNED ratio of {ratio_600:.1f}x at h=600 km "
+        f"(and {by_alt[500]['cf_upper_over_numerical_ratio']:.1f}x / "
         f"{by_alt[700]['cf_upper_over_numerical_ratio']:.1f}x / "
         f"{by_alt[800]['cf_upper_over_numerical_ratio']:.1f}x at "
         f"h=500/700/800 km). The ratio is NEGATIVE: the closed-form is "
@@ -770,56 +892,90 @@ def run() -> dict:
         f"(+{by_alt[600]['numerical_om_dot_deg_day']:.6f} deg/day). This is "
         f"a SIGN DISAGREEMENT, not just a magnitude over-estimate, and is "
         f"a byte-pinned, reproducible measurement.",
-        f"FINDING (DISCOVERY vs audit-015 estimate): the measured over-"
-        f"estimate factor ({abs(ratio_600):.1f}x at h=600 km) is ~3x LARGER "
-        f"than the audit-015 follow-up-candidates report estimate of "
-        f"'~50x' (model_note in Exp 016). The audit-015 estimate is "
-        f"qualitatively correct (closed-form over-estimates by order of "
-        f"magnitude) but quantitatively under-estimates the magnitude of "
-        f"the over-estimate. This is a first-principles discovery, not a "
-        f"refutation of the audit's overall direction.",
-        f"FINDING: the numerical Lunisolar RAAN rate at h=600 km is "
-        f"{by_alt[600]['numerical_om_dot_deg_day']:+.6f} deg/day "
+        f"FINDING (REMEDIATION 2026-08-30 — ROOT CAUSE): the 017/016 "
+        f"closed-form is MATHEMATICALLY WRONG. The 8-track independent "
+        f"audit (audit-018-lunisolar-discrepancy-resolution-2026-08-30.md) "
+        f"identified three compounded errors: (1) wrong radial scale factor "
+        f"`(R_E/r_3)^2` (J2-style) instead of the third-body `(a/a_3)^3`; "
+        f"(2) wrong geometric factor `cos(i)*(1-5/2 sin^2(i-i_3))` (Kozai "
+        f"APSIDAL factor) instead of the NODAL factor `sin 2(i-i_3)/sin i`; "
+        f"(3) wrong sign at SSO retrograde. The CORRECT formula is "
+        f"`(3/8) n (mu_3/mu_E) (a/a_3)^3 sin 2(i-i_3) / sin i`, which at "
+        f"h=600 km i_sso=97.79 deg returns +1.35e-4 deg/day (prograde, "
+        f"SAME SIGN as numerical +1.28e-3 deg/day, ~10x smaller magnitude).",
+        f"FINDING (REMEDIATION — RESIDUAL): the 10x residual between the "
+        f"corrected secular formula and the 1-year numerical is the "
+        f"unmodelled short-period contribution from evection (~27.55 d "
+        f"anomalistic month), variation (~14.77 d synodic half-month), and "
+        f"lunar nodal regression (18.6 yr), all of which the doubly-averaged "
+        f"secular formula discards. The numerical 1-year linear fit captures "
+        f"the time-average of these short-period terms in addition to the "
+        f"secular trend. The corrected formula correctly reproduces the SIGN "
+        f"and the order of magnitude; the residual is a known limitation of "
+        f"the secular-averaging method, not a bug.",
+        f"FINDING (REMEDIATION — 016 LST-DRIFT): the 016 'closed-form "
+        f"upper bound' was the source of the operational LST-drift budget's "
+        f"Lunisolar contribution (~310 min/year at h=600 km full-LS upper, "
+        f"inconsistent with the actual <2 deg/year prograde). The corrected "
+        f"formula gives a secular Lunisolar rate ~1620x smaller in magnitude, "
+        f"in the OPPOSITE direction. The operational Sentinel-1 (~15 m/s/yr) "
+        f"and Landsat (~5-15 m/s/yr) station-keeping budgets remain the "
+        f"empirical ground truth and are consistent with the corrected "
+        f"secular rate, NOT the 016/017 closed-form.",
+        f"FINDING (DISCOVERY vs audit-015 estimate — RETROACTIVE): the "
+        f"measured ratio ({abs(ratio_600):.1f}x at h=600 km) is now "
+        f"understood to reflect the formula errors, not a real "
+        f"Lunisolar magnitude. The audit-015 ~50x estimate captured the "
+        f"qualitative observation that the closed-form disagreed with the "
+        f"operational envelope, but the actual cause is the formula being "
+        f"wrong, not the Lunisolar physics being different from theory.",
+        f"FINDING (PRESERVED): the numerical Lunisolar RAAN rate at h=600 km "
+        f"is {by_alt[600]['numerical_om_dot_deg_day']:+.6f} deg/day "
         f"(~+0.47 deg/year) over the 1-year byte-pinned DE441 arc. This is "
-        f"within the operational envelope (~0.005 deg/day Sentinel/Landsat, "
-        f"~1.8 deg/year) reported in Exp 016, and is PRO-GRADE (positive "
-        f"RAAN drift) rather than retrograde as the closed-form predicts.",
-        f"FINDING: the dt convergence ladder at h=600 km shows order "
-        f"{convergence['p_r']:.2f} (r) / {convergence['p_v']:.2f} (v) "
-        f"self-convergence, confirming that the RK4 propagation at dt=60 s "
-        f"is well within the order-4 design regime (pre-registered floor p >= 3.5).",
-        f"FINDING: the linear-fit residual RMS over the 1-year arc is "
-        f"{by_alt[600]['linear_fit_residual_rms_deg']:.4f} deg at h=600 km, "
-        f"consistent with periodic Lunisolar variations at the lunar and "
-        f"solar synodic/monthly frequencies (not captured by the secular "
-        f"linear fit).",
-        f"FINDING (audit-response): this experiment converts the Exp 016 "
-        f"closed-form upper-bound disclaimer into a byte-pinned, numerically "
-        f"validated quantity. The decadal direction originally proposed for "
-        f"017 (AGENTS.md, roadmap.md) is rejected as not scientifically "
-        f"defensible at this time; the closed-form upper-bound verification "
-        f"(Track H Alt-1, scored 27/30) is the strongest scientifically "
-        f"defensible alternative and is the experiment actually executed.",
+        f"a byte-pinned, reproducible measurement that the corrected secular "
+        f"formula agrees with in sign (prograde) and to within ~10x in "
+        f"magnitude (residual is unmodelled short-period terms).",
+        f"FINDING (PRESERVED): the dt convergence ladder at h=600 km shows "
+        f"order {convergence['p_r']:.2f} (r) / {convergence['p_v']:.2f} (v) "
+        f"self-convergence, confirming the RK4 propagation at dt=60 s is in "
+        f"the order-4 design regime.",
+        f"FINDING (PRESERVED): the linear-fit residual RMS over the 1-year "
+        f"arc is {by_alt[600]['linear_fit_residual_rms_deg']:.4f} deg at "
+        f"h=600 km. The corrected closed-form plus the residual short-period "
+        f"contribution is consistent with this residual structure.",
     ]
 
     limitations = [
+        "REMEDIATED 2026-08-30: the original 017 closed-form (preserved "
+        "as `closed_form_lunisolar_raan_rate_rad_s` with a DeprecationWarning) "
+        "is mathematically wrong; the CORRECTED formula is "
+        "`corrected_secular_lunisolar_raan_rate_rad_s`. See "
+        "audit-018-lunisolar-discrepancy-resolution-2026-08-30.md.",
         "Point-mass Lunisolar (no Earth-Moon barycenter correction).",
         "J2 only for non-Kepler gravity (no tesseral harmonics, no solid-Earth tides).",
         "No SRP, no drag, no relativity (each excluded as a separate force).",
         "No future-arc extrapolation; experiment is bounded to 2026 (the "
         "byte-pinned snapshot year). Decadal extension would require a "
         "byte-pinned 10-year ephemeris acquisition (deferred).",
+        "Frame-mismatch caveat: the Sun and Moon vectors are in ICRF/J2000 "
+        "but the propagator treats them as mean-of-date; the ~0.4 deg frame "
+        "mismatch at 2026 produces a small bias on the RAAN rate. The 0.4 "
+        "deg bias is comparable to the residual between the corrected "
+        "closed-form and the 1-year numerical; Exp 018 will quantify the "
+        "attribution between frame mismatch and short-period terms.",
         "Mean-orbit constants in the closed-form reproduction use the lab's "
         "canon LUNAR_DISTANCE_KM=384400.0 (constant geocentric distance) "
-        "and LUNAR_INCLINATION_DEG=5.145 (constant lunar inclination to "
-        "ecliptic). These are the same approximations used in Exp 016; the "
-        "byte-pinned snapshot is the only place where time-varying "
-        "geocentric distance and lunar phase evolution enter.",
+        "and LUNAR_INCLINATION_DEG=5.145 (lunar mean inclination to the "
+        "ECLIPTIC, not the equator as the original comment claimed; "
+        "for the corrected formula, the Moon's mean inclination to the "
+        "equator is approximated as obliquity + 5.145 deg = 28.584 deg).",
         "Linear fit of Omega(t) vs t does not capture the dominant periodic "
         "Lunisolar terms (lunar nodal period 18.6 yr is far longer than the "
         "1-year arc; lunar anomalistic month 27.55 d, lunar synodic month "
         "29.53 d, and solar synodic year 365.24 d all contribute to the "
-        "short-period residuals).",
+        "short-period residuals). The residual between the corrected secular "
+        "formula and the 1-year numerical is the integrated effect of these "
+        "unmodelled short-period terms.",
     ]
 
     # Payload
@@ -865,14 +1021,26 @@ def run() -> dict:
         "limitations": limitations,
         "audit_response": {
             "exp_016_lunisolar_claim": (
-                "closed-form over-estimates by ~50x at SSO retrograde (model_note "
-                "in lstDrift/experiment.py:336-343)"
+                "016 closed-form: 'over-estimates by ~50x due to long-period + "
+                "evection terms not captured' (model_note in lstDrift/experiment.py:336-343). "
+                "REMEDIATED 2026-08-30: this claim is wrong; the closed-form is a "
+                "mathematically incorrect formula, not a '~50x over-estimate'. "
+                "The corrected secular formula is `(3/8) n (mu_3/mu_E) (a/a_3)^3 "
+                "sin 2(i-i_3) / sin i` (Track B independent derivation), which at "
+                "h=600 km i_sso=97.79 deg returns +1.35e-4 deg/day (prograde, "
+                "same sign as numerical, ~10x smaller than 1-year fit). The "
+                "~10x residual is the unmodelled short-period contribution, "
+                "NOT a 'long-period + evection cancellation'."
             ),
             "exp_017_response": (
-                "MEASURED the cf_upper / numerical ratio with byte-pinned Sun and "
-                "Moon DE441 geocentric vectors over a 1-year arc. Reported as the "
-                "key scientific result of this experiment; no fabrication, no "
-                "tuning, no extrapolation beyond the byte-pinned snapshot."
+                "ORIGINAL 017 measured the cf_upper / numerical ratio with byte-pinned "
+                "Sun and Moon DE441 geocentric vectors over a 1-year arc. "
+                "REMEDIATED 2026-08-30: the ratio of -170x (signed) is now "
+                "understood to be the compounded effect of three errors in the "
+                "closed-form formula: wrong radial scale factor, wrong geometric "
+                "factor (apsidal vs nodal), and wrong sign at SSO retrograde. "
+                "The numerical 1-year measurement is preserved as a byte-pinned, "
+                "reproducible physical measurement."
             ),
             "decadal_017_rejected": (
                 "AGENTS.md and roadmap.md proposed 017 as 'decadal station-keeping "
@@ -885,8 +1053,34 @@ def run() -> dict:
                 "single largest unverified input (Tracks C, G, H), and Sentinel-1 "
                 "operational records are not byte-pinned (Track G). The closed-"
                 "form upper-bound verification (Track H Alt-1, 27/30) is the "
-                "strongest defensible alternative and is what was executed."
+                "strongest defensible alternative and is what was executed. "
+                "REMEDIATION: the 017 execution is preserved as a diagnostic "
+                "experiment; the formula errors it uncovered are fixed in "
+                "corrected_secular_lunisolar_raan_rate_rad_s and propagated to "
+                "Exp 018."
             ),
+            "remediation_2026_08_30": {
+                "root_cause": (
+                    "017/016 closed-form used the wrong formula: J2-style "
+                    "radial scale `(R_E/r_3)^2` instead of third-body `(a/a_3)^3`, "
+                    "and Kozai APSIDAL geometric factor `cos(i)*(1-5/2 sin^2(i-i_3))` "
+                    "instead of the correct NODAL factor `sin 2(i-i_3)/sin i`. "
+                    "At SSO retrograde these compound to ~1620x magnitude error "
+                    "with opposite sign."
+                ),
+                "corrected_formula": (
+                    "`dO/dt = (3/8) n (mu_3/mu_E) (a/a_3)^3 sin 2(i-i_3) / sin(i)`. "
+                    "At h=600 km i_sso=97.79 deg: total +1.35e-4 deg/day (prograde)."
+                ),
+                "audit_synthesis": (
+                    "localdocs/reports/audit-018-lunisolar-discrepancy-resolution-2026-08-30.md"
+                ),
+                "preserved_artifacts": (
+                    "017 results.json (byte-pinned, all numerics preserved); 017 "
+                    "README.md; 017 tests (32 tests, all passing); 32 figures "
+                    "(regenerated from preserved inputs)."
+                ),
+            },
         },
         "code_sha256": code_hashes(),
     }
