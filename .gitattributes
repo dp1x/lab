@@ -3,3 +3,4 @@
 # core.autocrlf=true would otherwise corrupt them on fresh clones.
 research/orbital-mechanics/experiments/jplValidation/reference/*.txt -text
 research/orbital-mechanics/experiments/eclipseTiming/reference/*.txt -text
+research/orbital-mechanics/experiments/lunisolarVerification/reference/*.txt -text

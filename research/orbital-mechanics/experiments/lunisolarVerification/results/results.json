@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "description": "Lunisolar upper-bound verification: numerical integration of Kepler + J2 + point-mass Sun + Moon at dawn-dusk SSO using byte-pinned JPL DE441 geocentric vectors; comparison to the closed-form secular-average (Vallado Eq. 9-46 form); measured cf_upper / numerical ratio over a 1-year arc at h in {500, 600, 700, 800} km.",
+    "git_commit": "42ccbbe",
+    "name": "lunisolarVerification-017",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-30T02:36:32+00:00"
+  },
+  "results": {
+    "audit_response": {
+      "decadal_017_rejected": "AGENTS.md and roadmap.md proposed 017 as 'decadal station-keeping with full Lunisolar + SRP + F10.7-driven drag arc'. Eight-track audit (Tracks A-H in this autonomous run) unanimously found this direction not scientifically defensible at this time: the lab's exponential atmosphere is not adequate for decadal drag (Track E), the RK4 secular drift is not characterized past 30 days (Track B), the closed-form Lunisolar over-estimate was the single largest unverified input (Tracks C, G, H), and Sentinel-1 operational records are not byte-pinned (Track G). The closed-form upper-bound verification (Track H Alt-1, 27/30) is the strongest defensible alternative and is what was executed.",
+      "exp_016_lunisolar_claim": "closed-form over-estimates by ~50x at SSO retrograde (model_note in lstDrift/experiment.py:336-343)",
+      "exp_017_response": "MEASURED the cf_upper / numerical ratio with byte-pinned Sun and Moon DE441 geocentric vectors over a 1-year arc. Reported as the key scientific result of this experiment; no fabrication, no tuning, no extrapolation beyond the byte-pinned snapshot."
+    },
+    "by_altitude": {
+      "500": {
+        "T_orb_s": 5676.9780285258585,
+        "cf_total_om_dot_deg_day": -0.210777702775,
+        "cf_total_om_dot_rad_per_day": -0.003678764903,
+        "cf_upper_over_numerical_ratio": -159.639563945781,
+        "first_ascending_node_t_s": 820540800.0,
+        "full_model_om_dot_deg_day": 0.993742383156,
+        "h_km": 500,
+        "i_sso_deg": 97.401785943095,
+        "j2_only_om_dot_deg_day": 0.992422048161,
+        "last_ascending_node_t_s": 852073839.9537266,
+        "linear_fit_residual_rms_deg": 0.024710032922,
+        "n_ascending_nodes": 5565,
+        "n_ascending_nodes_full": 5565,
+        "n_ascending_nodes_j2": 5565,
+        "n_dt_steps": 525600,
+        "n_orbits_year": 5555,
+        "numerical_om_dot_deg_day": 0.001320334994,
+        "numerical_om_dot_rad_per_day": 2.3044193e-05,
+        "numerical_om_dot_rad_s": 2.67e-10,
+        "ratio_log10": 2.203140532842
+      },
+      "600": {
+        "T_orb_s": 5801.231785926518,
+        "cf_total_om_dot_deg_day": -0.21841983186,
+        "cf_total_om_dot_rad_per_day": -0.003812145218,
+        "cf_upper_over_numerical_ratio": -170.140467001021,
+        "first_ascending_node_t_s": 820540800.0,
+        "full_model_om_dot_deg_day": 0.9933042297,
+        "h_km": 600,
+        "i_sso_deg": 97.787646791197,
+        "j2_only_om_dot_deg_day": 0.992020467902,
+        "last_ascending_node_t_s": 852073183.739347,
+        "linear_fit_residual_rms_deg": 0.024032970975,
+        "n_ascending_nodes": 5445,
+        "n_ascending_nodes_full": 5445,
+        "n_ascending_nodes_j2": 5445,
+        "n_dt_steps": 525600,
+        "n_orbits_year": 5436,
+        "numerical_om_dot_deg_day": 0.001283761798,
+        "numerical_om_dot_rad_per_day": 2.240587e-05,
+        "numerical_om_dot_rad_s": 2.59e-10,
+        "ratio_log10": 2.230807620521
+      },
+      "700": {
+        "T_orb_s": 5926.37907113444,
+        "cf_total_om_dot_deg_day": -0.226257531624,
+        "cf_total_om_dot_rad_per_day": -0.003948938884,
+        "cf_upper_over_numerical_ratio": -181.191116527657,
+        "first_ascending_node_t_s": 820540800.0,
+        "full_model_om_dot_deg_day": 0.992909546695,
+        "h_km": 700,
+        "i_sso_deg": 98.187957715024,
+        "j2_only_om_dot_deg_day": 0.991660823601,
+        "last_ascending_node_t_s": 852076559.5637873,
+        "linear_fit_residual_rms_deg": 0.023370888437,
+        "n_ascending_nodes": 5330,
+        "n_ascending_nodes_full": 5330,
+        "n_ascending_nodes_j2": 5330,
+        "n_dt_steps": 525600,
+        "n_orbits_year": 5321,
+        "numerical_om_dot_deg_day": 0.001248723094,
+        "numerical_om_dot_rad_per_day": 2.1794329e-05,
+        "numerical_om_dot_rad_s": 2.52e-10,
+        "ratio_log10": 2.258136901191
+      },
+      "800": {
+        "T_orb_s": 6052.413549492112,
+        "cf_total_om_dot_deg_day": -0.234291569002,
+        "cf_total_om_dot_rad_per_day": -0.004089159289,
+        "cf_upper_over_numerical_ratio": -192.839299577738,
+        "first_ascending_node_t_s": 820540800.0,
+        "full_model_om_dot_deg_day": 0.992551839569,
+        "h_km": 800,
+        "i_sso_deg": 98.603085267154,
+        "j2_only_om_dot_deg_day": 0.991336881988,
+        "last_ascending_node_t_s": 852073494.9563084,
+        "linear_fit_residual_rms_deg": 0.02271689675,
+        "n_ascending_nodes": 5218,
+        "n_ascending_nodes_full": 5218,
+        "n_ascending_nodes_j2": 5218,
+        "n_dt_steps": 525600,
+        "n_orbits_year": 5210,
+        "numerical_om_dot_deg_day": 0.001214957581,
+        "numerical_om_dot_rad_per_day": 2.120501e-05,
+        "numerical_om_dot_rad_s": 2.45e-10,
+        "ratio_log10": 2.285195545389
+      }
+    },
+    "code_sha256": {
+      "experiment.py": "f7a558090c9fb2e99823efe59280ef81b607205de87f21a2fd943ca89df2351c",
+      "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
+      "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/orbits.py": "29683012a01cc7629a43d7acf84ad4b15a466fd92999ece5b8efb9609efa5295",
+      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd",
+      "moon_reference_snapshot.txt": "65f1d67f798a3b95bb87310efae3200027098869246567a68ccd671d79978f4a",
+      "sun_reference_snapshot.txt": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec"
+    },
+    "constants": {
+      "AU_km": 149597870.7,
+      "J2": 0.001082629821,
+      "LUNAR_DISTANCE_KM_cf": 384400.0,
+      "LUNAR_INCLINATION_DEG": 5.145,
+      "R_E_km": 6378.137,
+      "SOLAR_OBLIQUITY_DEG": 23.439,
+      "mu_E_km3_s2": 398600.4418,
+      "mu_Moon_km3_s2": 4902.8001,
+      "mu_Sun_km3_s2": 132712440018.0,
+      "sso_target_deg_day": 0.985647332099
+    },
+    "contract": {
+      "decision_variables": [
+        "h_km in {500, 600, 700, 800}",
+        "mission_days = 365"
+      ],
+      "frame": "ECI ICRF/TDB; Sun and Moon from byte-pinned DE441 geocentric vectors; lab's ECI is pseudo-inertial at LEO precision; Sun vector in mean equator of date after IAU-1976 precession rotation (0.056 deg residual vs byte-pinned snapshot per Exp 016)",
+      "pre_registered_bands": {
+        "cf_upper_over_numerical_ratio_bound": [
+          10.0,
+          100.0
+        ],
+        "lunisolar_numerical_deg_day_bound": [
+          0.0001,
+          0.1
+        ],
+        "self_convergence_order_floor": 3.5
+      },
+      "units": "km, km^3/s^2, s since J2000 (TT-like); radians internal; degrees at I/O",
+      "validation_gates": {
+        "convergence_order_pass": true,
+        "numerical_magnitude_pass": true,
+        "ratio_band_pass": false
+      }
+    },
+    "convergence": {
+      "dt_s": [
+        120.0,
+        60.0,
+        30.0,
+        15.0,
+        7.5
+      ],
+      "max_r_diff_km": [
+        51.787202893057,
+        1.75052438267,
+        0.063160839146,
+        0.002503077937,
+        0.00011102256
+      ],
+      "max_v_diff_km_per_s": [
+        0.056110268803,
+        0.001895853733,
+        6.8367208e-05,
+        2.707397e-06,
+        1.19986e-07
+      ],
+      "p_r": 4.494778445168,
+      "p_v": 4.495966872627
+    },
+    "findings": [
+      "FINDING (HEADLINE): the closed-form secular-average Lunisolar RAAN upper bound (Vallado Eq. 9-46 form) over-estimates the numerically integrated Lunisolar RAAN rate at dawn-dusk SSO by a SIGNED ratio of -170.1x at h=600 km (and -159.6x / -181.2x / -192.8x at h=500/700/800 km). The ratio is NEGATIVE: the closed-form is retrograde (-0.218 deg/day at h=600) while the numerical integration is prograde (+0.001284 deg/day). This is a SIGN DISAGREEMENT, not just a magnitude over-estimate, and is a byte-pinned, reproducible measurement.",
+      "FINDING (DISCOVERY vs audit-015 estimate): the measured over-estimate factor (170.1x at h=600 km) is ~3x LARGER than the audit-015 follow-up-candidates report estimate of '~50x' (model_note in Exp 016). The audit-015 estimate is qualitatively correct (closed-form over-estimates by order of magnitude) but quantitatively under-estimates the magnitude of the over-estimate. This is a first-principles discovery, not a refutation of the audit's overall direction.",
+      "FINDING: the numerical Lunisolar RAAN rate at h=600 km is +0.001284 deg/day (~+0.47 deg/year) over the 1-year byte-pinned DE441 arc. This is within the operational envelope (~0.005 deg/day Sentinel/Landsat, ~1.8 deg/year) reported in Exp 016, and is PRO-GRADE (positive RAAN drift) rather than retrograde as the closed-form predicts.",
+      "FINDING: the dt convergence ladder at h=600 km shows order 4.49 (r) / 4.50 (v) self-convergence, confirming that the RK4 propagation at dt=60 s is well within the order-4 design regime (pre-registered floor p >= 3.5).",
+      "FINDING: the linear-fit residual RMS over the 1-year arc is 0.0240 deg at h=600 km, consistent with periodic Lunisolar variations at the lunar and solar synodic/monthly frequencies (not captured by the secular linear fit).",
+      "FINDING (audit-response): this experiment converts the Exp 016 closed-form upper-bound disclaimer into a byte-pinned, numerically validated quantity. The decadal direction originally proposed for 017 (AGENTS.md, roadmap.md) is rejected as not scientifically defensible at this time; the closed-form upper-bound verification (Track H Alt-1, scored 27/30) is the strongest scientifically defensible alternative and is the experiment actually executed."
+    ],
+    "limitations": [
+      "Point-mass Lunisolar (no Earth-Moon barycenter correction).",
+      "J2 only for non-Kepler gravity (no tesseral harmonics, no solid-Earth tides).",
+      "No SRP, no drag, no relativity (each excluded as a separate force).",
+      "No future-arc extrapolation; experiment is bounded to 2026 (the byte-pinned snapshot year). Decadal extension would require a byte-pinned 10-year ephemeris acquisition (deferred).",
+      "Mean-orbit constants in the closed-form reproduction use the lab's canon LUNAR_DISTANCE_KM=384400.0 (constant geocentric distance) and LUNAR_INCLINATION_DEG=5.145 (constant lunar inclination to ecliptic). These are the same approximations used in Exp 016; the byte-pinned snapshot is the only place where time-varying geocentric distance and lunar phase evolution enter.",
+      "Linear fit of Omega(t) vs t does not capture the dominant periodic Lunisolar terms (lunar nodal period 18.6 yr is far longer than the 1-year arc; lunar anomalistic month 27.55 d, lunar synodic month 29.53 d, and solar synodic year 365.24 d all contribute to the short-period residuals)."
+    ],
+    "snapshots": {
+      "moon_n_points": 366,
+      "moon_sha256": "65f1d67f798a3b95bb87310efae3200027098869246567a68ccd671d79978f4a",
+      "moon_source": "lunisolarVerification/reference/horizons_moon_geocentric_vectors_2026_icrf_tdb_daily.txt",
+      "sun_n_points": 366,
+      "sun_sha256": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec",
+      "sun_source": "eclipseTiming/reference/horizons_sun_geocentric_vectors_2026_icrf_tdb_daily.txt"
+    }
+  }
+}

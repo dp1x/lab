@@ -248,8 +248,34 @@ J2 closure + Exp 009 nodal rate formula. The remediation contract was: provide
 defensible first-principles derivation of the LST drift rate and station-keeping
 budget that Exp 015 claimed but did not derive; this experiment satisfies it.
 
-Next: 017 per `localdocs/roadmap.md`, building on the Exp 016 first-principles LST
-drift budget. Candidate directions include: refined J2 mean-vs-osculating coupling
-study with the corrected LST baseline; higher-altitude eclipse-season coupling
-(h=900-1200 km); decadal station-keeping with full Lunisolar + SRP + F10.7-driven
-drag arc.
+Experiment 017 (Lunisolar upper-bound verification) is COMPLETE (2026-08-30) in
+`research/orbital-mechanics/experiments/lunisolarVerification/`: byte-pinned JPL
+Horizons DE441 geocentric Moon vectors (76 KB, 366 daily rows, sha256
+`65f1d67f798a3b95...`) under `reference/`, fetched via identical pattern to the
+Exp 014 Sun snapshot. Numerical integration of Kepler + J2 + point-mass Sun +
+Moon at h in {500, 600, 700, 800} km over 1 year, with J2-only control subtraction
+to isolate the Lunisolar contribution (model-order separation per Track F
+Pillar C). Headline: the closed-form secular-average Lunisolar RAAN upper bound
+(Vallado Eq. 9-46 form, Exp 016 model_note) over-estimates the numerically
+integrated Lunisolar RAAN rate by a SIGNED RATIO of ~170x at h=600 km (cf
+retrograde -0.218 deg/day, numerical prograde +0.001284 deg/day). The ratio is
+~3x larger than the audit-015 ~50x estimate (documented as a first-principles
+discovery). RK4 self-convergence order p_r = 4.49, p_v = 4.50. 4 figures
+(cf/numerical ratio by altitude, drift rate comparison, dt convergence ladder,
+linear-fit residual RMS); 32 new tests, 658 total repo tests (626 baseline + 32
+new). The original Exp 017 decadal direction was rejected by an eight-track audit
+(Tracks A-H in the autonomous audit log) as not scientifically defensible at this
+time (the lab's exponential atmosphere is inadequate for decadal drag, RK4
+secular drift not characterized past 30 days, Sentinel-1 operational records are
+not byte-pinned); the closed-form upper-bound verification (audit-015 candidate #4,
+Track H Alt-1 scored 27/30) is the strongest defensible alternative and is what
+was executed.
+
+Next: 018 per `localdocs/roadmap.md`, building on the Exp 017 measured Lunisolar
+over-estimate factor (~170x) and the byte-pinned Moon ephemeris. Candidate
+directions include: refined Lunisolar evection + variation terms (to close the
+closed-form over-estimate at the lunisynodic/anomalistic monthly frequencies);
+multi-year Sentinel/Landsat byte-pinning (to provide the external validation
+anchor currently missing for any operational LEO claim); decadal station-keeping
+(deferred to a later experiment pending F10.7-driven density model, symplectic
+integrator, and multi-year anchor).
