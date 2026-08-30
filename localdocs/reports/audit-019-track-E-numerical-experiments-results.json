@@ -1,0 +1,726 @@
+{
+  "constants": {
+    "h_km": 600.0,
+    "dt_s": 60.0,
+    "duration_days": 365.0,
+    "R_E_km": 6378.137,
+    "J2": 0.001082629821,
+    "mu_E_km3_s2": 398600.4418,
+    "mu_Sun_km3_s2": 132712440018.0,
+    "mu_Moon_km3_s2": 4902.8001,
+    "AU_km": 149597870.7,
+    "T0_s": 820540800.0,
+    "anomalistic_month_d": 27.55455,
+    "synodic_month_d": 29.530588,
+    "draconic_month_d": 27.212221,
+    "W_full_d": 365.0,
+    "W_half_d": 180.0,
+    "W_phase_d": 180.0,
+    "N_cycle_segments": 12
+  },
+  "snapshots": {
+    "sun_sha256": "06d54fb35523a0af6ba3ea738315f1e3f5b996067c40f474052cd2fb5b5658ec",
+    "sun_n_points": 366,
+    "moon_sha256": "65f1d67f798a3b95bb87310efae3200027098869246567a68ccd671d79978f4a",
+    "moon_n_points": 366
+  },
+  "frame_choice": "ICRF/J2000: Sun and Moon snapshots used as-is, no precession rotation. Track E methodological choice; the 018 'with_precession' fix adds ~0.4 deg/year bias reduction. Documented in the report.",
+  "headline_full_year": {
+    "sun_only_full_year_deg_per_day": -3.255153760909599e-05,
+    "moon_only_full_year_deg_per_day": -9.818024471822908e-05,
+    "sun_moon_no_j2_full_year_deg_per_day": -0.00013071658558638606,
+    "full_model_full_year_deg_per_day": 0.9933042296999847,
+    "j2_only_estimate_full_year_deg_per_day": 0.993434946285571,
+    "lunisolar_only_full_year_deg_per_day": -0.00013071658558644347,
+    "expected_published_full_model_deg_per_day": 0.9933,
+    "expected_published_j2_only_deg_per_day": 0.992,
+    "expected_published_lunisolar_deg_per_day": 0.00132,
+    "frame_choice": "ICRF/J2000 (no precession rotation applied)"
+  },
+  "propagation_summary": {
+    "sun_only": {
+      "n_ascending_nodes": 5441,
+      "i_sso_deg": 97.78764679119705,
+      "duration_days": 365.0,
+      "dt_s": 60.0
+    },
+    "moon_only": {
+      "n_ascending_nodes": 5441,
+      "i_sso_deg": 97.78764679119705,
+      "duration_days": 365.0,
+      "dt_s": 60.0
+    },
+    "sun_moon": {
+      "n_ascending_nodes": 5441,
+      "i_sso_deg": 97.78764679119705,
+      "duration_days": 365.0,
+      "dt_s": 60.0
+    },
+    "sun_moon_j2": {
+      "n_ascending_nodes": 5445,
+      "i_sso_deg": 97.78764679119705,
+      "duration_days": 365.0,
+      "dt_s": 60.0
+    }
+  },
+  "estimators_by_mode": {
+    "sun_only": {
+      "full_year": {
+        "estimator": "full_year",
+        "window_days": [
+          0.0,
+          365.0
+        ],
+        "n_points": 5441,
+        "slope_rad_per_day": -5.681315078654878e-07,
+        "slope_deg_per_day": -3.255153760909599e-05,
+        "intercept_rad": -3.068802197104794e-06,
+        "rms_deg": 0.0006615607243549692
+      },
+      "first_half": {
+        "estimator": "first_half",
+        "window_days": [
+          0.0,
+          180.0
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -4.377629878866368e-07,
+        "slope_deg_per_day": -2.5081971632940873e-05,
+        "intercept_rad": -1.0913130220019552e-05,
+        "rms_deg": 0.00047465724859065866
+      },
+      "second_half": {
+        "estimator": "second_half",
+        "window_days": [
+          180.0,
+          365.0
+        ],
+        "n_points": 2759,
+        "slope_rad_per_day": -4.463722854842585e-07,
+        "slope_deg_per_day": -2.557524804985671e-05,
+        "intercept_rad": -0.00012037276359183026,
+        "rms_deg": 0.0005135667873111596
+      },
+      "full_moon_start": {
+        "estimator": "full_moon_start_window",
+        "window_days": [
+          17.500800740740917,
+          197.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -5.002143422602727e-07,
+        "slope_deg_per_day": -2.8660170663426083e-05,
+        "intercept_rad": -1.5960271393113823e-05,
+        "rms_deg": 0.0006165586681397443
+      },
+      "new_moon_start": {
+        "estimator": "new_moon_start_window",
+        "window_days": [
+          1.5008007407409174,
+          181.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -4.4081460421380156e-07,
+        "slope_deg_per_day": -2.5256816369180624e-05,
+        "intercept_rad": -1.1566090859875443e-05,
+        "rms_deg": 0.00048446524434339486
+      },
+      "perigee_start": {
+        "estimator": "perigee_start_window",
+        "window_days": [
+          5.500800740740917,
+          185.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -4.509819962855099e-07,
+        "slope_deg_per_day": -2.5839365023544287e-05,
+        "intercept_rad": -1.309074816453594e-05,
+        "rms_deg": 0.0005143671346530426
+      },
+      "W_anomalistic_month": {
+        "estimator": "W_anomalistic_month",
+        "window_days": [
+          0.0,
+          27.55455
+        ],
+        "n_points": 411,
+        "slope_rad_per_day": -1.0675367588969896e-06,
+        "slope_deg_per_day": -6.116535075987244e-05,
+        "intercept_rad": -1.0057888862365512e-06,
+        "rms_deg": 2.8617940686723345e-05
+      },
+      "W_synodic_month": {
+        "estimator": "W_synodic_month",
+        "window_days": [
+          0.0,
+          29.530588
+        ],
+        "n_points": 440,
+        "slope_rad_per_day": -1.0489071739837685e-06,
+        "slope_deg_per_day": -6.009795417026428e-05,
+        "intercept_rad": -1.1825944052398802e-06,
+        "rms_deg": 3.365674826116518e-05
+      },
+      "cycle_averaged": {
+        "estimator": "cycle_averaged",
+        "n_segments": 12,
+        "segment_width_days": 30.416666666666668,
+        "seg_centers_days": [
+          15.208333333333334,
+          45.625,
+          76.04166666666667,
+          106.45833333333334,
+          136.875,
+          167.29166666666669,
+          197.70833333333334,
+          228.125,
+          258.5416666666667,
+          288.95833333333337,
+          319.375,
+          349.7916666666667
+        ],
+        "slopes_rad_per_day": [
+          -1.0397551590037268e-06,
+          -3.8822603252612793e-07,
+          -1.9220661400969676e-08,
+          -2.715121714741236e-07,
+          -8.393719578642492e-07,
+          -1.1656490354961807e-06,
+          -9.589870566877854e-07,
+          -4.1040106438786657e-07,
+          -2.9392387073597274e-08,
+          -2.1528406546228394e-07,
+          -8.385259099977598e-07,
+          -1.2741291932404607e-06
+        ],
+        "slopes_deg_per_day": [
+          -5.957358233786738e-05,
+          -2.2243713160855752e-05,
+          -1.1012627777255705e-06,
+          -1.5556501511899583e-05,
+          -4.809247062725425e-05,
+          -6.678677012742623e-05,
+          -5.494591095588313e-05,
+          -2.3514248897101506e-05,
+          -1.6840597291320004e-06,
+          -1.2334868347407001e-05,
+          -4.804399565523836e-05,
+          -7.30022253270869e-05
+        ],
+        "mean_slope_rad_per_day": -6.208712245512609e-07,
+        "mean_slope_deg_per_day": -3.557330078790647e-05,
+        "std_slope_rad_per_day": 4.286836262124811e-07,
+        "std_slope_deg_per_day": 2.4561762528338914e-05
+      }
+    },
+    "moon_only": {
+      "full_year": {
+        "estimator": "full_year",
+        "window_days": [
+          0.0,
+          365.0
+        ],
+        "n_points": 5441,
+        "slope_rad_per_day": -1.7135685307468698e-06,
+        "slope_deg_per_day": -9.818024471822908e-05,
+        "intercept_rad": -3.900483893756785e-06,
+        "rms_deg": 0.00016703117741849496
+      },
+      "first_half": {
+        "estimator": "first_half",
+        "window_days": [
+          0.0,
+          180.0
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -1.7273310480514108e-06,
+        "slope_deg_per_day": -9.896877887525504e-05,
+        "intercept_rad": -2.6344061057847283e-06,
+        "rms_deg": 0.00016105517324200934
+      },
+      "second_half": {
+        "estimator": "second_half",
+        "window_days": [
+          180.0,
+          365.0
+        ],
+        "n_points": 2759,
+        "slope_rad_per_day": -1.6991826591202783e-06,
+        "slope_deg_per_day": -9.735599498940839e-05,
+        "intercept_rad": -0.00031370038675314723,
+        "rms_deg": 0.00016195776869987695
+      },
+      "full_moon_start": {
+        "estimator": "full_moon_start_window",
+        "window_days": [
+          17.500800740740917,
+          197.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -1.7275429825228642e-06,
+        "slope_deg_per_day": -9.898092182600265e-05,
+        "intercept_rad": -3.279737383970359e-05,
+        "rms_deg": 0.00016482310580994702
+      },
+      "new_moon_start": {
+        "estimator": "new_moon_start_window",
+        "window_days": [
+          1.5008007407409174,
+          181.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -1.7275518311071557e-06,
+        "slope_deg_per_day": -9.898142881253722e-05,
+        "intercept_rad": -5.228511702493711e-06,
+        "rms_deg": 0.00016112898761446034
+      },
+      "perigee_start": {
+        "estimator": "perigee_start_window",
+        "window_days": [
+          5.500800740740917,
+          185.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -1.7310254634214749e-06,
+        "slope_deg_per_day": -9.918045328372797e-05,
+        "intercept_rad": -1.1768171738690602e-05,
+        "rms_deg": 0.00015797915236187254
+      },
+      "W_anomalistic_month": {
+        "estimator": "W_anomalistic_month",
+        "window_days": [
+          0.0,
+          27.55455
+        ],
+        "n_points": 411,
+        "slope_rad_per_day": -1.532631677713303e-06,
+        "slope_deg_per_day": -8.781332668102686e-05,
+        "intercept_rad": -4.827183342551451e-06,
+        "rms_deg": 0.00013537248098277371
+      },
+      "W_synodic_month": {
+        "estimator": "W_synodic_month",
+        "window_days": [
+          0.0,
+          29.530588
+        ],
+        "n_points": 440,
+        "slope_rad_per_day": -1.5780933370539622e-06,
+        "slope_deg_per_day": -9.041808789090812e-05,
+        "intercept_rad": -4.393130786954173e-06,
+        "rms_deg": 0.00014008804035961657
+      },
+      "cycle_averaged": {
+        "estimator": "cycle_averaged",
+        "n_segments": 12,
+        "segment_width_days": 30.416666666666668,
+        "seg_centers_days": [
+          15.208333333333334,
+          45.625,
+          76.04166666666667,
+          106.45833333333334,
+          136.875,
+          167.29166666666669,
+          197.70833333333334,
+          228.125,
+          258.5416666666667,
+          288.95833333333337,
+          319.375,
+          349.7916666666667
+        ],
+        "slopes_rad_per_day": [
+          -1.6126145602057709e-06,
+          -1.7311532041957952e-06,
+          -1.8312230788818136e-06,
+          -1.7947598380377041e-06,
+          -1.7192550943700536e-06,
+          -1.7323448398181587e-06,
+          -1.7948062991278188e-06,
+          -1.7603667746596984e-06,
+          -1.6354983181563014e-06,
+          -1.6002699778559122e-06,
+          -1.6902926205678124e-06,
+          -1.7410413846981986e-06
+        ],
+        "slopes_deg_per_day": [
+          -9.239600828113607e-05,
+          -9.918777229096826e-05,
+          -0.00010492135376688015,
+          -0.00010283216395914363,
+          -9.850606081377014e-05,
+          -9.925604798284713e-05,
+          -0.00010283482598351879,
+          -0.00010086158658305795,
+          -9.37071510311004e-05,
+          -9.168871581263747e-05,
+          -9.68466333006435e-05,
+          -9.975432330081953e-05
+        ],
+        "mean_slope_rad_per_day": -1.7203021658812533e-06,
+        "mean_slope_deg_per_day": -9.856605359221026e-05,
+        "std_slope_rad_per_day": 7.058920313588659e-08,
+        "std_slope_deg_per_day": 4.044463418877937e-06
+      }
+    },
+    "sun_moon": {
+      "full_year": {
+        "estimator": "full_year",
+        "window_days": [
+          0.0,
+          365.0
+        ],
+        "n_points": 5441,
+        "slope_rad_per_day": -2.2814348054473992e-06,
+        "slope_deg_per_day": -0.00013071658558638606,
+        "intercept_rad": -6.968915668372059e-06,
+        "rms_deg": 0.0006745928325741863
+      },
+      "first_half": {
+        "estimator": "first_half",
+        "window_days": [
+          0.0,
+          180.0
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -2.1647890759643346e-06,
+        "slope_deg_per_day": -0.00012403327758878172,
+        "intercept_rad": -1.3549812800798579e-05,
+        "rms_deg": 0.00048594383433244424
+      },
+      "second_half": {
+        "estimator": "second_half",
+        "window_days": [
+          180.0,
+          365.0
+        ],
+        "n_points": 2759,
+        "slope_rad_per_day": -2.145268567822461e-06,
+        "slope_deg_per_day": -0.0001229148348583016,
+        "intercept_rad": -0.0004340278950178381,
+        "rms_deg": 0.0005296743161273744
+      },
+      "full_moon_start": {
+        "estimator": "full_moon_start_window",
+        "window_days": [
+          17.500800740740917,
+          197.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -2.2274810942830954e-06,
+        "slope_deg_per_day": -0.00012762526564760358,
+        "intercept_rad": -4.875297932936393e-05,
+        "rms_deg": 0.000626498730344014
+      },
+      "new_moon_start": {
+        "estimator": "new_moon_start_window",
+        "window_days": [
+          1.5008007407409174,
+          181.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -2.1680633525509933e-06,
+        "slope_deg_per_day": -0.00012422087981815578,
+        "intercept_rad": -1.6796344670175687e-05,
+        "rms_deg": 0.0004969913759532514
+      },
+      "perigee_start": {
+        "estimator": "perigee_start_window",
+        "window_days": [
+          5.500800740740917,
+          185.5008007407409
+        ],
+        "n_points": 2682,
+        "slope_rad_per_day": -2.1817097346341623e-06,
+        "slope_deg_per_day": -0.0001250027599171443,
+        "intercept_rad": -2.4859186524475336e-05,
+        "rms_deg": 0.0005319471102709352
+      },
+      "W_anomalistic_month": {
+        "estimator": "W_anomalistic_month",
+        "window_days": [
+          0.0,
+          27.55455
+        ],
+        "n_points": 411,
+        "slope_rad_per_day": -2.6000613373917846e-06,
+        "slope_deg_per_day": -0.00014897254110768964,
+        "intercept_rad": -5.833365709542541e-06,
+        "rms_deg": 0.0001415311565768888
+      },
+      "W_synodic_month": {
+        "estimator": "W_synodic_month",
+        "window_days": [
+          0.0,
+          29.530588
+        ],
+        "n_points": 440,
+        "slope_rad_per_day": -2.6268840969657197e-06,
+        "slope_deg_per_day": -0.00015050937202617024,
+        "intercept_rad": -5.576207388674653e-06,
+        "rms_deg": 0.00014051050167045875
+      },
+      "cycle_averaged": {
+        "estimator": "cycle_averaged",
+        "n_segments": 12,
+        "segment_width_days": 30.416666666666668,
+        "seg_centers_days": [
+          15.208333333333334,
+          45.625,
+          76.04166666666667,
+          106.45833333333334,
+          136.875,
+          167.29166666666669,
+          197.70833333333334,
+          228.125,
+          258.5416666666667,
+          288.95833333333337,
+          319.375,
+          349.7916666666667
+        ],
+        "slopes_rad_per_day": [
+          -2.652247034345466e-06,
+          -2.119005253657973e-06,
+          -1.8499415879821352e-06,
+          -2.06591185517526e-06,
+          -2.558509468934603e-06,
+          -2.8979536209164138e-06,
+          -2.7535856458818076e-06,
+          -2.170330202771724e-06,
+          -1.6644316564316405e-06,
+          -1.8153151517343814e-06,
+          -2.5288038045445283e-06,
+          -3.0151235010667277e-06
+        ],
+        "slopes_deg_per_day": [
+          -0.0001519625612940843,
+          -0.0001214100578006503,
+          -0.0001059938453371058,
+          -0.00011836803014758455,
+          -0.00014659179441421034,
+          -0.00016604051170316538,
+          -0.00015776883603683243,
+          -0.00012435076076859194,
+          -9.536490920150166e-05,
+          -0.0001040098966805307,
+          -0.00014488978521702702,
+          -0.00017275385132183206
+        ],
+        "mean_slope_rad_per_day": -2.340929898620222e-06,
+        "mean_slope_deg_per_day": -0.00013412540332692638,
+        "std_slope_rad_per_day": 4.3239960520400956e-07,
+        "std_slope_deg_per_day": 2.4774672441312777e-05
+      }
+    },
+    "sun_moon_j2": {
+      "full_year": {
+        "estimator": "full_year",
+        "window_days": [
+          0.0,
+          365.0
+        ],
+        "n_points": 5445,
+        "slope_rad_per_day": 0.01733642928225078,
+        "slope_deg_per_day": 0.9933042296999847,
+        "intercept_rad": -0.0032096242290063927,
+        "rms_deg": 0.07626438955949714
+      },
+      "first_half": {
+        "estimator": "first_half",
+        "window_days": [
+          0.0,
+          180.0
+        ],
+        "n_points": 2684,
+        "slope_rad_per_day": 0.01731139692724265,
+        "slope_deg_per_day": 0.9918699814067458,
+        "intercept_rad": -0.0009437566035819896,
+        "rms_deg": 0.021860792591518293
+      },
+      "second_half": {
+        "estimator": "second_half",
+        "window_days": [
+          180.0,
+          365.0
+        ],
+        "n_points": 2761,
+        "slope_rad_per_day": 0.017360296519929694,
+        "slope_deg_per_day": 0.9946717216876221,
+        "intercept_rad": 3.115127006007989,
+        "rms_deg": 0.016445681026023583
+      },
+      "full_moon_start": {
+        "estimator": "full_moon_start_window",
+        "window_days": [
+          17.500800740740917,
+          197.5008007407409
+        ],
+        "n_points": 2684,
+        "slope_rad_per_day": 0.017316664714220047,
+        "slope_deg_per_day": 0.9921718033679245,
+        "intercept_rad": 0.30157419651390355,
+        "rms_deg": 0.01954276440294295
+      },
+      "new_moon_start": {
+        "estimator": "new_moon_start_window",
+        "window_days": [
+          1.5008007407409174,
+          181.5008007407409
+        ],
+        "n_points": 2684,
+        "slope_rad_per_day": 0.017311878773724573,
+        "slope_deg_per_day": 0.9918975891765331,
+        "intercept_rad": 0.024992551373643278,
+        "rms_deg": 0.021651585400180712
+      },
+      "perigee_start": {
+        "estimator": "perigee_start_window",
+        "window_days": [
+          5.500800740740917,
+          185.5008007407409
+        ],
+        "n_points": 2684,
+        "slope_rad_per_day": 0.017313093472347055,
+        "slope_deg_per_day": 0.9919671862809817,
+        "intercept_rad": 0.094129120785474,
+        "rms_deg": 0.021135389229208785
+      },
+      "W_anomalistic_month": {
+        "estimator": "W_anomalistic_month",
+        "window_days": [
+          0.0,
+          27.55455
+        ],
+        "n_points": 411,
+        "slope_rad_per_day": 0.01728375332024136,
+        "slope_deg_per_day": 0.9902861193950535,
+        "intercept_rad": -2.9793539707395218e-05,
+        "rms_deg": 0.0006649003882645883
+      },
+      "W_synodic_month": {
+        "estimator": "W_synodic_month",
+        "window_days": [
+          0.0,
+          29.530588
+        ],
+        "n_points": 441,
+        "slope_rad_per_day": 0.01728412975342632,
+        "slope_deg_per_day": 0.9903076874278204,
+        "intercept_rad": -3.3361737361487415e-05,
+        "rms_deg": 0.0007457975248592013
+      },
+      "cycle_averaged": {
+        "estimator": "cycle_averaged",
+        "n_segments": 12,
+        "segment_width_days": 30.416666666666668,
+        "seg_centers_days": [
+          15.208333333333334,
+          45.625,
+          76.04166666666667,
+          106.45833333333334,
+          136.875,
+          167.29166666666669,
+          197.70833333333334,
+          228.125,
+          258.5416666666667,
+          288.95833333333337,
+          319.375,
+          349.7916666666667
+        ],
+        "slopes_rad_per_day": [
+          0.01728426535915915,
+          0.017296641179568407,
+          0.01730888380493895,
+          0.017318272859002254,
+          0.017324953556283357,
+          0.01733147189211923,
+          0.017339980507572662,
+          0.017350065052465027,
+          0.017359122920300396,
+          0.017365175794669147,
+          0.017369368863805967,
+          0.017374993263681537
+        ],
+        "slopes_deg_per_day": [
+          0.9903154570639894,
+          0.9910245393414516,
+          0.9917259901053435,
+          0.992263943276791,
+          0.9926467190352026,
+          0.9930201921680472,
+          0.9935076999230286,
+          0.9940855017836713,
+          0.9946044793820252,
+          0.9949512835372776,
+          0.9951915287020239,
+          0.995513783077188
+        ],
+        "mean_slope_rad_per_day": 0.017335266254463837,
+        "mean_slope_deg_per_day": 0.9932375931163364,
+        "std_slope_rad_per_day": 2.8350071611134646e-05,
+        "std_slope_deg_per_day": 0.0016243394522116653
+      }
+    }
+  },
+  "residual_summary": {
+    "sun_only": {
+      "residuals_vs_full_year_deg_per_day": {
+        "full_year": 0.0,
+        "first_half": 7.469565976155115e-06,
+        "second_half": 6.976289559239276e-06,
+        "full_moon_start": 3.891366945669905e-06,
+        "new_moon_start": 7.294721239915364e-06,
+        "perigee_start": 6.712172585551701e-06,
+        "W_anomalistic_month": -2.8613813150776455e-05,
+        "W_synodic_month": -2.7546416561168294e-05,
+        "cycle_averaged": -3.0217631788104823e-06
+      },
+      "full_year_slope_deg_per_day": -3.255153760909599e-05,
+      "cycle_mean_minus_full_year_deg_per_day": -3.0217631788104823e-06
+    },
+    "moon_only": {
+      "residuals_vs_full_year_deg_per_day": {
+        "full_year": 0.0,
+        "first_half": -7.885341570259635e-07,
+        "second_half": 8.24249728820689e-07,
+        "full_moon_start": -8.006771077735697e-07,
+        "new_moon_start": -8.01184094308138e-07,
+        "perigee_start": -1.0002085654988937e-06,
+        "W_anomalistic_month": 1.0366918037202222e-05,
+        "W_synodic_month": 7.762156827320957e-06,
+        "cycle_averaged": -3.858088739811861e-07
+      },
+      "full_year_slope_deg_per_day": -9.818024471822908e-05,
+      "cycle_mean_minus_full_year_deg_per_day": -3.858088739811861e-07
+    },
+    "sun_moon": {
+      "residuals_vs_full_year_deg_per_day": {
+        "full_year": 0.0,
+        "first_half": 6.6833079976043395e-06,
+        "second_half": 7.80175072808445e-06,
+        "full_moon_start": 3.091319938782486e-06,
+        "new_moon_start": 6.495705768230287e-06,
+        "perigee_start": 5.713825669241763e-06,
+        "W_anomalistic_month": -1.825595552130358e-05,
+        "W_synodic_month": -1.9792786439784175e-05,
+        "cycle_averaged": -3.408817740540313e-06
+      },
+      "full_year_slope_deg_per_day": -0.00013071658558638606,
+      "cycle_mean_minus_full_year_deg_per_day": -3.408817740540313e-06
+    },
+    "sun_moon_j2": {
+      "residuals_vs_full_year_deg_per_day": {
+        "full_year": 0.0,
+        "first_half": -0.0014342482932389045,
+        "second_half": 0.0013674919876374148,
+        "full_moon_start": -0.0011324263320601213,
+        "new_moon_start": -0.001406640523451519,
+        "perigee_start": -0.0013370434190029812,
+        "W_anomalistic_month": -0.003018110304931154,
+        "W_synodic_month": -0.002996542272164282,
+        "cycle_averaged": -6.663658364824965e-05
+      },
+      "full_year_slope_deg_per_day": 0.9933042296999847,
+      "cycle_mean_minus_full_year_deg_per_day": -6.663658364824965e-05
+    }
+  }
+}

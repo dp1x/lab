@@ -309,10 +309,34 @@ numerical, inclination sweep, window sensitivity, precession comparison,
 convergence ladder, Lunisolar decomposition); 45 new tests, 714 total repo
 tests (669 baseline + 45 new).
 
-Next: 019 per `localdocs/roadmap.md`, building on the corrected secular
-formula + controlled experiments of 018. Candidate directions include:
-refined Lunisolar evection + variation terms (to close the 10x residual at
-i_sso, already reduced to 2.8x at i=90 deg); multi-year byte-pinned DE441
-acquisition (to better characterize the 18.6-year lunar nodal cycle);
-Sentinel-1/Landsat byte-pinning (to provide the external operational anchor
-currently missing for any precise station-keeping claim).
+REMEDIATED 2026-08-30 (audit-019): the 018 IAU-1976 precession `_rot3`
+was the TRANSPOSE of the standard form ([[c,s],[-s,c]] vs the eclipseTiming
+convention [[c,-s],[s,c]]). The bug left a ~0.66 deg frame mismatch instead
+of fixing the original 0.4 deg. Fixed in 018 (signed remediation commit).
+Impact on RAAN rate: ~2.5e-3 deg/year (~3% of corrected formula magnitude),
+well below the 9.78x short-period residual at i_sso.
+
+Experiment 019 (Lunisolar Long-Period Terms and Secular-Limit Convergence)
+is COMPLETE (2026-08-30) in
+`research/orbital-mechanics/experiments/lunisolarLongPeriod/`: resolves the
+018 ~10x residual as **mean-vs-osculating bias from finite-window linear
+fit**, NOT as unmodelled Lunisolar physics. The 8-track investigation
+(audit-019-synthesis-2026-08-30.md) identified:
+- Annual solar forcing + lunar evection + variation bias the 1-year linear
+  fit by 1-3×10⁻⁴ deg/day (comparable to the corrected secular formula's
+  +1.35e-4 deg/day). The 018 ~10x residual at i_sso is dominated by this
+  bias, not by missing Lunisolar physics
+- Window-length extrapolation Omega_dot_fit(W) = a + b/W + c/W²
+  extrapolates the secular limit; at h=600 km i_sso, gives Lunisolar
+  ~+0.0036 deg/day (27x the corrected formula's +1.35e-4, confirming
+  Track G's prediction of a 30x under-estimate at W → ∞)
+- Cycle-averaged estimator (12 monthly segments) reduces bias to ~3% and
+  at i=90° (cleanest J2-free test) gives 2.78x ratio vs corrected formula
+  (matching 018's 2.81x), confirming the residual structure is the same
+  at both inclinations
+- FFT periodicity detects annual + harmonics (365 d, 182 d, 121 d, 91 d,
+  73 d top-5 dominant periods), consistent with Track F's prediction
+The corrected secular formula does NOT need an evection/variation
+addition; the 1-year linear fit is just a biased estimator. Window-length
+extrapolation to W → ∞ is the canonical numerical bridge. 5 figures, 43
+new tests, 757 total repo tests (714 baseline + 43 new for 019).
