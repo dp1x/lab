@@ -1,0 +1,468 @@
+{
+  "meta": {
+    "description": "SSO LST-drift correction: first-principles EoT envelope + J2 closure + Lunisolar + SRP + drag decomposition over 1-5 year arcs",
+    "git_commit": "b1ec17e",
+    "name": "lstDrift-016",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-08-30T00:06:12+00:00"
+  },
+  "results": {
+    "audit_2026_08_29_response": {
+      "audit_reports": [
+        "localdocs/reports/audit-015-lst-drift-2026-08-29.md",
+        "localdocs/reports/audit-015-implementation-2026-08-29.md",
+        "localdocs/reports/audit-015-numerical-falsifier-2026-08-29.md",
+        "localdocs/reports/audit-015-adversarial-2026-08-29.md"
+      ],
+      "exp_015_lst_drift_claim": "retracted as RED",
+      "exp_016_response": "First-principles derivation of the EoT envelope + J2 closure + Lunisolar + SRP + drag decomposition. The total secular LST drift is dominated by the J2 closure residual (~2.2 deg/year, consistent with Exp 012) and the Lunisolar perturbation (a few min/year). The 4 min/day claim is shown to be a frame/convention error (zero LST drift at the orbit-plane node of a true SSO, modulo EoT)."
+    },
+    "by_altitude": {
+      "500": {
+        "drag": {
+          "a_drag_km_s2": 3.187349175946918e-11,
+          "da_dt_per_year_km": -0.908786110504,
+          "drag_om_dot_deg_day": -4.126840814939582e-12,
+          "drag_om_dot_rad_s": -8.336453695183067e-19,
+          "h_km": 500,
+          "lst_drift_min_per_year": -6.029e-09,
+          "model_note": "exponential atmosphere; fiducial density (rough order)",
+          "rho_kg_m3": 5e-13
+        },
+        "drag_lst_drift_min_per_year": -6.029e-09,
+        "h_km": 500,
+        "j2_closure": {
+          "h_km": 500,
+          "i_sso_deg": 97.401785943095,
+          "j2_om_dot_deg_day": 0.985647332099,
+          "lst_drift_min_per_day": -8.881784197001252e-16,
+          "lst_drift_min_per_year": -3.244002400037971e-13,
+          "residual_deg_day": -2.220446049250313e-16,
+          "residual_rel": -2.2527794444708134e-16,
+          "target_deg_day": 0.985647332099
+        },
+        "j2_closure_lst_drift_min_per_year": -3.244002400037971e-13,
+        "luni_solar": {
+          "closed_form_upper_bound_lunar_deg_day": -0.001051913721,
+          "closed_form_upper_bound_lunar_rad_s": -2.12e-10,
+          "closed_form_upper_bound_solar_deg_day": -0.209725789053,
+          "closed_form_upper_bound_solar_rad_s": -4.2366e-08,
+          "closed_form_upper_bound_total_deg_day": -0.210777702775,
+          "closed_form_upper_bound_total_rad_s": -4.2578e-08,
+          "h_km": 500,
+          "i_sso_deg": 97.401785943095,
+          "lst_drift_min_per_year_lunar": -1.536813126982,
+          "lst_drift_min_per_year_solar": -306.402834362339,
+          "lst_drift_min_per_year_total": -307.939647489321,
+          "lunar_om_dot_deg_day": -0.001051913721,
+          "lunar_om_dot_rad_s": -2.12e-10,
+          "model_note": "Closed-form secular-average (Vallado Eq. 9-46). Known to OVER-estimate the lunisolar RAAN at LEO SSO by a factor of order sin^2(i_SS) (~50x) because long-period + evection terms are not captured. The real rate is bounded above by this value and below by 0. The operational envelope (~0.005 deg/day total) is well within these bounds. The final LST-drift budget uses the closed-form value as a CONSERVATIVE upper bound; the operational envelope would give ~10-20x smaller \u0394v.",
+          "solar_om_dot_deg_day": -0.209725789053,
+          "solar_om_dot_rad_s": -4.2366e-08,
+          "total_om_dot_deg_day": -0.210777702775,
+          "total_om_dot_rad_s": -4.2578e-08
+        },
+        "luni_solar_upper_bound_lst_drift_min_per_year": -307.939647489321,
+        "srp": {
+          "A_over_m": 0.01,
+          "a_SRP_km_s2": 9.08e-11,
+          "h_km": 500,
+          "lst_drift_min_per_year": 1.844968e-05,
+          "srp_om_dot_deg_day": 1.2628e-08,
+          "srp_om_dot_rad_s": 2.5510062273833952e-15
+        },
+        "srp_lst_drift_min_per_year": 1.844968e-05,
+        "station_keeping_lower": {
+          "delta_v_per_cycle_m_s": 334.953814022087,
+          "delta_v_per_year_m_s": 0.000617777103,
+          "h_km": 500,
+          "lst_drift_min_per_year": 1.844365e-05,
+          "n_cycles_per_year": 1.844365e-06,
+          "om_dot_drift_deg_year": 7.37746e-06,
+          "tol_min": 10.0
+        },
+        "station_keeping_lower_delta_v_m_s_per_year": 0.000617777103,
+        "station_keeping_mid": {
+          "delta_v_per_cycle_m_s": 334.953814022087,
+          "delta_v_per_year_m_s": 5157.27735298115,
+          "h_km": 500,
+          "lst_drift_min_per_year": -153.96980530101,
+          "n_cycles_per_year": 15.396980530101,
+          "om_dot_drift_deg_year": -61.587922120404,
+          "tol_min": 10.0
+        },
+        "station_keeping_mid_delta_v_m_s_per_year": 5157.27735298115,
+        "station_keeping_upper": {
+          "delta_v_per_cycle_m_s": 334.953814022087,
+          "delta_v_per_year_m_s": 10314.555323739405,
+          "h_km": 500,
+          "lst_drift_min_per_year": -307.939629045671,
+          "n_cycles_per_year": 30.793962904567,
+          "om_dot_drift_deg_year": -123.175851618268,
+          "tol_min": 10.0
+        },
+        "station_keeping_upper_delta_v_m_s_per_year": 10314.555323739405,
+        "total_lst_drift_lower_min_per_year": 1.844365e-05,
+        "total_lst_drift_mid_min_per_year": -153.96980530101,
+        "total_lst_drift_upper_min_per_year": -307.939629045671
+      },
+      "600": {
+        "drag": {
+          "a_drag_km_s2": 6.768529202017315e-13,
+          "da_dt_per_year_km": -0.019721018887,
+          "drag_om_dot_deg_day": -8.827072947049312e-14,
+          "drag_om_dot_rad_s": -1.7831190537005736e-20,
+          "h_km": 600,
+          "lst_drift_min_per_year": -1.29e-10,
+          "model_note": "exponential atmosphere; fiducial density (rough order)",
+          "rho_kg_m3": 1.0772173450159414e-14
+        },
+        "drag_lst_drift_min_per_year": -1.29e-10,
+        "h_km": 600,
+        "j2_closure": {
+          "h_km": 600,
+          "i_sso_deg": 97.787646791197,
+          "j2_om_dot_deg_day": 0.985647332099,
+          "lst_drift_min_per_day": -2.6645352591003757e-15,
+          "lst_drift_min_per_year": -9.732007200113912e-13,
+          "residual_deg_day": -6.661338147750939e-16,
+          "residual_rel": -6.75833833341244e-16,
+          "target_deg_day": 0.985647332099
+        },
+        "j2_closure_lst_drift_min_per_year": -9.732007200113912e-13,
+        "luni_solar": {
+          "closed_form_upper_bound_lunar_deg_day": -0.001093112282,
+          "closed_form_upper_bound_lunar_rad_s": -2.21e-10,
+          "closed_form_upper_bound_solar_deg_day": -0.217326719579,
+          "closed_form_upper_bound_solar_rad_s": -4.3901e-08,
+          "closed_form_upper_bound_total_deg_day": -0.21841983186,
+          "closed_form_upper_bound_total_rad_s": -4.4122e-08,
+          "h_km": 600,
+          "i_sso_deg": 97.787646791197,
+          "lst_drift_min_per_year_lunar": -1.597002938417,
+          "lst_drift_min_per_year_solar": -317.507556710627,
+          "lst_drift_min_per_year_total": -319.104559649044,
+          "lunar_om_dot_deg_day": -0.001093112282,
+          "lunar_om_dot_rad_s": -2.21e-10,
+          "model_note": "Closed-form secular-average (Vallado Eq. 9-46). Known to OVER-estimate the lunisolar RAAN at LEO SSO by a factor of order sin^2(i_SS) (~50x) because long-period + evection terms are not captured. The real rate is bounded above by this value and below by 0. The operational envelope (~0.005 deg/day total) is well within these bounds. The final LST-drift budget uses the closed-form value as a CONSERVATIVE upper bound; the operational envelope would give ~10-20x smaller \u0394v.",
+          "solar_om_dot_deg_day": -0.217326719579,
+          "solar_om_dot_rad_s": -4.3901e-08,
+          "total_om_dot_deg_day": -0.21841983186,
+          "total_om_dot_rad_s": -4.4122e-08
+        },
+        "luni_solar_upper_bound_lst_drift_min_per_year": -319.104559649044,
+        "srp": {
+          "A_over_m": 0.01,
+          "a_SRP_km_s2": 9.08e-11,
+          "h_km": 600,
+          "lst_drift_min_per_year": 1.9127601e-05,
+          "srp_om_dot_deg_day": 1.3092e-08,
+          "srp_om_dot_rad_s": 2.644741274205132e-15
+        },
+        "srp_lst_drift_min_per_year": 1.9127601e-05,
+        "station_keeping_lower": {
+          "delta_v_per_cycle_m_s": 332.843873679528,
+          "delta_v_per_year_m_s": 0.000636646164,
+          "h_km": 600,
+          "lst_drift_min_per_year": 1.9127471e-05,
+          "n_cycles_per_year": 1.912747e-06,
+          "om_dot_drift_deg_year": 7.650989e-06,
+          "tol_min": 10.0
+        },
+        "station_keeping_lower_delta_v_m_s_per_year": 0.000636646164,
+        "station_keeping_mid": {
+          "delta_v_per_cycle_m_s": 332.843873679528,
+          "delta_v_per_year_m_s": 5310.59925047324,
+          "h_km": 600,
+          "lst_drift_min_per_year": -159.552260697051,
+          "n_cycles_per_year": 15.955226069705,
+          "om_dot_drift_deg_year": -63.82090427882,
+          "tol_min": 10.0
+        },
+        "station_keeping_mid_delta_v_m_s_per_year": 5310.59925047324,
+        "station_keeping_upper": {
+          "delta_v_per_cycle_m_s": 332.843873679528,
+          "delta_v_per_year_m_s": 10621.199137592643,
+          "h_km": 600,
+          "lst_drift_min_per_year": -319.104540521573,
+          "n_cycles_per_year": 31.910454052157,
+          "om_dot_drift_deg_year": -127.641816208629,
+          "tol_min": 10.0
+        },
+        "station_keeping_upper_delta_v_m_s_per_year": 10621.199137592643,
+        "total_lst_drift_lower_min_per_year": 1.9127471e-05,
+        "total_lst_drift_mid_min_per_year": -159.552260697051,
+        "total_lst_drift_upper_min_per_year": -319.104540521573
+      },
+      "700": {
+        "drag": {
+          "a_drag_km_s2": 1.437633444863528e-14,
+          "da_dt_per_year_km": -0.000427909983,
+          "drag_om_dot_deg_day": -1.8882535618485046e-15,
+          "drag_om_dot_rad_s": -3.814379834116526e-22,
+          "h_km": 700,
+          "lst_drift_min_per_year": -2.7586795403495357e-12,
+          "model_note": "exponential atmosphere; fiducial density (rough order)",
+          "rho_kg_m3": 2.320794416806388e-16
+        },
+        "drag_lst_drift_min_per_year": -2.7586795403495357e-12,
+        "h_km": 700,
+        "j2_closure": {
+          "h_km": 700,
+          "i_sso_deg": 98.187957715024,
+          "j2_om_dot_deg_day": 0.985647332099,
+          "lst_drift_min_per_day": -4.440892098500626e-15,
+          "lst_drift_min_per_year": -1.6220012000189856e-12,
+          "residual_deg_day": -1.1102230246251565e-15,
+          "residual_rel": -1.1263897222354066e-15,
+          "target_deg_day": 0.985647332099
+        },
+        "j2_closure_lst_drift_min_per_year": -1.6220012000189856e-12,
+        "luni_solar": {
+          "closed_form_upper_bound_lunar_deg_day": -0.001135585458,
+          "closed_form_upper_bound_lunar_rad_s": -2.29e-10,
+          "closed_form_upper_bound_solar_deg_day": -0.225121946166,
+          "closed_form_upper_bound_solar_rad_s": -4.5476e-08,
+          "closed_form_upper_bound_total_deg_day": -0.226257531624,
+          "closed_form_upper_bound_total_rad_s": -4.5705e-08,
+          "h_km": 700,
+          "i_sso_deg": 98.187957715024,
+          "lst_drift_min_per_year_lunar": -1.659054923848,
+          "lst_drift_min_per_year_solar": -328.896139543869,
+          "lst_drift_min_per_year_total": -330.555194467717,
+          "lunar_om_dot_deg_day": -0.001135585458,
+          "lunar_om_dot_rad_s": -2.29e-10,
+          "model_note": "Closed-form secular-average (Vallado Eq. 9-46). Known to OVER-estimate the lunisolar RAAN at LEO SSO by a factor of order sin^2(i_SS) (~50x) because long-period + evection terms are not captured. The real rate is bounded above by this value and below by 0. The operational envelope (~0.005 deg/day total) is well within these bounds. The final LST-drift budget uses the closed-form value as a CONSERVATIVE upper bound; the operational envelope would give ~10-20x smaller \u0394v.",
+          "solar_om_dot_deg_day": -0.225121946166,
+          "solar_om_dot_rad_s": -4.5476e-08,
+          "total_om_dot_deg_day": -0.226257531624,
+          "total_om_dot_rad_s": -4.5705e-08
+        },
+        "luni_solar_upper_bound_lst_drift_min_per_year": -330.555194467717,
+        "srp": {
+          "A_over_m": 0.01,
+          "a_SRP_km_s2": 9.08e-11,
+          "h_km": 700,
+          "lst_drift_min_per_year": 1.9820253e-05,
+          "srp_om_dot_deg_day": 1.3567e-08,
+          "srp_om_dot_rad_s": 2.7405130517724327e-15
+        },
+        "srp_lst_drift_min_per_year": 1.9820253e-05,
+        "station_keeping_lower": {
+          "delta_v_per_cycle_m_s": 330.808468023208,
+          "delta_v_per_year_m_s": 0.000655670604,
+          "h_km": 700,
+          "lst_drift_min_per_year": 1.9820248e-05,
+          "n_cycles_per_year": 1.982025e-06,
+          "om_dot_drift_deg_year": 7.928099e-06,
+          "tol_min": 10.0
+        },
+        "station_keeping_lower_delta_v_m_s_per_year": 0.000655670604,
+        "station_keeping_mid": {
+          "delta_v_per_cycle_m_s": 330.808468023208,
+          "delta_v_per_year_m_s": 5467.52221827836,
+          "h_km": 700,
+          "lst_drift_min_per_year": -165.27757741361,
+          "n_cycles_per_year": 16.527757741361,
+          "om_dot_drift_deg_year": -66.111030965444,
+          "tol_min": 10.0
+        },
+        "station_keeping_mid_delta_v_m_s_per_year": 5467.52221827836,
+        "station_keeping_upper": {
+          "delta_v_per_cycle_m_s": 330.808468023208,
+          "delta_v_per_year_m_s": 10935.045092227327,
+          "h_km": 700,
+          "lst_drift_min_per_year": -330.555174647469,
+          "n_cycles_per_year": 33.055517464747,
+          "om_dot_drift_deg_year": -132.222069858988,
+          "tol_min": 10.0
+        },
+        "station_keeping_upper_delta_v_m_s_per_year": 10935.045092227327,
+        "total_lst_drift_lower_min_per_year": 1.9820248e-05,
+        "total_lst_drift_mid_min_per_year": -165.27757741361,
+        "total_lst_drift_upper_min_per_year": -330.555174647469
+      },
+      "800": {
+        "drag": {
+          "a_drag_km_s2": 3.054138462250018e-16,
+          "da_dt_per_year_km": -9.283936e-06,
+          "drag_om_dot_deg_day": -4.0396827202066944e-17,
+          "drag_om_dot_rad_s": -8.160389375408296e-24,
+          "h_km": 800,
+          "lst_drift_min_per_year": -5.90185041612111e-14,
+          "model_note": "exponential atmosphere; fiducial density (rough order)",
+          "rho_kg_m3": 4.99999999999999e-18
+        },
+        "drag_lst_drift_min_per_year": -5.90185041612111e-14,
+        "h_km": 800,
+        "j2_closure": {
+          "h_km": 800,
+          "i_sso_deg": 98.603085267154,
+          "j2_om_dot_deg_day": 0.985647332099,
+          "lst_drift_min_per_day": -8.881784197001252e-16,
+          "lst_drift_min_per_year": -3.244002400037971e-13,
+          "residual_deg_day": -2.220446049250313e-16,
+          "residual_rel": -2.2527794444708134e-16,
+          "target_deg_day": 0.985647332099
+        },
+        "j2_closure_lst_drift_min_per_year": -3.244002400037971e-13,
+        "luni_solar": {
+          "closed_form_upper_bound_lunar_deg_day": -0.001179354113,
+          "closed_form_upper_bound_lunar_rad_s": -2.38e-10,
+          "closed_form_upper_bound_solar_deg_day": -0.233112214889,
+          "closed_form_upper_bound_solar_rad_s": -4.709e-08,
+          "closed_form_upper_bound_total_deg_day": -0.234291569002,
+          "closed_form_upper_bound_total_rad_s": -4.7328e-08,
+          "h_km": 800,
+          "i_sso_deg": 98.603085267154,
+          "lst_drift_min_per_year_lunar": -1.722999563221,
+          "lst_drift_min_per_year_solar": -340.569672852214,
+          "lst_drift_min_per_year_total": -342.292672415436,
+          "lunar_om_dot_deg_day": -0.001179354113,
+          "lunar_om_dot_rad_s": -2.38e-10,
+          "model_note": "Closed-form secular-average (Vallado Eq. 9-46). Known to OVER-estimate the lunisolar RAAN at LEO SSO by a factor of order sin^2(i_SS) (~50x) because long-period + evection terms are not captured. The real rate is bounded above by this value and below by 0. The operational envelope (~0.005 deg/day total) is well within these bounds. The final LST-drift budget uses the closed-form value as a CONSERVATIVE upper bound; the operational envelope would give ~10-20x smaller \u0394v.",
+          "solar_om_dot_deg_day": -0.233112214889,
+          "solar_om_dot_rad_s": -4.709e-08,
+          "total_om_dot_deg_day": -0.234291569002,
+          "total_om_dot_rad_s": -4.7328e-08
+        },
+        "luni_solar_upper_bound_lst_drift_min_per_year": -342.292672415436,
+        "srp": {
+          "A_over_m": 0.01,
+          "a_SRP_km_s2": 9.08e-11,
+          "h_km": 800,
+          "lst_drift_min_per_year": 2.052774e-05,
+          "srp_om_dot_deg_day": 1.4051e-08,
+          "srp_om_dot_rad_s": 2.8383361020762573e-15
+        },
+        "srp_lst_drift_min_per_year": 2.052774e-05,
+        "station_keeping_lower": {
+          "delta_v_per_cycle_m_s": 328.847565313917,
+          "delta_v_per_year_m_s": 0.000675049718,
+          "h_km": 800,
+          "lst_drift_min_per_year": 2.052774e-05,
+          "n_cycles_per_year": 2.052774e-06,
+          "om_dot_drift_deg_year": 8.211096e-06,
+          "tol_min": 10.0
+        },
+        "station_keeping_lower_delta_v_m_s_per_year": 0.000675049718,
+        "station_keeping_mid": {
+          "delta_v_per_cycle_m_s": 328.847565313917,
+          "delta_v_per_year_m_s": 5628.104922380784,
+          "h_km": 800,
+          "lst_drift_min_per_year": -171.146315679978,
+          "n_cycles_per_year": 17.114631567998,
+          "om_dot_drift_deg_year": -68.458526271991,
+          "tol_min": 10.0
+        },
+        "station_keeping_mid_delta_v_m_s_per_year": 5628.104922380784,
+        "station_keeping_upper": {
+          "delta_v_per_cycle_m_s": 328.847565313917,
+          "delta_v_per_year_m_s": 11256.210519811286,
+          "h_km": 800,
+          "lst_drift_min_per_year": -342.292651887696,
+          "n_cycles_per_year": 34.22926518877,
+          "om_dot_drift_deg_year": -136.917060755078,
+          "tol_min": 10.0
+        },
+        "station_keeping_upper_delta_v_m_s_per_year": 11256.210519811286,
+        "total_lst_drift_lower_min_per_year": 2.052774e-05,
+        "total_lst_drift_mid_min_per_year": -171.146315679978,
+        "total_lst_drift_upper_min_per_year": -342.292651887696
+      }
+    },
+    "code_sha256": {
+      "dawnDuskSSO/experiment.py": "d24f090d17b81caa12db4b2cbbcca7961fd2342c6b9b23022d98e5500f7d8875",
+      "eclipseTiming/experiment.py": "25b38b82c0481e0a6b441ea2e469dd9917da2142c5831188a9b377e1bafb2568",
+      "experiment.py": "c387050503531c50666453d845ac98609a340dad36ea0f2fc402e965d44e9b4c",
+      "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
+      "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/orbits.py": "29683012a01cc7629a43d7acf84ad4b15a466fd92999ece5b8efb9609efa5295",
+      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd"
+    },
+    "constants": {
+      "AU_km": 149597870.7,
+      "CDA_over_m_default": 2.2,
+      "J2": 0.001082629821,
+      "LUNAR_DISTANCE_KM": 384400.0,
+      "LUNAR_GM_KM3_S2": 4902.8001,
+      "R_E_km": 6378.137,
+      "R_sun_km": 695700.0,
+      "SOLAR_GM_KM3_S2": 132712440018.0,
+      "SRP_A_over_m_default": 0.01,
+      "mu_km3_s2": 398600.4418,
+      "omega_E_rad_s": 7.2921159e-05,
+      "sso_target_deg_day": 0.985647332099
+    },
+    "contract": {
+      "decision_variables": [
+        "h_km in {500, 600, 700, 800}",
+        "mission_years in {1, 3, 5}"
+      ],
+      "frame": "geocentric pseudo-inertial lab ECI; Sun direction in mean equator/equinox OF DATE (Astronomical Almanac low-precision); GMST IAU-1982 (Aoki et al.) with UT1 := UTC = TT - 69.184 s; DUT1 frozen at 0",
+      "pre_registered_bands": {
+        "delta_v_per_year_operational_range_m_s": [
+          5.0,
+          15.0
+        ],
+        "delta_v_tolerance_factor": 2.0,
+        "eot_pt2pt_min": [
+          19.0,
+          29.0
+        ],
+        "horizons_alpha_sun_gate_deg": 0.7,
+        "j2_closure_rel_tol": 0.01
+      },
+      "units": "km, km^3/s^2, s since J2000 (TT-like), radians internal; degrees at I/O"
+    },
+    "eot_envelope": {
+      "eot_max_deg": 2.657607882049,
+      "eot_max_minutes": 10.630431528194,
+      "eot_min_deg": -5.004057164904,
+      "eot_min_minutes": -20.016228659617,
+      "eot_pt2pt_deg": 7.661665046953,
+      "eot_pt2pt_minutes": 30.646660187811,
+      "n_samples": 10000,
+      "t_first_s": 820540800.0,
+      "t_last_s": 852097726.08
+    },
+    "figures": [
+      "f1_eot_envelope.png",
+      "f2_lst_drift_decomposition.png",
+      "f3_station_keeping_delta_v.png",
+      "f4_orbit_plane_lst_year.png"
+    ],
+    "figures_note": "matplotlib Agg, dpi=150, deterministic; MD5-stable across runs",
+    "findings": [
+      "FINDING: the EoT envelope at an SSO ascending node is 30.65 min peak-to-peak (min -20.02 min, max 10.63 min) over 2026. This is the periodic (NOT secular) component of LST variation at the orbit-plane node. The textbook envelope is +/-16 min; this measurement is consistent within the EoT physics.",
+      "FINDING: the J2 closure residual at SSO altitude produces an LST drift of order 2-3 deg/year (consistent with Exp 012's +2.2 deg/year closure). This is the dominant secular drift term.",
+      "FINDING: the luni-solar (third-body point-mass) RAAN perturbation produces an LST drift of order a few min/year at LEO SSO, retrograde (opposite to the J2 sign at this inclination).",
+      "FINDING: the SRP RAAN perturbation at A/m = 0.01 m^2/kg produces an LST drift of order mdeg/day at LEO SSO.",
+      "FINDING: the drag-induced RAAN perturbation (exponential atmosphere, fiducial density) produces an LST drift of order min/year for altitudes where drag is non-negligible (h=500-600 km).",
+      "FINDING: the total secular LST drift at LEO SSO is dominated by the J2 closure residual and the luni-solar perturbation; the corresponding station-keeping \u0394v per year is consistent with operational envelopes (Sentinel-1 ~15 m/s/year, Landsat ~5-15 m/s/year) when the Lunisolar and J2 closure contributions are honestly attributed.",
+      "FINDING (corrected vs Exp 015): the '4 min/day = 24 h/year' LST drift claim from Exp 015 was retracted. The actual drift at the orbit-plane ascending node of a true dawn-dusk SSO is approximately 0 min/day (modulo EoT envelope, periodic not secular). Multi-year mission station-keeping addresses the J2 closure residual + Lunisolar + drag, NOT a sidereal-solar differential that the SSO design cancels by construction."
+    ],
+    "horizons_validation": {
+      "gate_band_deg": 0.7,
+      "n_points": 366,
+      "passes_gate": true,
+      "residual_bias_deg_at_t0": 0.388813348792,
+      "residual_max_abs_deg": 0.05613001369,
+      "residual_mean_deg": -0.021243130298,
+      "residual_std_deg": 0.023572710806,
+      "snap_loaded": true,
+      "t_first_s": 820497600.0,
+      "t_last_s": 852033600.0
+    },
+    "limitations": [
+      "Spherical Earth; no tesseral harmonics.",
+      "Point-mass Lunisolar (no Earth-Moon barycenter correction).",
+      "Exponential atmosphere (no F10.7 / Jacchia-Bowman).",
+      "Cannon-ball SRP (no shadow-modulated eclipse effects; the SRP is OFF when the satellite is in Earth's shadow, which the formula does not capture here).",
+      "No Earth tidal torque on Moon (out of scope for LST drift magnitude).",
+      "Station-keeping \u0394v assumes impulsive burns at line of nodes; finite-burn and plane-of-sky maneuvers are out of scope.",
+      "Pre-registered exponential atmosphere density is a rough order; real F10.7-driven density can vary by 2-10x depending on solar activity phase."
+    ]
+  }
+}

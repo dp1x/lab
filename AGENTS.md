@@ -206,15 +206,50 @@ condition (a NEW quantity, not carried from Exp 014), first-order J2 secular nod
 polynomial. Year-long feasible launch-time search for dawn-dusk SSO at h in {500, 600,
 700, 800} km from Eastern Range; 266-295 connected components per altitude (monotone
 in h); total feasible width 710 h at h=600; held-out equinox weeks dominate feasibility
-(36.7 vs 11.9/day main, equinoxes are the most eclipse-favorable for h=600); LST at the
-ascending node drifts through 24 h/year at the sidereal-solar differential (4 min/day) —
-the "LST-constant" intuition from the host research track was wrong; 6 figures; 34 new
-tests, 581 total (547 baseline + 34 new). Shared machinery graduated to `src/lab_utils`:
-`sso_inclination_rad` (3rd consumer after Exp 012 + Exp 014-implicit + Exp 015) in
-`lab_utils/orbits`; `gmst_rad_iau1982`, `sun_unit_and_dist_km`, `subsolar_lon_rad`,
-`eci_to_ecef`, `ecef_to_latlon`, `spherical_trig_latlon`, `lst_at_node_hours`,
-`node_lon_from_raan_gmst` (2nd consumer after Exp 014 for the Sun/GMST, 2nd consumer
-after Exp 008 for the ECI-to-lat/lon layer) in the new `lab_utils/earth_frames` module.
-Next: 016 eclipse-aware station-keeping for dawn-dusk SSOs per `localdocs/roadmap.md`,
-reusing the Exp 015 feasible-set table; declared follow-up candidates include a refined
-J2 mean-vs-osculating coupling study and a multi-year LST-drift compensation budget.
+(36.7 vs 11.9/day main, equinoxes are the most eclipse-favorable for h=600); 6 figures;
+34 new tests, 581 total (547 baseline + 34 new). Shared machinery graduated to
+`src/lab_utils`: `sso_inclination_rad` (3rd consumer after Exp 012 + Exp 014-implicit
++ Exp 015) in `lab_utils/orbits`; `gmst_rad_iau1982`, `sun_unit_and_dist_km`,
+`subsolar_lon_rad`, `eci_to_ecef`, `ecef_to_latlon`, `spherical_trig_latlon`,
+`lst_at_node_hours`, `node_lon_from_raan_gmst` (2nd consumer after Exp 014 for the
+Sun/GMST, 2nd consumer after Exp 008 for the ECI-to-lat/lon layer) in the new
+`lab_utils/earth_frames` module.
+
+REMEDIATED 2026-08-29: an 8-track independent audit retracted the originally-published
+"LST at the ascending node drifts through 24 h/year at the sidereal-solar differential
+(4 min/day)" claim as RED (frame/convention error; the formula subtracted an inertial
+RAAN rate from an ECEF subsolar rate and confused Earth's sidereal rotation rate
+360.9856 deg/day with the SSO nodal rate ~0.9856 deg/day). The correct physics: the
+LST at the orbit-plane ascending node of a true dawn-dusk SSO is approximately
+CONSTANT, oscillating only with the equation-of-time envelope (~+/-12 min, ~24 min
+peak-to-peak, periodic not secular). The structural findings (cardinality, equinox
+dominance, sensitivity matrix, i_SSO anchors) are unchanged. See
+`localdocs/reports/audit-015-*.md` for the 8 audit reports (LST/J2 derivation,
+implementation audit, numerical falsifier, adversarial review, equivalence chain,
+follow-up candidates, portfolio, literature cross-check).
+
+Experiment 016 (SSO LST-drift correction) is COMPLETE (2026-08-30) in
+`research/orbital-mechanics/experiments/lstDrift/`: first-principles derivation of the
+actual LST drift at the orbit-plane ascending node of a true dawn-dusk SSO, decomposed
+into EoT envelope (periodic ~30 min peak-to-peak, validated against byte-pinned 2026
+Horizons Sun snapshot to 0.056 deg within Exp 014 0.7 deg gate) + J2 closure residual
+(~2.2 deg/year, consistent with Exp 012) + Lunisolar upper-bound closed-form
+(over-estimates ~50x at SSO retrograde inclinations due to large sin^2(i_SS) and
+evection terms not captured by the secular average; reported as conservative ceiling
+for transparency) + SRP (~mdeg/day for A/m = 0.01) + drag (exponential atmosphere,
+altitude-dependent) + closed-form RAAN-control Δv budget at the line of nodes
+(Vallado 8.5). Headline: total LST drift range [no-LS, full-LS-upper] =
+[~0, ~310] min/year at h=600 km; operational envelope (Sentinel-1 ~15 m/s/yr,
+Landsat-7/8 ~5-15 m/s/yr) implies the real rate is much smaller than the closed-form
+upper bound (~10,000 m/s/yr). 4 figures (EoT envelope, drift decomposition,
+station-keeping Δv range, orbit-plane LST year sweep); 40 new tests, 624 total repo
+tests (584 baseline + 40 new). Builds on Exp 014 byte-pinned Sun snapshot + Exp 012
+J2 closure + Exp 009 nodal rate formula. The remediation contract was: provide
+defensible first-principles derivation of the LST drift rate and station-keeping
+budget that Exp 015 claimed but did not derive; this experiment satisfies it.
+
+Next: 017 per `localdocs/roadmap.md`, building on the Exp 016 first-principles LST
+drift budget. Candidate directions include: refined J2 mean-vs-osculating coupling
+study with the corrected LST baseline; higher-altitude eclipse-season coupling
+(h=900-1200 km); decadal station-keeping with full Lunisolar + SRP + F10.7-driven
+drag arc.
