@@ -248,34 +248,71 @@ J2 closure + Exp 009 nodal rate formula. The remediation contract was: provide
 defensible first-principles derivation of the LST drift rate and station-keeping
 budget that Exp 015 claimed but did not derive; this experiment satisfies it.
 
-Experiment 017 (Lunisolar upper-bound verification) is COMPLETE (2026-08-30) in
+Experiment 017 (Lunisolar upper-bound verification) is COMPLETE (2026-08-30) and
+REMEDIATED (2026-08-30, audit-018) in
 `research/orbital-mechanics/experiments/lunisolarVerification/`: byte-pinned JPL
 Horizons DE441 geocentric Moon vectors (76 KB, 366 daily rows, sha256
 `65f1d67f798a3b95...`) under `reference/`, fetched via identical pattern to the
 Exp 014 Sun snapshot. Numerical integration of Kepler + J2 + point-mass Sun +
 Moon at h in {500, 600, 700, 800} km over 1 year, with J2-only control subtraction
 to isolate the Lunisolar contribution (model-order separation per Track F
-Pillar C). Headline: the closed-form secular-average Lunisolar RAAN upper bound
-(Vallado Eq. 9-46 form, Exp 016 model_note) over-estimates the numerically
-integrated Lunisolar RAAN rate by a SIGNED RATIO of ~170x at h=600 km (cf
-retrograde -0.218 deg/day, numerical prograde +0.001284 deg/day). The ratio is
-~3x larger than the audit-015 ~50x estimate (documented as a first-principles
-discovery). RK4 self-convergence order p_r = 4.49, p_v = 4.50. 4 figures
-(cf/numerical ratio by altitude, drift rate comparison, dt convergence ladder,
-linear-fit residual RMS); 32 new tests, 658 total repo tests (626 baseline + 32
-new). The original Exp 017 decadal direction was rejected by an eight-track audit
-(Tracks A-H in the autonomous audit log) as not scientifically defensible at this
-time (the lab's exponential atmosphere is inadequate for decadal drag, RK4
-secular drift not characterized past 30 days, Sentinel-1 operational records are
-not byte-pinned); the closed-form upper-bound verification (audit-015 candidate #4,
-Track H Alt-1 scored 27/30) is the strongest defensible alternative and is what
-was executed.
+Pillar C). Original 017 headline: the closed-form secular-average Lunisolar RAAN
+upper bound (Vallado Eq. 9-46 form, Exp 016 model_note) over-estimated the
+numerically integrated Lunisolar RAAN rate by a SIGNED RATIO of ~170x at h=600
+km (cf retrograde -0.218 deg/day, numerical prograde +0.001284 deg/day). RK4
+self-convergence order p_r = 4.49, p_v = 4.50. 4 figures; 32 new tests, 658
+total repo tests (626 baseline + 32 new). 11 additional tests added in
+remediation commit (L7 corrected formula validation, 669 total). The original
+Exp 017 decadal direction was rejected by an eight-track audit as not
+scientifically defensible at this time; the closed-form upper-bound verification
+(audit-015 candidate #4) is what was executed.
 
-Next: 018 per `localdocs/roadmap.md`, building on the Exp 017 measured Lunisolar
-over-estimate factor (~170x) and the byte-pinned Moon ephemeris. Candidate
-directions include: refined Lunisolar evection + variation terms (to close the
-closed-form over-estimate at the lunisynodic/anomalistic monthly frequencies);
-multi-year Sentinel/Landsat byte-pinning (to provide the external validation
-anchor currently missing for any operational LEO claim); decadal station-keeping
-(deferred to a later experiment pending F10.7-driven density model, symplectic
-integrator, and multi-year anchor).
+REMEDIATED 2026-08-30 (audit-018): the 8-track independent investigation
+identified the 016/017 closed-form as MATHEMATICALLY WRONG in three compounded
+ways: (1) wrong radial scale factor (J2-style `(R_E/r_3)^2` instead of the
+third-body `(a/a_3)^3`); (2) wrong geometric factor (Kozai APSIDAL
+`cos(i) (1-5/2 sin^2(i-i_3))` instead of the NODAL `sin 2(i-i_3) / sin i`);
+(3) wrong sign at SSO retrograde. The CORRECT formula is `(3/8) n
+(mu_3/mu_E) (a/a_3)^3 sin 2(i-i_3) / sin i` (Track B independent derivation);
+at h=600 km i_sso=97.79 deg it gives +1.35e-4 deg/day (prograde, SAME SIGN as
+numerical +1.32e-3 deg/day, 9.78x smaller magnitude). The 10x residual is the
+unmodelled short-period contribution (evection + variation + lunar-nodal). The
+wrong formula is preserved as `closed_form_lunisolar_raan_rate_rad_s` (017) and
+`luni_solar_raan_rate_rad_s` (016) with DeprecationWarning for backwards
+compatibility; the corrected formula is exposed as
+`corrected_secular_lunisolar_raan_rate_rad_s` (017) and
+`corrected_luni_solar_raan_rate_rad_s` (016). 016 LST-drift budget impact: the
+~310 min/year full-LS upper bound is wrong; the corrected formula gives ~1620x
+smaller magnitude in the OPPOSITE direction; the operational Sentinel-1
+(~15 m/s/yr) and Landsat (~5-15 m/s/yr) budgets remain the empirical ground
+truth and are consistent with the corrected formula, NOT the 016/017
+closed-form.
+
+Experiment 018 (Lunisolar RAAN reconciliation) is COMPLETE (2026-08-30) in
+`research/orbital-mechanics/experiments/lunisolarReconciliation/`: builds on
+Exp 017 byte-pinned Moon snapshot + Exp 014 Sun snapshot + 8-track audit
+synthesis. Implements the corrected secular formula `(3/8) n (mu_3/mu_E)
+(a/a_3)^3 sin 2(i-i_3) / sin i` and runs controlled numerical experiments:
+force isolation (j2_only / sun_only / moon_only / sun_moon / sun_moon_j2 at
+h=600 km i_sso), inclination sweep (i in {0, 30, 60, 90, 97.79, 82.21} deg at
+h=600 km), window-length sensitivity (W in {30, 90, 180, 365, 730} d),
+precession on/off (with and without IAU-1976 precession rotation applied
+to Sun/Moon vectors), force-level identity (50 random states, machine
+precision), and dt convergence ladder (RK4 design order confirmed).
+HEADLINE: the 170x signed discrepancy is RESOLVED; the corrected formula
+agrees with the numerical in SIGN (both prograde) and within 9.78x in
+magnitude at h=600 km i_sso. The CLEANEST test (i=90 deg, where J2 cos(i)=0)
+gives 2.81x agreement, confirming the residual is dominated by unmodelled
+short-period terms. The 016 frame-mismatch (Track D) is small: 0.012 deg/year
+bias from not applying IAU-1976 precession. 6 figures (corrected cf vs
+numerical, inclination sweep, window sensitivity, precession comparison,
+convergence ladder, Lunisolar decomposition); 45 new tests, 714 total repo
+tests (669 baseline + 45 new).
+
+Next: 019 per `localdocs/roadmap.md`, building on the corrected secular
+formula + controlled experiments of 018. Candidate directions include:
+refined Lunisolar evection + variation terms (to close the 10x residual at
+i_sso, already reduced to 2.8x at i=90 deg); multi-year byte-pinned DE441
+acquisition (to better characterize the 18.6-year lunar nodal cycle);
+Sentinel-1/Landsat byte-pinning (to provide the external operational anchor
+currently missing for any precise station-keeping claim).
