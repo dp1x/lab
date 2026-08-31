@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import json
 import math
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -26,11 +25,16 @@ import pytest
 # Add experiment directory to sys.path
 HERE = Path(__file__).resolve().parent
 EXP_DIR = HERE.parent
-sys.path.insert(0, str(EXP_DIR))
 LAB_ROOT = EXP_DIR.parents[2]
-sys.path.insert(0, str(LAB_ROOT))
 
-import experiment as exp  # noqa: E402
+# Load experiment.py as a module with a unique name to avoid colliding
+# with other experiments that also have an experiment.py (e.g.,
+# odeIntegratorStudy/tests/test_experiment.py imports from experiment).
+import importlib.util as _ilu  # noqa: E402
+_spec = _ilu.spec_from_file_location("exp_020_lunisolar_secular_limit",
+                                       EXP_DIR / "experiment.py")
+exp = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(exp)
 
 
 # --------------------------------------------------------------------------- #
@@ -305,4 +309,5 @@ def test_contract_decision_variables_frozen():
 
 if __name__ == "__main__":
     print("[020-tests] running standalone test entry")
-    sys.exit(pytest.main([__file__, "-v"]))
+    import sys as _sys
+    _sys.exit(pytest.main([__file__, "-v"]))
