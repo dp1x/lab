@@ -340,3 +340,38 @@ The corrected secular formula does NOT need an evection/variation
 addition; the 1-year linear fit is just a biased estimator. Window-length
 extrapolation to W → ∞ is the canonical numerical bridge. 5 figures, 43
 new tests, 757 total repo tests (714 baseline + 43 new for 019).
+
+Experiment 020 (Lunisolar Long-Arc Secular-Limit Validation) is COMPLETE
+(2026-08-30) in `research/orbital-mechanics/experiments/lunisolarSecularLimit/`:
+8-track audit-020 (`localdocs/reports/audit-020-track-{1..8}-*.md`) +
+1-yr arc at h=600 km i_sso with 4-phase ensemble. **The 019 extrapolation
++0.0036 deg/day (27x the corrected formula) is NOT validated as the
+asymptotic secular limit**:
+- Track 3 (estimator theory) shows the 019 polynomial-in-1/W extrapolation
+  has NO theoretical asymptotic basis; the actual OLS bias scales as
+  O(1/W²) for fast harmonics and O(A_k ω_k) constant for slow harmonics.
+- Track 7 (hostile review) shows the 019 i=90° extrapolation sign-flips
+  between linear (+1.7e-4) and quadratic (-3.7e-4) models — a smoking gun
+  for mis-specification.
+- Track 4 (implementation audit) discovers that at 2026 (near descending
+  lunar node) the actual lunar i3 is ~18.29°, not the secular mean
+  28.584°, making the apples-to-apples 2026 ratio closer to 13-14×, not
+  9.78×.
+- Synthetic oracle test: harmonic-regression estimator (Track 3
+  recommendation (f)) recovers known secular to machine precision (7e-16
+  deg/day bias) on synthetic data with 019 FFT amplitudes.
+- Real data at h=600 km i_sso, 1-yr arc, 4-phase ensemble: direct OLS (a),
+  secant (g), node-vector (n) all give Lunisolar ~+1e-3 to +2e-3 deg/day,
+  ratio 9.3× to corrected cf — reproducing 018 finding. Harmonic
+  regression (f) is FRAGILE on the 1-yr ascending-node data (j2_only
+  harmonic regression is stable but full_model swings from 8.89e-1 to
+  1.11e+0 deg/day; unmodelled short-period content is aliased into a
+  long-period harmonic the regression interprets as secular drift).
+- 14 new tests, 771 total (757 baseline + 14 new).
+- 5 figures (estimator comparison, ratio to corrected cf, phase dependence,
+  harmonic amplitude recovery, estimator bias on synthetic oracle).
+**Verdict**: the corrected 018 formula gives the correct SIGN but
+UNDER-ESTIMATES the 1-yr numerical Lunisolar rate at i_sso by ~9.3×. The
+019 extrapolation is reported only as a diagnostic, NOT a robust
+asymptotic measurement. The secular limit at W → ∞ remains UNRESOLVED
+at the 1-yr arc.
