@@ -282,7 +282,7 @@ def make_rhs(sun_snap: dict, moon_snap: dict, *, mode: str,
 # Observable extraction
 # --------------------------------------------------------------------------- #
 def detect_ascending_nodes(t_s_arr: np.ndarray, x_arr: np.ndarray) -> tuple:
-    """Find ascending-node crossings of z coordinate."""
+    """Find ascending-node crossings of z coordinate. Robust unwrap via np.unwrap."""
     t_crossings = []
     om_crossings = []
     z_prev = x_arr[0, 2]
@@ -293,20 +293,21 @@ def detect_ascending_nodes(t_s_arr: np.ndarray, x_arr: np.ndarray) -> tuple:
             t_cross = t_s_arr[k - 1] + frac * (t_s_arr[k] - t_s_arr[k - 1])
             r_cross = x_arr[k - 1, :3] + frac * (x_arr[k, :3] - x_arr[k - 1, :3])
             om_cross = math.atan2(r_cross[1], r_cross[0])
-            if om_crossings:
-                om_prev = om_crossings[-1]
-                while om_cross < om_prev - math.pi:
-                    om_cross += 2 * math.pi
-                while om_cross > om_prev + math.pi:
-                    om_cross -= 2 * math.pi
             t_crossings.append(t_cross)
             om_crossings.append(om_cross)
         z_prev = z_curr
-    return np.array(t_crossings), np.array(om_crossings)
+    om_arr = np.array(om_crossings)
+    t_arr = np.array(t_crossings)
+    if len(om_arr) > 1:
+        om_unwrapped = np.unwrap(om_arr)  # default period = 2*pi
+    else:
+        om_unwrapped = om_arr
+    return t_arr, om_unwrapped
 
 
 def node_vector_series(t_s_arr: np.ndarray, x_arr: np.ndarray) -> tuple:
-    """Theory-INDEPENDENT kinematic Omega from the node vector n = z x h."""
+    """Theory-INDEPENDENT kinematic Omega from the node vector n = z x h.
+    Uses np.unwrap for robust multi-cycle unwrapping."""
     n_x = np.empty(len(x_arr))
     n_y = np.empty(len(x_arr))
     for k in range(len(x_arr)):
@@ -321,11 +322,8 @@ def node_vector_series(t_s_arr: np.ndarray, x_arr: np.ndarray) -> tuple:
     n_y_filt = n_y[good]
     t_filt = t_s_arr[good]
     omega_node = np.arctan2(n_y_filt, n_x_filt)
-    for k in range(1, len(omega_node)):
-        while omega_node[k] < omega_node[k - 1] - math.pi:
-            omega_node[k] += 2 * math.pi
-        while omega_node[k] > omega_node[k - 1] + math.pi:
-            omega_node[k] -= 2 * math.pi
+    if len(omega_node) > 1:
+        omega_node = np.unwrap(omega_node)
     return t_filt, omega_node
 
 
