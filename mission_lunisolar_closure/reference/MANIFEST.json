@@ -1,0 +1,84 @@
+{
+  "acquired_utc": "2026-09-01T19:09:16.949354+00:00",
+  "acquisition_doctrine": "Exp 014/017 byte-pinned snapshot pattern",
+  "cadence": "1 day",
+  "center": "Earth (399)",
+  "description": "19-year DE441 geocentric Sun + Moon vectors for mission_lunisolar_closure.",
+  "frame": "ICRF",
+  "moon_concat": {
+    "n_rows": 6941,
+    "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_moon_geocentric_vectors_2026_to_2045_icrf_tdb_daily.txt",
+    "sha256": "cadc3935aca12b7882f39a54cd7b13882fb054879b7bb98fafbf8cf9d94ef4e8"
+  },
+  "per_chunk": {
+    "moon": {
+      "2026_2031": {
+        "end_year": 2031,
+        "n_rows": 1827,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_moon_geocentric_vectors_2026_to_2031_icrf_tdb_daily.txt",
+        "sha256": "8f6c819450e37acebc8f887903ef1a4bce77356413f3eb4617bfb66c9313756d",
+        "start_year": 2026
+      },
+      "2031_2036": {
+        "end_year": 2036,
+        "n_rows": 1827,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_moon_geocentric_vectors_2031_to_2036_icrf_tdb_daily.txt",
+        "sha256": "e25caa04339890a394255e2d0d897d731f80d09b6d3b12bdad01f823bd8000f6",
+        "start_year": 2031
+      },
+      "2036_2041": {
+        "end_year": 2041,
+        "n_rows": 1828,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_moon_geocentric_vectors_2036_to_2041_icrf_tdb_daily.txt",
+        "sha256": "dccb6599c37e74cf50bbc37977eb039a4dc0796277da410b98cc7eaaed56d7ac",
+        "start_year": 2036
+      },
+      "2041_2045": {
+        "end_year": 2045,
+        "n_rows": 1462,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_moon_geocentric_vectors_2041_to_2045_icrf_tdb_daily.txt",
+        "sha256": "3994c785f136df0d1571edf6e28dd8c7884536b5ca9fc3feee28604343324fbe",
+        "start_year": 2041
+      }
+    },
+    "sun": {
+      "2026_2031": {
+        "end_year": 2031,
+        "n_rows": 1827,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_sun_geocentric_vectors_2026_to_2031_icrf_tdb_daily.txt",
+        "sha256": "eb7b241eecb2ff3b6a6de0cb71db65cf52c41707fc0dd59600c491467982f925",
+        "start_year": 2026
+      },
+      "2031_2036": {
+        "end_year": 2036,
+        "n_rows": 1827,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_sun_geocentric_vectors_2031_to_2036_icrf_tdb_daily.txt",
+        "sha256": "c015b9eec8a9445921456fa8e833f574821efe1f04448ecbbb80f7a502c7d3fa",
+        "start_year": 2031
+      },
+      "2036_2041": {
+        "end_year": 2041,
+        "n_rows": 1828,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_sun_geocentric_vectors_2036_to_2041_icrf_tdb_daily.txt",
+        "sha256": "8b5e301b969e6f0bd009c27448a0ea436628b89735c5f7e07ec66af7ee65e2e5",
+        "start_year": 2036
+      },
+      "2041_2045": {
+        "end_year": 2045,
+        "n_rows": 1462,
+        "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_sun_geocentric_vectors_2041_to_2045_icrf_tdb_daily.txt",
+        "sha256": "ef24201172c18738986b42da6846888cf7fb1fe2e3354668deb87ff52dea1e99",
+        "start_year": 2041
+      }
+    }
+  },
+  "source": "NASA/JPL Horizons API (DE441)",
+  "sun_concat": {
+    "n_rows": 6941,
+    "path": "R:\\lab_scratch\\mission_lunisolar_closure\\ephemeris\\horizons_sun_geocentric_vectors_2026_to_2045_icrf_tdb_daily.txt",
+    "sha256": "6f0d3b3b5b3036226c594549c263e26f3994c9bc6842545f788169d038bb3574"
+  },
+  "time_type": "TDB",
+  "units": "KM-S",
+  "vectors_corrected": "NONE (geometric)"
+}
