@@ -1,7 +1,0 @@
-# Byte-pinned Horizons DE441 Sun/Moon snapshots: enforce LF line endings
-# and prevent git from rewriting the content. These files are byte-identical
-# to the cached Horizons API response and must not be modified.
-mission_lunisolar_closure/reference/horizons_sun_geocentric_vectors_2026_to_2045_icrf_tdb_daily.txt -text
-mission_lunisolar_closure/reference/horizons_moon_geocentric_vectors_2026_to_2045_icrf_tdb_daily.txt -text
-mission_lunisolar_closure/reference/per_chunk/*.txt -text
-mission_lunisolar_closure/reference/MANIFEST.json -text

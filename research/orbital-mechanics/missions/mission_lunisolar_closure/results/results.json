@@ -1,0 +1,620 @@
+{
+  "meta": {
+    "description": "18.6-yr direct arc, 3 inclinations x 2 modes, parallelized",
+    "git_commit": "223c64e",
+    "name": "mission_lunisolar_closure_parallel",
+    "python_version": "3.12.13",
+    "timestamp_utc": "2026-09-02T22:28:59+00:00"
+  },
+  "results": {
+    "code_sha256": {
+      "018_experiment.py": "f5777ebce68b66a8b9bde6f7b0892ba5e43a38625dbf974c992a528969d0d7cc",
+      "020_experiment.py": "cd96526610062ac09eed28277693d5220b748ab79e560cf37d9b447500650f81",
+      "MANIFEST.json": "fa930cbbd4926b043a64029bf467b3824bc6bcecf34c8713aee8816de4e7aaa8",
+      "experiment.py": "51ab920f3267e346f026a7efa600fe61c6f75f9ddb343a4f6adf0787da21004f",
+      "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
+      "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
+      "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+      "lab_utils/orbits.py": "29683012a01cc7629a43d7acf84ad4b15a466fd92999ece5b8efb9609efa5295",
+      "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd",
+      "moon_reference_snapshot.txt": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59",
+      "sun_reference_snapshot.txt": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db"
+    },
+    "comparison_with_corrected_formula": {
+      "i_30_cf_total_deg_day": 4.5468735e-05,
+      "i_30_harmonic_reg_lunisolar_deg_day": -0.000347397984,
+      "i_30_ratio_harmonic_to_cf": -7.640370495293,
+      "i_90_cf_total_deg_day": 0.000173904782,
+      "i_90_harmonic_reg_lunisolar_deg_day": 0.004697312231,
+      "i_90_ratio_harmonic_to_cf": 27.010828455042,
+      "i_sso_cf_total_deg_day": 0.000134754285,
+      "i_sso_harmonic_reg_lunisolar_deg_day": -0.022921804814,
+      "i_sso_ratio_harmonic_to_cf": -170.100748883505
+    },
+    "constants": {
+      "AU_km": 149597870.7,
+      "HALF_NODAL_PERIOD_DAYS": 3399.2,
+      "J2": 0.001082629821,
+      "LUNAR_DISTANCE_KM_cf": 384400.0,
+      "LUNAR_INCLINATION_DEG": 5.145,
+      "LUNAR_NODAL_PERIOD_DAYS": 6798.4,
+      "R_E_km": 6378.137,
+      "SOLAR_OBLIQUITY_DEG": 23.439,
+      "mu_E_km3_s2": 398600.4418,
+      "mu_Moon_km3_s2": 4902.8001,
+      "mu_Sun_km3_s2": 132712440018.0
+    },
+    "contract": {
+      "decision_rule": "Corrected formula is VERIFIED-WITH-LIMITATION if the 18.6-yr harmonic regression rate at i_sso agrees with the corrected formula within +/- 50%; the i=90 and i=30 controls must agree within +/- 100%.",
+      "estimators": [
+        "direct_OLS on ascending-node crossings",
+        "secant on ascending-node crossings",
+        "harmonic_regression (theory-driven OLS; Estimator f)",
+        "node_vector (theory-INDEPENDENT kinematic observable; Estimator n)"
+      ],
+      "force_modes": [
+        "j2_only",
+        "sun_moon_j2"
+      ],
+      "frame": "ECI mean-of-date; Sun and Moon rotated from ICRF/J2000 via FIXED IAU-1976 precession.",
+      "headline_estimator": "harmonic_regression at 18.6-yr (Estimator f)",
+      "horizons_arc_days": 6793.650000000001,
+      "horizons_arc_years": 18.6,
+      "inclinations_deg": {
+        "i_30": 30.0,
+        "i_90": 90.0,
+        "i_sso": 97.7876
+      },
+      "limitations": [
+        "Single phase per inclination (lunar anomalistic zero); 18.6-yr direct fit over a full lunar nodal cycle averages over the nodal modulation of the secular rate.",
+        "No J2 x Lunisolar coupling term in the corrected formula.",
+        "No atmospheric drag.",
+        "Point-mass Sun; no solar radiation pressure."
+      ],
+      "phase": 0.0,
+      "units": "km, km^3/s^2, s since J2000 (TT-like); radians internal; degrees at I/O."
+    },
+    "corrected_closed_form": {
+      "i_30": {
+        "h_km": 600.0,
+        "i_deg": 30.0,
+        "lunar_deg_day": 1.4619274e-05,
+        "solar_deg_day": 3.0849462e-05,
+        "total_deg_day": 4.5468735e-05
+      },
+      "i_90": {
+        "h_km": 600.0,
+        "i_deg": 90.0,
+        "lunar_deg_day": 0.000124313347,
+        "solar_deg_day": 4.9591435e-05,
+        "total_deg_day": 0.000173904782
+      },
+      "i_sso": {
+        "h_km": 600.0,
+        "i_deg": 97.7876,
+        "lunar_deg_day": 9.9125269e-05,
+        "solar_deg_day": 3.5629016e-05,
+        "total_deg_day": 0.000134754285
+      }
+    },
+    "force_level_identity_check": {
+      "max_diff_moon_km_s2": 0.0,
+      "max_diff_sun_km_s2": 0.0,
+      "n_states": 50,
+      "passes_moon": true,
+      "passes_sun": true
+    },
+    "headline_propagations": {
+      "i_30": {
+        "j2_only_analysis": {
+          "direct_ols_deg_per_day": -6.573309004559,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 0.428543798715,
+              "amp_rad": 0.007479500277,
+              "cos": 0.006196370239,
+              "sin": -0.004189023783
+            },
+            "14.7653": {
+              "amp_deg": 0.035757186595,
+              "amp_rad": 0.000624080637,
+              "cos": -0.000598043991,
+              "sin": -0.000178381688
+            },
+            "182.6211": {
+              "amp_deg": 0.843933920646,
+              "amp_rad": 0.014729425585,
+              "cos": -0.012058231324,
+              "sin": -0.008459020947
+            },
+            "27.5546": {
+              "amp_deg": 0.183079399256,
+              "amp_rad": 0.00319533831,
+              "cos": 0.000524996755,
+              "sin": -0.003151914548
+            },
+            "3399.19958274": {
+              "amp_deg": 45.495665134506,
+              "amp_rad": 0.794049151982,
+              "cos": -0.793877952466,
+              "sin": -0.016487945649
+            },
+            "365.2422": {
+              "amp_deg": 2.162297517891,
+              "amp_rad": 0.037739211095,
+              "cos": 0.012145449365,
+              "sin": -0.035731444328
+            },
+            "6798.4": {
+              "amp_deg": 182.177468391821,
+              "amp_rad": 3.179596646385,
+              "cos": -3.176578602676,
+              "sin": -0.138503482715
+            },
+            "73.0484": {
+              "amp_deg": 0.040456153838,
+              "amp_rad": 0.000706093087,
+              "cos": -0.000689404884,
+              "sin": 0.00015260522
+            },
+            "91.3106": {
+              "amp_deg": 0.60506094798,
+              "amp_rad": 0.010560305717,
+              "cos": -0.003260861383,
+              "sin": -0.010044244117
+            }
+          },
+          "harmonic_regression_deg_per_day": -6.575218103462,
+          "harmonic_regression_rms_residual_deg": 18.026710291706,
+          "n_nodes": 103223,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": -6.572292570215,
+          "secant_deg_per_day": -6.575237222541,
+          "wall_clock_s": 981.343886613846
+        },
+        "sun_moon_j2_analysis": {
+          "direct_ols_deg_per_day": -6.573662125449,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 0.428360620236,
+              "amp_rad": 0.007476303209,
+              "cos": 0.006194844366,
+              "sin": -0.004185571999
+            },
+            "14.7653": {
+              "amp_deg": 0.035944613425,
+              "amp_rad": 0.000627351853,
+              "cos": -0.000600709003,
+              "sin": -0.000180884052
+            },
+            "182.6211": {
+              "amp_deg": 0.843432347879,
+              "amp_rad": 0.014720671488,
+              "cos": -0.012053861219,
+              "sin": -0.008450005845
+            },
+            "27.5546": {
+              "amp_deg": 0.183177302378,
+              "amp_rad": 0.003197047041,
+              "cos": 0.000528886361,
+              "sin": -0.003152996829
+            },
+            "3399.19958274": {
+              "amp_deg": 45.492989199801,
+              "amp_rad": 0.794002448111,
+              "cos": -0.793828782664,
+              "sin": -0.01660576464
+            },
+            "365.2422": {
+              "amp_deg": 2.162545112042,
+              "amp_rad": 0.037743532428,
+              "cos": 0.012150333778,
+              "sin": -0.035734348031
+            },
+            "6798.4": {
+              "amp_deg": 182.182132685297,
+              "amp_rad": 3.179678053664,
+              "cos": -3.176677341086,
+              "sin": -0.138107188747
+            },
+            "73.0484": {
+              "amp_deg": 0.04064708233,
+              "amp_rad": 0.000709425418,
+              "cos": -0.000692974357,
+              "sin": 0.00015189129
+            },
+            "91.3106": {
+              "amp_deg": 0.605125454429,
+              "amp_rad": 0.010561431567,
+              "cos": -0.003257319634,
+              "sin": -0.010046576808
+            }
+          },
+          "harmonic_regression_deg_per_day": -6.575565501446,
+          "harmonic_regression_rms_residual_deg": 18.026604448932,
+          "n_nodes": 103223,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": -6.572645316159,
+          "secant_deg_per_day": -6.575583513665,
+          "wall_clock_s": 4048.209448575974
+        }
+      },
+      "i_90": {
+        "j2_only_analysis": {
+          "direct_ols_deg_per_day": -4.649530678991365e-16,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 2.9969858421285954e-17,
+              "amp_rad": 5.230727058079897e-19,
+              "cos": 4.330510641050785e-19,
+              "sin": -2.9338001199596223e-19
+            },
+            "14.7653": {
+              "amp_deg": 2.4730907274769637e-18,
+              "amp_rad": 4.3163575895014814e-20,
+              "cos": -4.1409337495828954e-20,
+              "sin": -1.218035517549625e-20
+            },
+            "182.6211": {
+              "amp_deg": 5.895312946247078e-17,
+              "amp_rad": 1.02892621347459e-18,
+              "cos": -8.423587630662279e-19,
+              "sin": -5.908645082086857e-19
+            },
+            "27.5546": {
+              "amp_deg": 1.2798621999863991e-17,
+              "amp_rad": 2.233780936158079e-19,
+              "cos": 3.621380485534731e-20,
+              "sin": -2.2042307738830673e-19
+            },
+            "3399.19958274": {
+              "amp_deg": 3.1793641278202753e-15,
+              "amp_rad": 5.5490372150261646e-17,
+              "cos": -5.547885072903308e-17,
+              "sin": -1.1307179843795445e-18
+            },
+            "365.2422": {
+              "amp_deg": 1.5111463280619435e-16,
+              "amp_rad": 2.6374478904103295e-18,
+              "cos": 8.479179554323055e-19,
+              "sin": -2.4974319841560042e-18
+            },
+            "6798.4": {
+              "amp_deg": 1.2731898461442562e-14,
+              "amp_rad": 2.22213548181773e-16,
+              "cos": -2.220089478200906e-16,
+              "sin": -9.533524183083378e-18
+            },
+            "73.0484": {
+              "amp_deg": 2.7982730014765593e-18,
+              "amp_rad": 4.883907724543011e-20,
+              "cos": -4.768807815017215e-20,
+              "sin": 1.0540525059415334e-20
+            },
+            "91.3106": {
+              "amp_deg": 4.227446664023999e-17,
+              "amp_rad": 7.37828632396693e-19,
+              "cos": -2.282302581799082e-19,
+              "sin": -7.016423875704109e-19
+            }
+          },
+          "harmonic_regression_deg_per_day": -4.650846710102364e-16,
+          "harmonic_regression_rms_residual_deg": 1.2597254172480115e-15,
+          "n_nodes": 102933,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": 3.249786e-06,
+          "secant_deg_per_day": -4.650860054905888e-16,
+          "wall_clock_s": 976.808594703674
+        },
+        "sun_moon_j2_analysis": {
+          "direct_ols_deg_per_day": 0.004551601228,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 0.00985947242,
+              "amp_rad": 0.000172080256,
+              "cos": -0.000157302922,
+              "sin": 6.9766792e-05
+            },
+            "14.7653": {
+              "amp_deg": 0.000856856045,
+              "amp_rad": 1.4954959e-05,
+              "cos": 1.4918031e-05,
+              "sin": 1.050311e-06
+            },
+            "182.6211": {
+              "amp_deg": 0.018225850132,
+              "amp_rad": 0.000318101094,
+              "cos": 0.000307538564,
+              "sin": -8.1291681e-05
+            },
+            "27.5546": {
+              "amp_deg": 0.004150021255,
+              "amp_rad": 7.2431535e-05,
+              "cos": -1.3265067e-05,
+              "sin": 7.1206497e-05
+            },
+            "3399.19958274": {
+              "amp_deg": 1.022361620842,
+              "amp_rad": 0.01784357643,
+              "cos": 0.017501245594,
+              "sin": 0.003478451161
+            },
+            "365.2422": {
+              "amp_deg": 0.050164413435,
+              "amp_rad": 0.000875534182,
+              "cos": -0.000329560445,
+              "sin": 0.000811141182
+            },
+            "6798.4": {
+              "amp_deg": 2.872719895538,
+              "amp_rad": 0.050138420665,
+              "cos": 0.049537700207,
+              "sin": 0.007738054337
+            },
+            "73.0484": {
+              "amp_deg": 0.001486969528,
+              "amp_rad": 2.5952514e-05,
+              "cos": 1.5702082e-05,
+              "sin": -2.0663437e-05
+            },
+            "91.3106": {
+              "amp_deg": 0.013912744863,
+              "amp_rad": 0.000242823206,
+              "cos": 7.9806078e-05,
+              "sin": 0.000229334034
+            }
+          },
+          "harmonic_regression_deg_per_day": 0.004697312231,
+          "harmonic_regression_rms_residual_deg": 0.416536657135,
+          "n_nodes": 102933,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": 0.004541932474,
+          "secant_deg_per_day": 0.004738029115,
+          "wall_clock_s": 4051.07332277298
+        }
+      },
+      "i_sso": {
+        "j2_only_analysis": {
+          "direct_ols_deg_per_day": 1.028884998071,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 0.066355818328,
+              "amp_rad": 0.001158127508,
+              "cos": -0.000958714736,
+              "sin": 0.000649711766
+            },
+            "14.7653": {
+              "amp_deg": 0.005455722437,
+              "amp_rad": 9.522032e-05,
+              "cos": 9.1390137e-05,
+              "sin": 2.6734848e-05
+            },
+            "182.6211": {
+              "amp_deg": 0.130479301844,
+              "amp_rad": 0.002277293423,
+              "cos": 0.001864517343,
+              "sin": 0.001307532183
+            },
+            "27.5546": {
+              "amp_deg": 0.028333693544,
+              "amp_rad": 0.000494516242,
+              "cos": -7.9829652e-05,
+              "sin": 0.000488030265
+            },
+            "3399.19958274": {
+              "amp_deg": 7.037603770253,
+              "amp_rad": 0.122829357242,
+              "cos": 0.122803845677,
+              "sin": 0.002503295307
+            },
+            "365.2422": {
+              "amp_deg": 0.334504812041,
+              "amp_rad": 0.005838210334,
+              "cos": -0.001876671375,
+              "sin": 0.005528363633
+            },
+            "6798.4": {
+              "amp_deg": 28.182402853062,
+              "amp_rad": 0.491875720909,
+              "cos": 0.491422558281,
+              "sin": 0.021109098344
+            },
+            "73.0484": {
+              "amp_deg": 0.006174606605,
+              "amp_rad": 0.000107767215,
+              "cos": 0.000105202911,
+              "sin": -2.3369213e-05
+            },
+            "91.3106": {
+              "amp_deg": 0.093571329199,
+              "amp_rad": 0.00163312778,
+              "cos": 0.000505550418,
+              "sin": 0.0015529086
+            }
+          },
+          "harmonic_regression_deg_per_day": 1.029176404035,
+          "harmonic_regression_rms_residual_deg": 2.788424828502,
+          "n_nodes": 102940,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": 1.028730484113,
+          "secant_deg_per_day": 1.029179356567,
+          "wall_clock_s": 983.113124847412
+        },
+        "sun_moon_j2_analysis": {
+          "direct_ols_deg_per_day": 1.005205569301,
+          "harmonic_amplitudes_deg": {
+            "121.7474": {
+              "amp_deg": 0.036151792361,
+              "amp_rad": 0.000630967807,
+              "cos": -0.000558929789,
+              "sin": 0.000292776135
+            },
+            "14.7653": {
+              "amp_deg": 0.003072602845,
+              "amp_rad": 5.3627036e-05,
+              "cos": 5.3176912e-05,
+              "sin": 6.933615e-06
+            },
+            "182.6211": {
+              "amp_deg": 0.070370260023,
+              "amp_rad": 0.001228192733,
+              "cos": 0.001043032584,
+              "sin": 0.000648490878
+            },
+            "27.5546": {
+              "amp_deg": 0.015355433239,
+              "amp_rad": 0.000268002868,
+              "cos": -4.7770217e-05,
+              "sin": 0.000263711099
+            },
+            "3399.19958274": {
+              "amp_deg": 3.257279462506,
+              "amp_rad": 0.056850251278,
+              "cos": 0.056614312682,
+              "sin": 0.005174038066
+            },
+            "365.2422": {
+              "amp_deg": 0.176611150162,
+              "amp_rad": 0.003082446066,
+              "cos": -0.001089154932,
+              "sin": 0.0028836115
+            },
+            "6798.4": {
+              "amp_deg": 3.822314515509,
+              "amp_rad": 0.066711973342,
+              "cos": 0.022798970652,
+              "sin": 0.062695249616
+            },
+            "73.0484": {
+              "amp_deg": 0.004872932857,
+              "amp_rad": 8.5048723e-05,
+              "cos": 5.8769823e-05,
+              "sin": -6.1476769e-05
+            },
+            "91.3106": {
+              "amp_deg": 0.050710660423,
+              "amp_rad": 0.00088506799,
+              "cos": 0.00028606962,
+              "sin": 0.000837561651
+            }
+          },
+          "harmonic_regression_deg_per_day": 1.006254599222,
+          "harmonic_regression_rms_residual_deg": 1.4905150804,
+          "n_nodes": 102940,
+          "n_subsamples": 97831,
+          "node_vector_deg_per_day": 1.005139570022,
+          "secant_deg_per_day": 1.006376068898,
+          "wall_clock_s": 4050.592722654343
+        }
+      }
+    },
+    "idealized_circular_perturber_bridge_i_sso": {
+      "cf_lunar_component_deg_day": 9.9125269e-05,
+      "i_deg": 97.7876,
+      "idealized_orbit_averaged_nodal_deg_day": 0.000910431127,
+      "ratio": 9.184652228438
+    },
+    "lunisolar_estimates": {
+      "i_30": {
+        "direct_ols_deg_per_day": -0.00035312089,
+        "harmonic_regression_deg_per_day": -0.000347397984,
+        "node_vector_deg_per_day": -0.000352745944,
+        "secant_deg_per_day": -0.000346291124
+      },
+      "i_90": {
+        "direct_ols_deg_per_day": 0.004551601228,
+        "harmonic_regression_deg_per_day": 0.004697312231,
+        "node_vector_deg_per_day": 0.004538682688,
+        "secant_deg_per_day": 0.004738029115
+      },
+      "i_sso": {
+        "direct_ols_deg_per_day": -0.023679428769,
+        "harmonic_regression_deg_per_day": -0.022921804814,
+        "node_vector_deg_per_day": -0.023590914091,
+        "secant_deg_per_day": -0.022803287669
+      }
+    },
+    "meta": {
+      "description": "mission_lunisolar_closure parallel campaign: 18.6-yr direct arc, 3 inclinations x 2 modes, single phase. STREAMING RK4 (no full-trajectory storage). Parallelized across all CPU cores via multiprocessing.Pool.",
+      "n_workers": 7,
+      "name": "mission_lunisolar_closure_parallel",
+      "wall_clock_total_s": 4051.778493881226
+    },
+    "snapshots": {
+      "manifest_sha256": "fa930cbbd4926b043a64029bf467b3824bc6bcecf34c8713aee8816de4e7aaa8",
+      "moon_duration_days": 6940.0,
+      "moon_n_points": 6941,
+      "moon_sha256": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59",
+      "sun_duration_days": 6940.0,
+      "sun_n_points": 6941,
+      "sun_sha256": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db"
+    },
+    "synthetic_estimator_test": {
+      "W_days": 6793.650000000001,
+      "a_true_deg_day": 0.0001,
+      "estimator_a_bias_deg_day": -1.0422192e-05,
+      "estimator_a_direct_ols_deg_day": 8.9577808e-05,
+      "estimator_f_bias_deg_day": 6.776263578034403e-20,
+      "estimator_f_harmonic_regression_deg_day": 0.0001,
+      "estimator_f_rms_residual_deg": 1.0979541095985277e-15,
+      "harmonic_amplitudes_deg_recovered": {
+        "121.7474": {
+          "amp_deg": 0.01,
+          "amp_rad": 0.000174532925,
+          "cos": 0.000146864392,
+          "sin": 9.4300542e-05
+        },
+        "14.7653": {
+          "amp_deg": 0.001,
+          "amp_rad": 1.7453293e-05,
+          "cos": 1.5554503e-05,
+          "sin": 7.916746e-06
+        },
+        "182.6211": {
+          "amp_deg": 0.02,
+          "amp_rad": 0.00034906585,
+          "cos": 0.000167351083,
+          "sin": 0.000306334103
+        },
+        "27.5546": {
+          "amp_deg": 0.002,
+          "amp_rad": 3.4906585e-05,
+          "cos": 1.0315601e-05,
+          "sin": 3.3347534e-05
+        },
+        "3399.19958274": {
+          "amp_deg": 5.804167784935913e-16,
+          "amp_rad": 1.0130183818531781e-17,
+          "cos": -1.2046645701118748e-18,
+          "sin": 1.0058300426551212e-17
+        },
+        "365.2422": {
+          "amp_deg": 0.05,
+          "amp_rad": 0.000872664626,
+          "cos": 2.377754561769761e-18,
+          "sin": 0.000872664626
+        },
+        "6798.4": {
+          "amp_deg": 0.5,
+          "amp_rad": 0.00872664626,
+          "cos": 0.008704785894,
+          "sin": 0.000617298536
+        },
+        "73.0484": {
+          "amp_deg": 0.003,
+          "amp_rad": 5.2359878e-05,
+          "cos": 4.7610702e-05,
+          "sin": -2.1789397e-05
+        },
+        "91.3106": {
+          "amp_deg": 0.005,
+          "amp_rad": 8.7266463e-05,
+          "cos": 8.7047859e-05,
+          "sin": 6.172985e-06
+        }
+      },
+      "n_samples": 38044,
+      "verdict": "f wins"
+    }
+  }
+}

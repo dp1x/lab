@@ -177,41 +177,92 @@ def _third_body_accel(r_eci_km: np.ndarray, t_s: float, sun_snap: dict,
 def propagate_streaming(sun_snap, moon_snap, *, mode: str, t0_s: float,
                           t_end_s: float, dt_s: float = DT_S,
                           subsample_every: int = 100) -> dict:
-    """Run RK4 step-by-step. Do NOT store the full trajectory.
+    """DEPRECATED wrapper: use `propagate_streaming_with_x0`, which requires
+    the caller to supply the initial state vector `x0`. This stub is kept
+    to avoid importing failures in downstream code that referenced it.
+    """
+    raise RuntimeError(
+        "propagate_streaming is a deprecated stub. Use "
+        "propagate_streaming_with_x0(sun_snap, moon_snap, x0, mode=..., "
+        "t0_s=..., t_end_s=..., dt_s=..., subsample_every=...) instead.")
+
+
+# --------------------------------------------------------------------------- #
+# Phase-locked 2-window estimator (operates on streaming outputs)
+# --------------------------------------------------------------------------- #
+def phase_locked_two_window(t_cross: np.ndarray, om_cross: np.ndarray, *,
+                              window_days: float, separation_days: float,
+                              t_start_s: float = 0.0,
+                              mode: str = "as_measured") -> dict:
+    """Phase-locked 2-window RAAN estimator.
+
+    Splits the ascending-node-crossing RAAN history into two windows of
+    length `window_days` separated by `separation_days`. Computes the
+    RAAN drift in each window; the average of the two drifts is the
+    "phase-locked" estimator that, in principle, cancels the contribution
+    of a slow harmonic whose period equals `2 * separation_days` (the
+    two-window baseline).
+
+    With `separation_days = HALF_NODAL_DAYS = 3399.2 d`, the two-window
+    baseline equals one full lunar nodal cycle (6798.4 d), so the
+    estimator is asymptotically insensitive to the dominant slow harmonic
+    of the lunar evection/variation family.
+
+    Args:
+      t_cross: ascending-node-crossing times [seconds since some epoch].
+      om_cross: unwrapped RAAN at each crossing [radians].
+      window_days: length of each window [days].
+      separation_days: gap between window midpoints [days].
+      t_start_s: epoch of t_cross = 0 [seconds since some epoch].
+      mode: 'as_measured' (default) returns each window's drift in rad/s;
+            'rate_only' returns the average rate only.
 
     Returns:
-      t_cross: ascending-node-crossing times
-      om_cross: unwrapped RAAN at each crossing
-      t_node, omega_node: theory-INDEPENDENT node-vector samples (subsampled)
-      n_steps: total steps taken
-      wall_clock_s: time spent
+      Dict with window A and window B drift rates (rad/day), the average
+      rate, and the number of node-crossings used in each window. Returns
+      NaN if either window has fewer than 4 nodes.
     """
-    # Build the RHS once
-    f_j2 = j2_rhs(MU_EARTH_KM3S2, J2_EARTH, R_EARTH_KM)
-    use_sun = mode in ("sun_only", "sun_moon", "sun_moon_j2")
-    use_moon = mode in ("moon_only", "sun_moon", "sun_moon_j2")
-    use_j2 = mode != "kepler_only"
+    n = len(t_cross)
+    if n < 8:
+        return {
+            "window_a_drift_deg_day": float("nan"),
+            "window_b_drift_deg_day": float("nan"),
+            "avg_drift_deg_day": float("nan"),
+            "window_a_n_nodes": 0,
+            "window_b_n_nodes": 0,
+        }
 
-    def f(t, x):
-        r = x[:3]
-        v = x[3:]
-        if mode == "kepler_only":
-            a_kep = -MU_EARTH_KM3S2 * r / np.linalg.norm(r) ** 3
-            return np.concatenate([v, a_kep])
-        if use_j2:
-            a = f_j2(t, x)[3:]
-        else:
-            a = -MU_EARTH_KM3S2 * r / np.linalg.norm(r) ** 3
-        if use_sun or use_moon:
-            a_3b = _third_body_accel(r, t, sun_snap, moon_snap,
-                                       include_sun=use_sun, include_moon=use_moon)
-            a = a + a_3b
-        return np.concatenate([v, a])
+    t_day = (t_cross - t_start_s) / 86400.0
 
-    # Initial state — caller must set x0 (passed via closure by the caller)
-    # We construct it here from t0_s + a generic initial state is not known
-    # so we accept x0 from caller via wrapper
-    raise RuntimeError("propagate_streaming needs a wrapper to set x0")
+    win_s = window_days
+    sep_s = separation_days
+
+    # Window A: [0, win_s]
+    # Window B: [win_s + sep_s, 2*win_s + sep_s]
+    a_lo, a_hi = 0.0, win_s
+    b_lo, b_hi = win_s + sep_s, 2.0 * win_s + sep_s
+
+    a_mask = (t_day >= a_lo) & (t_day <= a_hi)
+    b_mask = (t_day >= b_lo) & (t_day <= b_hi)
+
+    out = {
+        "window_a_n_nodes": int(np.sum(a_mask)),
+        "window_b_n_nodes": int(np.sum(b_mask)),
+        "window_a_drift_deg_day": float("nan"),
+        "window_b_drift_deg_day": float("nan"),
+        "avg_drift_deg_day": float("nan"),
+    }
+    if out["window_a_n_nodes"] >= 4:
+        _, a_rate = ols_slope(t_day[a_mask], om_cross[a_mask])
+        out["window_a_drift_deg_day"] = math.degrees(a_rate)
+    if out["window_b_n_nodes"] >= 4:
+        _, b_rate = ols_slope(t_day[b_mask], om_cross[b_mask])
+        out["window_b_drift_deg_day"] = math.degrees(b_rate)
+    if (not math.isnan(out["window_a_drift_deg_day"]) and
+            not math.isnan(out["window_b_drift_deg_day"])):
+        out["avg_drift_deg_day"] = 0.5 * (
+            out["window_a_drift_deg_day"] + out["window_b_drift_deg_day"])
+    return out
 
 
 def propagate_streaming_with_x0(sun_snap, moon_snap, x0: np.ndarray, *,
@@ -517,7 +568,13 @@ def mean_motion(a_km: float) -> float:
 
 def code_hashes() -> dict:
     here = Path(__file__).resolve().parent
-    lab_root = here.parents[1]
+    # Walk up to find the repo root (the directory that contains
+    # `src/lab_utils/`). This is robust to the mission's location.
+    lab_root = here
+    while lab_root != lab_root.parent:
+        if (lab_root / "src" / "lab_utils").exists():
+            break
+        lab_root = lab_root.parent
     files = {
         "experiment.py": here / "experiment.py",
         "lab_utils/orbits.py": lab_root / "src" / "lab_utils" / "orbits.py",

@@ -209,7 +209,6 @@ def main():
             "description": "Mission 1 Lunisolar Capability Closure: 18.6-yr direct arc, "
                             "3 inclinations, J2-only and J2+Sun+Moon modes, single phase. "
                             "STREAMING RK4 (no full-trajectory storage).",
-            "git_commit": "PENDING",
             "name": "mission_lunisolar_closure_focused_streaming",
             "wall_clock_total_s": time.time() - t_start,
         },
@@ -288,7 +287,9 @@ def main():
         },
     }
     out_path = OUT_DIR / "results.json"
-    exp.save_json_result(payload, out_path)
+    exp.save_json_result(str(out_path), payload,
+                          name="mission_lunisolar_closure_focused_streaming",
+                          description="18.6-yr direct arc, 3 inclinations x 2 modes, single phase")
     print(f"\nResults saved to {out_path}")
     print(f"Total wall-clock: {time.time()-t_start:.1f}s ({(time.time()-t_start)/60:.1f} min)")
 

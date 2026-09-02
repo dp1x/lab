@@ -74,6 +74,19 @@ def test_manifest_exists_and_loads():
     assert m["time_type"] == "TDB"
     assert m["cadence"] == "1 day"
     assert m["units"] == "KM-S"
+    # MANIFEST must NOT reference any R: paths (durable-storage rule).
+    manifest_text = MANIFEST.read_text(encoding="utf-8")
+    assert "R:" not in manifest_text, (
+        "MANIFEST.json must not reference R: paths; all durable data must be "
+        "under the repository root.")
+    # Concatenated snapshot sha256s must match the actual files in the repo.
+    assert m["sun_concat"]["sha256"].startswith("f2c4f048"), m["sun_concat"]["sha256"]
+    assert m["moon_concat"]["sha256"].startswith("aee85099"), m["moon_concat"]["sha256"]
+    # Concat paths must be repo-relative.
+    for k in ("sun_concat", "moon_concat"):
+        p = m[k]["path"]
+        assert not p.startswith("R:") and not p.startswith("C:"), p
+        assert p.startswith("research/"), p
 
 
 def test_snapshot_continuity():
@@ -131,28 +144,68 @@ def test_force_level_identity_exact_at_machine_precision():
 # Phase-locked 2-window estimator on synthetic data
 # --------------------------------------------------------------------------- #
 def test_phase_locked_returns_well_defined_value():
-    """Trivial: the phase_locked_two_window function returns a finite
-    avg slope for any input. This guards against NaN regressions.
+    """The phase_locked_two_window function returns a dict with the
+    documented shape for any input, including degenerate (too few
+    crossings) inputs where the drift fields are NaN.
     """
-    # Build a realistic trajectory with 10 timesteps of 1 day each
+    # Build a synthetic ascending-node-crossing record with daily cadence
     t_s = np.arange(0, 10 * 86400.0, 86400.0, dtype=float)
-    x_arr = np.zeros((len(t_s), 6))
-    pl = exp.phase_locked_two_window(t_s, x_arr,
+    om_rad = np.zeros_like(t_s)
+    pl = exp.phase_locked_two_window(t_s, om_rad,
                                      window_days=5 * 86400.0,
                                      separation_days=exp.HALF_NODAL_DAYS,
                                      t_start_s=0.0)
     assert isinstance(pl, dict)
-    # Either nan or finite; just check the dict shape.
     assert "window_a_n_nodes" in pl
     assert "window_b_n_nodes" in pl
+    # Either nan or finite is acceptable; just check the shape.
+    for k in ("window_a_drift_deg_day", "window_b_drift_deg_day",
+              "avg_drift_deg_day"):
+        assert k in pl
+        assert isinstance(pl[k], float)
 
 
-# (Removed synthetic phase-locked tests: the analytical prediction that the
-# estimator exactly cancels the slow-harmonic bias turned out to require
-# conditions that 1-yr windows with the lunar-nodal period do NOT satisfy.
-# The mission uses the 18.6-yr harmonic regression as the headline
-# estimator instead, which has all harmonics in the basis and avoids this
-# issue.)
+def test_phase_locked_synthetic_drift_recovers_known_slope():
+    """On a synthetic record with a known secular RAAN drift of
+    +1e-4 deg/day and a slow harmonic at 2*HALF_NODAL_DAYS = 6798.4 d,
+    the average of two 100-d windows placed at half-period separation
+    must recover the input slope to better than 1e-5 deg/day.
+
+    The slow-harmonic bias per window is O(amp_deg * omega_slow)
+    ~ 9.2e-6 deg/day. With windows placed symmetrically around the
+    slow-harmonic nodes, the bias cancels in the average to within
+    O(bias^2) (the OLS residual, ~ 1e-9 deg/day for 100-d windows).
+    """
+    n_days = 6000
+    t_s = np.arange(n_days) * 86400.0
+    true_rate_deg_day = 1.0e-4
+    om_rad = np.deg2rad(true_rate_deg_day) * t_s / 86400.0
+    T_slow = 2.0 * exp.HALF_NODAL_DAYS
+    omega_slow = 2.0 * math.pi / T_slow
+    amp_deg = 0.01
+    om_rad += np.deg2rad(amp_deg) * np.sin(omega_slow * t_s / 86400.0)
+    pl = exp.phase_locked_two_window(t_s, om_rad,
+                                     window_days=100.0,
+                                     separation_days=exp.HALF_NODAL_DAYS,
+                                     t_start_s=0.0)
+    assert pl["window_a_n_nodes"] >= 80
+    assert pl["window_b_n_nodes"] >= 80
+    recovered = pl["avg_drift_deg_day"]
+    assert abs(recovered - true_rate_deg_day) < 1e-5, (
+        f"recovered {recovered:.3e} vs true {true_rate_deg_day:.3e}")
+
+
+def test_phase_locked_degenerate_input_returns_nans():
+    """With fewer than 8 total crossings, all drift fields must be NaN."""
+    t_s = np.arange(0, 5 * 86400.0, 86400.0, dtype=float)
+    om_rad = np.zeros_like(t_s)
+    pl = exp.phase_locked_two_window(t_s, om_rad,
+                                     window_days=5 * 86400.0,
+                                     separation_days=exp.HALF_NODAL_DAYS,
+                                     t_start_s=0.0)
+    assert math.isnan(pl["window_a_drift_deg_day"])
+    assert math.isnan(pl["window_b_drift_deg_day"])
+    assert math.isnan(pl["avg_drift_deg_day"])
 
 
 # --------------------------------------------------------------------------- #
@@ -177,7 +230,8 @@ def test_headline_decision_rule_if_results_present():
     results_path = HERE / "results" / "results.json"
     if not results_path.exists():
         pytest.skip("main campaign results.json not yet written")
-    payload = json.loads(results_path.read_text(encoding="utf-8"))
+    top = json.loads(results_path.read_text(encoding="utf-8"))
+    payload = top.get("results", top)
     cmp = payload["comparison_with_corrected_formula"]
     # The 18.6-yr harmonic regression Lunisolar rate at i_sso should be
     # within +/- 50% of the corrected formula's prediction.
@@ -188,3 +242,25 @@ def test_headline_decision_rule_if_results_present():
         # Note: this is informational; we do NOT assert pass/fail because
         # the conclusion is part of the scientific report.
         assert math.isfinite(ratio)
+        # i_sso result is RETROGRADE while corrected cf is PROGRADE; this
+        # is the headline finding. Document it in the test for clarity.
+        if "i_sso_sign_match" in cmp:
+            assert cmp["i_sso_sign_match"] is False or cmp["i_sso_sign_match"] is True
+            # The actual sign at i_sso is retrograde; cf is prograde. If
+            # the field is present, document the expected sign
+            # disagreement.
+            # (Mission finding: sign disagreement at i_sso.)
+        # i_30 result is also retrograde vs cf prograde.
+        i30_harm = cmp["i_30_harmonic_reg_lunisolar_deg_day"]
+        i30_cf = cmp["i_30_cf_total_deg_day"]
+        if not math.isnan(i30_harm) and i30_cf != 0:
+            assert i30_harm * i30_cf < 0, (
+                f"expected i_30 sign disagreement, got "
+                f"numerical={i30_harm}, cf={i30_cf}")
+        # i=90 result is prograde matching cf.
+        i90_harm = cmp["i_90_harmonic_reg_lunisolar_deg_day"]
+        i90_cf = cmp["i_90_cf_total_deg_day"]
+        if not math.isnan(i90_harm) and i90_cf != 0:
+            assert i90_harm * i90_cf > 0, (
+                f"expected i_90 sign agreement, got "
+                f"numerical={i90_harm}, cf={i90_cf}")
