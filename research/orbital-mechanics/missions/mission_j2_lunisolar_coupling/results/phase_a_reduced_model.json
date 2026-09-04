@@ -1,0 +1,153 @@
+{
+  "phase": "A_reduced_model",
+  "arc_days": 365.25,
+  "results": [
+    {
+      "label": "real_j2_only",
+      "mode": "j2_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": false,
+      "rate_deg_day": 0.992015962324261,
+      "rms_residual_deg": 1.0405740842641008e-07,
+      "n_steps": 525960,
+      "n_nodes": 5449,
+      "wall_clock_s": 46.81359028816223,
+      "apply_precession": true
+    },
+    {
+      "label": "synthetic_j2_only",
+      "mode": "j2_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": true,
+      "rate_deg_day": 0.992015962324261,
+      "rms_residual_deg": 1.0405740842641008e-07,
+      "n_steps": 525960,
+      "n_nodes": 5449,
+      "wall_clock_s": 46.75839710235596,
+      "apply_precession": true
+    },
+    {
+      "label": "real_sun_only",
+      "mode": "sun_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": false,
+      "rate_deg_day": -7.24785083760796e-05,
+      "rms_residual_deg": 1.6296352003016096e-10,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 120.83512043952942,
+      "apply_precession": true
+    },
+    {
+      "label": "synthetic_sun_only",
+      "mode": "sun_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": true,
+      "rate_deg_day": -7.24785083760796e-05,
+      "rms_residual_deg": 1.6296352003016096e-10,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 120.57829236984253,
+      "apply_precession": true
+    },
+    {
+      "label": "real_moon_only",
+      "mode": "moon_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": false,
+      "rate_deg_day": -0.0002040037775804026,
+      "rms_residual_deg": 8.212782201714074e-10,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 121.3539559841156,
+      "apply_precession": true
+    },
+    {
+      "label": "synthetic_moon_only",
+      "mode": "moon_only",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": true,
+      "rate_deg_day": -9.903368737926998e-05,
+      "rms_residual_deg": 0.0001525064656129368,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 139.85565614700317,
+      "apply_precession": true
+    },
+    {
+      "label": "real_sun_moon",
+      "mode": "sun_moon",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": false,
+      "rate_deg_day": -0.00027660496763873196,
+      "rms_residual_deg": 6.577277023666493e-10,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 206.19108867645264,
+      "apply_precession": true
+    },
+    {
+      "label": "synthetic_sun_moon",
+      "mode": "sun_moon",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": true,
+      "rate_deg_day": -0.00017148029254748537,
+      "rms_residual_deg": 0.00015246058112431226,
+      "n_steps": 525960,
+      "n_nodes": 5445,
+      "wall_clock_s": 214.40104222297668,
+      "apply_precession": true
+    },
+    {
+      "label": "real_sun_moon_j2",
+      "mode": "sun_moon_j2",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": false,
+      "rate_deg_day": 0.9905784036454127,
+      "rms_residual_deg": 2.7684003519657777e-07,
+      "n_steps": 525960,
+      "n_nodes": 5449,
+      "wall_clock_s": 216.9563455581665,
+      "apply_precession": true
+    },
+    {
+      "label": "synthetic_sun_moon_j2",
+      "mode": "sun_moon_j2",
+      "lambda_j2": 1.0,
+      "lambda_3body": 1.0,
+      "synthetic_moon": true,
+      "rate_deg_day": 0.9914402778823723,
+      "rms_residual_deg": 0.00021553027865742772,
+      "n_steps": 525960,
+      "n_nodes": 5449,
+      "wall_clock_s": 222.85542678833008,
+      "apply_precession": true
+    }
+  ],
+  "snapshot_provenance": {
+    "sun_sha256": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db",
+    "moon_sha256": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59",
+    "sun_n_points": 6941,
+    "moon_n_points": 6941
+  },
+  "code_hashes": {
+    "mission_experiment.py": "930a9f0ed9cdb79c3a415705e56b27d7de7f54df09b9710868e008f153454c34",
+    "lab_utils/orbits.py": "29683012a01cc7629a43d7acf84ad4b15a466fd92999ece5b8efb9609efa5295",
+    "lab_utils/earth_frames.py": "54ab3019b82218402f66d9e1f26605058bead27d3e86cd7aab9cb686577fb3fd",
+    "lab_utils/integrators.py": "59f9550a164d5b8af22203e5d47db39d7089cbd23d18494fb50bcdc81c21ccc6",
+    "lab_utils/results.py": "197be6e86738864a92ab374a2cb4714e4d04cbdb6186f5ec633df4fe292015bd",
+    "lab_utils/__init__.py": "d5087b18359952361306a5575f8fa3e20ba4f0211fedb4513a5cfc40014ceeb6",
+    "parent_mission_experiment.py": "51ab920f3267e346f026a7efa600fe61c6f75f9ddb343a4f6adf0787da21004f",
+    "sun_reference_snapshot.txt": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db",
+    "moon_reference_snapshot.txt": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59"
+  }
+}
