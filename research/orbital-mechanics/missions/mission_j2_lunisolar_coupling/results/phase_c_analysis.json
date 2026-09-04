@@ -1,0 +1,42 @@
+{
+  "phase": "C_analysis",
+  "arc_days": 365.25,
+  "by_inclination": {
+    "30.0": {
+      "kepler_rate_deg_day": 6.060923831102326e-15,
+      "j2_only_rate_deg_day": -6.33513727156805,
+      "sun_only_rate_deg_day": -6.283720922275525e-05,
+      "moon_only_rate_deg_day": -2.2033868433520348e-05,
+      "sun_moon_rate_deg_day": -8.493546472572826e-05,
+      "sun_moon_j2_rate_deg_day": -6.335463964594372,
+      "Luni_combined_deg_day": -0.00032669302632193364,
+      "Luni_isolated_sun_plus_moon_deg_day": -8.48710776562756e-05,
+      "R_J2x3b_cross_residual_deg_day": -0.00024182194866565805,
+      "R_J2x3b_pct_of_luni_combined": 74.02115416671278
+    },
+    "90.0": {
+      "kepler_rate_deg_day": -1.5369903020766421e-31,
+      "j2_only_rate_deg_day": -4.482966060947996e-16,
+      "sun_only_rate_deg_day": -0.00010090893230719412,
+      "moon_only_rate_deg_day": -0.0002542146131838829,
+      "sun_moon_rate_deg_day": -0.0003552390695189033,
+      "sun_moon_j2_rate_deg_day": -0.004569315491101127,
+      "Luni_combined_deg_day": -0.004569315491100678,
+      "Luni_isolated_sun_plus_moon_deg_day": -0.00035512354549107705,
+      "R_J2x3b_cross_residual_deg_day": -0.004214191945609601,
+      "R_J2x3b_pct_of_luni_combined": 92.22807997865927
+    },
+    "97.79": {
+      "kepler_rate_deg_day": 3.7836951929182686e-16,
+      "j2_only_rate_deg_day": 0.992015962324261,
+      "sun_only_rate_deg_day": -7.24785083760796e-05,
+      "moon_only_rate_deg_day": -0.0002040037775804026,
+      "sun_moon_rate_deg_day": -0.00027660496763873196,
+      "sun_moon_j2_rate_deg_day": 0.9905784036454127,
+      "Luni_combined_deg_day": -0.0014375586788483163,
+      "Luni_isolated_sun_plus_moon_deg_day": -0.0002764822859564822,
+      "R_J2x3b_cross_residual_deg_day": -0.0011610763928918341,
+      "R_J2x3b_pct_of_luni_combined": 80.76723475538523
+    }
+  }
+}
