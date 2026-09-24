@@ -27,6 +27,9 @@ import pytest
 
 HERE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(HERE))
+# Evict any cached sibling mission module (the precession mission also ships
+# mission_experiment.py); path-insert alone cannot evict sys.modules entries.
+sys.modules.pop("mission_experiment", None)
 
 from mission_experiment import (
     H_SSO_KM, I_SSO_DEG, I_90_DEG, I_30_DEG,

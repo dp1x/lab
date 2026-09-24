@@ -1,0 +1,79 @@
+{
+  "summary": {
+    "97.7876": {
+      "averaged_lunisolar_modulated": 0.00017696106637543618,
+      "averaged_lunisolar_frozen": -3.1447696180637314e-05,
+      "averaged_lunisolar_prescribed_half": 0.00015542345030372662,
+      "Omega_dot_J2": 0.9856414464620996,
+      "S0": 0.000134754880497133
+    },
+    "90.0": {
+      "averaged_lunisolar_modulated": 2.9619889797772553e-06,
+      "averaged_lunisolar_frozen": 2.961988979777316e-06,
+      "averaged_lunisolar_prescribed_half": 2.9619889797772985e-06,
+      "Omega_dot_J2": -4.454067863909392e-16,
+      "S0": 0.00017390525381406536
+    },
+    "30.0": {
+      "averaged_lunisolar_modulated": 4.521714349969841e-05,
+      "averaged_lunisolar_frozen": 0.00021638652847589393,
+      "averaged_lunisolar_prescribed_half": 4.141511300170819e-05,
+      "Omega_dot_J2": -6.299507618051265,
+      "S0": 4.5467390662845264e-05
+    }
+  },
+  "rows": [
+    {
+      "inc": 97.7876,
+      "oj2": 0.9856414464620996,
+      "s0": 0.000134754880497133,
+      "r_mod": 0.9858184075284734,
+      "r_frozen": -3.1447696180637314e-05,
+      "r_half": 0.4929761466813527,
+      "r_j2": 0.985641446462098,
+      "r_j2_0": 0.0,
+      "luni_mod": 0.00017696106637543618,
+      "luni_frozen": -3.1447696180637314e-05,
+      "luni_half": 0.00015542345030372662
+    },
+    {
+      "inc": 90.0,
+      "oj2": -4.454067863909392e-16,
+      "s0": 0.00017390525381406536,
+      "r_mod": 2.9619889793318486e-06,
+      "r_frozen": 2.961988979777316e-06,
+      "r_half": 2.961988979554595e-06,
+      "r_j2": -4.454067863909403e-16,
+      "r_j2_0": 0.0,
+      "luni_mod": 2.9619889797772553e-06,
+      "luni_frozen": 2.961988979777316e-06,
+      "luni_half": 2.9619889797772985e-06
+    },
+    {
+      "inc": 30.0,
+      "oj2": -6.299507618051265,
+      "s0": 4.5467390662845264e-05,
+      "r_mod": -6.299462400907773,
+      "r_frozen": 0.00021638652847589393,
+      "r_half": -3.1497123939126346,
+      "r_j2": -6.299507618051273,
+      "r_j2_0": 0.0,
+      "luni_mod": 4.521714349969841e-05,
+      "luni_frozen": 0.00021638652847589393,
+      "luni_half": 4.141511300170819e-05
+    }
+  ],
+  "theory_sha": "7c880ce94b070aea",
+  "code": {
+    "averaged_propagator.py": "3028a7625353958b",
+    "mission_experiment.py": "4a49e077281006e1",
+    "run_compact.py": "7dd0cb6d70bcdccc",
+    "run_final_18yr.py": "26649f80861371c8",
+    "run_frozen_fix.py": "5e797983d18c3a13",
+    "run_headline.py": "4e34e2fa344dab09",
+    "run_independent_check.py": "46c0267ed36c536e",
+    "run_prescribed.py": "387860fc7e69d167",
+    "run_scaling.py": "a88aff87a31f3b05",
+    "theory_modulation.py": "7c880ce94b070aea"
+  }
+}

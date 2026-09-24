@@ -1,0 +1,183 @@
+{
+  "summary": {
+    "97.7876": {
+      "combined": 0.0005402370808861552,
+      "isolated": -0.00013065182638116797,
+      "R": 0.0006708889072673232
+    },
+    "90.0": {
+      "combined": 0.0005006683694100763,
+      "isolated": -0.00016966636134090654,
+      "R": 0.0006703347307509828
+    },
+    "30.0": {
+      "combined": 1.1487447817655483e-05,
+      "isolated": -4.9549306143686176e-05,
+      "R": 6.103675396134166e-05
+    }
+  },
+  "rows": [
+    {
+      "mode": "kepler_only",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": 3.7836951929182676e-16,
+      "n": 5445
+    },
+    {
+      "mode": "j2_only",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": 0.006374515804753608,
+      "n": 5449
+    },
+    {
+      "mode": "sun_only",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -3.254230076761268e-05,
+      "n": 5445
+    },
+    {
+      "mode": "moon_only",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -9.810952561279856e-05,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -0.00013063682775739304,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon_j2",
+      "inc": 97.7876,
+      "h": 600.0,
+      "frozen": true,
+      "rate": 0.0069147528856397635,
+      "n": 5449
+    },
+    {
+      "mode": "kepler_only",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -1.5369903020766421e-31,
+      "n": 5445
+    },
+    {
+      "mode": "j2_only",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -2.889819704423682e-18,
+      "n": 5449
+    },
+    {
+      "mode": "sun_only",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -4.5293636547818174e-05,
+      "n": 5445
+    },
+    {
+      "mode": "moon_only",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -0.00012437272479308837,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -0.00016965657305968848,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon_j2",
+      "inc": 90.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": 0.0005006683694100734,
+      "n": 5449
+    },
+    {
+      "mode": "kepler_only",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": 6.060923831102321e-15,
+      "n": 5445
+    },
+    {
+      "mode": "j2_only",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -0.03562965441288697,
+      "n": 5462
+    },
+    {
+      "mode": "sun_only",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -2.8159529507097236e-05,
+      "n": 5445
+    },
+    {
+      "mode": "moon_only",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -2.138977662446709e-05,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -4.956095517482857e-05,
+      "n": 5445
+    },
+    {
+      "mode": "sun_moon_j2",
+      "inc": 30.0,
+      "h": 600.0,
+      "frozen": true,
+      "rate": -0.035618166965069316,
+      "n": 5462
+    }
+  ],
+  "provenance": {
+    "sun_sha256": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db",
+    "moon_sha256": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59",
+    "code": {
+      "averaged_propagator.py": "3028a7625353958b",
+      "mission_experiment.py": "4a49e077281006e1",
+      "run_compact.py": "7dd0cb6d70bcdccc",
+      "run_final_18yr.py": "26649f80861371c8",
+      "run_frozen_fix.py": "5e797983d18c3a13",
+      "run_headline.py": "4e34e2fa344dab09",
+      "run_prescribed.py": "387860fc7e69d167",
+      "run_scaling.py": "a88aff87a31f3b05",
+      "theory_modulation.py": "7c880ce94b070aea"
+    },
+    "W_d": 365.25,
+    "h_km": 600.0,
+    "control": "freeze_plane open-loop"
+  }
+}

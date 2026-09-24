@@ -1,0 +1,88 @@
+{
+  "rows": [
+    {
+      "mode": "kepler_only",
+      "buggy": false,
+      "rate": -4.524699434601602e-16,
+      "n_cross": 1341
+    },
+    {
+      "mode": "kepler_only",
+      "buggy": true,
+      "rate": -4.524699434601602e-16,
+      "n_cross": 1341
+    },
+    {
+      "mode": "j2_only",
+      "buggy": false,
+      "rate": 0.990564164637715,
+      "n_cross": 1342
+    },
+    {
+      "mode": "j2_only",
+      "buggy": true,
+      "rate": 0.990564164637715,
+      "n_cross": 1342
+    },
+    {
+      "mode": "sun_only",
+      "buggy": false,
+      "rate": -2.6634501747739046e-05,
+      "n_cross": 1341
+    },
+    {
+      "mode": "sun_only",
+      "buggy": true,
+      "rate": -2.757747447290823e-05,
+      "n_cross": 1341
+    },
+    {
+      "mode": "moon_only",
+      "buggy": false,
+      "rate": -9.946745240424643e-05,
+      "n_cross": 1341
+    },
+    {
+      "mode": "moon_only",
+      "buggy": true,
+      "rate": -9.219434406479592e-05,
+      "n_cross": 1341
+    },
+    {
+      "mode": "sun_moon",
+      "buggy": false,
+      "rate": -0.0001260829476610786,
+      "n_cross": 1341
+    },
+    {
+      "mode": "sun_moon",
+      "buggy": true,
+      "rate": -0.00011975480789023772,
+      "n_cross": 1341
+    },
+    {
+      "mode": "sun_moon_j2",
+      "buggy": false,
+      "rate": 0.9909481276983518,
+      "n_cross": 1342
+    },
+    {
+      "mode": "sun_moon_j2",
+      "buggy": true,
+      "rate": 0.9908780171385877,
+      "n_cross": 1342
+    }
+  ],
+  "correct": {
+    "combined": 0.00038396306063681607,
+    "isolated": -0.00012610195415108054,
+    "R": 0.0005100650147878966
+  },
+  "buggy": {
+    "combined": 0.00031385250087268,
+    "isolated": -0.00011977181853679922,
+    "R": 0.00043362431940947925
+  },
+  "sun_sha": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db",
+  "moon_sha": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59"
+}

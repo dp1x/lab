@@ -24,6 +24,9 @@ import pytest
 
 HERE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(HERE))
+# Evict any cached sibling mission module (the precession mission also ships
+# mission_experiment.py); path-insert alone cannot evict sys.modules entries.
+sys.modules.pop("mission_experiment", None)
 
 from mission_experiment import (
     H_SSO_KM, I_SSO_DEG, I_90_DEG, I_30_DEG,
@@ -365,7 +368,7 @@ def test_code_hashes_includes_expected_files():
 def test_decision_rule_conditions_documented():
     """The README §4.1 decision rule conditions must be present in the mission card."""
     readme_path = HERE / "README.md"
-    text = readme_path.read_text()
+    text = readme_path.read_text(encoding="utf-8")
     assert "H1-SUPPORTED" in text or "H1-FALSIFIED" in text, (
         "README does not declare a final state (H1-SUPPORTED/H1-FALSIFIED)"
     )

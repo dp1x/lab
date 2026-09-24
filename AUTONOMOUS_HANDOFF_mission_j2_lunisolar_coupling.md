@@ -3,7 +3,7 @@
 **Date**: 2026-09-03 (session) → 2026-09-04 (commit timestamp)
 **Session**: First autonomous mission executed under LAB_CONSTITUTION adoption (continuation of mission_lunisolar_closure session)
 **Branch**: main
-**Final commit**: 09be866 (mission_j2_lunisolar_coupling COMPLETE)
+**Final commit**: 76cccf2 (mission_j2_lunisolar_coupling COMPLETE; originally committed as 09be866 with a hallucinated non-canonical author email `dhanesh@lab.local`; remediated 2026-09-22 by a sanctioned 2-commit history rewrite (this commit + its child) preserving all timestamps and re-signing — see the 2026-09-22 mission commit)
 **Signed**: ✓ RSA key 5774B47A005623ACD39DF7284EB7C30F884E8259 ("Good signature from Dhanesh")
 **Pushed**: ✓ to origin/main, post-push audit confirmed
 
@@ -108,8 +108,8 @@ Also unresolved:
 ## 4. Repository changes
 
 ### Git state
-- **HEAD**: 09be866 (signed, RSA key 5774B47A005623ACD39DF7284EB7C30F884E8259)
-- **Live remote tip**: 09be86697dc965800c8e5a19ec88bc264360645d (matches HEAD, post-push verified)
+- **HEAD**: 76cccf2 (signed, RSA key 5774B47A005623ACD39DF7284EB7C30F884E8259; rewrite of 09be866, 2026-09-22 email remediation)
+- **Live remote tip**: 976c09f602547e8e573dc61dfabbd25142710209 (matches rewritten HEAD lineage, post-push verified)
 - **Working tree**: clean
 - **Commits ahead of origin**: 0 (after push)
 
@@ -161,7 +161,7 @@ Also unresolved:
 ## 6. Final commit
 
 ```
-09be866 (HEAD -> main, origin/main)
+76cccf2 (HEAD -> main, origin/main; rewrite of 09be866, 2026-09-22)
 mission_j2_lunisolar_coupling COMPLETE: H1-PARTIALLY-SUPPORTED; J2-precession-modulated Lunisolar coupling identified as dominant kinematic effect at LEO
 
 Three-phase campaign: Phase A (synthetic vs real Moon isolation), Phase B

@@ -1,0 +1,61 @@
+{
+  "rows": [
+    {
+      "omega_p": -2.0,
+      "rate": -1.9999461808229868,
+      "response": 5.381917701319239e-05,
+      "R_vs_stationary": 0.00017990212467427097
+    },
+    {
+      "omega_p": -1.0,
+      "rate": -1.000057184889762,
+      "response": -5.718488976191871e-05,
+      "R_vs_stationary": 6.889805789915988e-05
+    },
+    {
+      "omega_p": -0.5,
+      "rate": -0.500106921300502,
+      "response": -0.00010692130050204973,
+      "R_vs_stationary": 1.9161647159028855e-05
+    },
+    {
+      "omega_p": 0.0,
+      "rate": -0.0001260829476610786,
+      "response": -0.0001260829476610786,
+      "R_vs_stationary": 0.0
+    },
+    {
+      "omega_p": 0.5,
+      "rate": 0.49989147959635166,
+      "response": -0.00010852040364833782,
+      "R_vs_stationary": 1.7562544012740772e-05
+    },
+    {
+      "omega_p": 1.0,
+      "rate": 0.9999317681502172,
+      "response": -6.823184978277386e-05,
+      "R_vs_stationary": 5.785109787830473e-05
+    },
+    {
+      "omega_p": 2.0,
+      "rate": 2.000009150677982,
+      "response": 9.150677982017186e-06,
+      "R_vs_stationary": 0.00013523362564309577
+    }
+  ],
+  "baseline_stationary": -0.0001260829476610786,
+  "sun_sha": "f2c4f04824b07d02638b3c6cac1e72385bedf56c7575709ab1158391f92889db",
+  "moon_sha": "aee8509932c1ea169df1f518feebd0169cf1fd8ebd07f153f6fe80f4ee7d8c59",
+  "code": {
+    "averaged_propagator.py": "3028a7625353958b",
+    "mission_experiment.py": "4a49e077281006e1",
+    "run_compact.py": "7dd0cb6d70bcdccc",
+    "run_final_18yr.py": "26649f80861371c8",
+    "run_frozen_fix.py": "5e797983d18c3a13",
+    "run_headline.py": "4e34e2fa344dab09",
+    "run_independent_check.py": "46c0267ed36c536e",
+    "run_prescribed.py": "387860fc7e69d167",
+    "run_scaling.py": "a88aff87a31f3b05",
+    "theory_modulation.py": "7c880ce94b070aea"
+  }
+}
