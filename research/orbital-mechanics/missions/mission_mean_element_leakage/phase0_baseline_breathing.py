@@ -166,45 +166,68 @@ def job(arg) -> dict:
             "smoothing_window_crossings": int(win)}
 
 
+def summary_for(by: dict, inc: float, modes: list) -> dict:
+    """Per-inclination summary from whatever modes are present.
+
+    With all five modes this reproduces the 1-yr schema exactly. With a reduced
+    mode set (the 18.6-yr arm runs j2_only + sun_moon_j2 only, ~45 min/propagation)
+    the isolated/residual terms are OMItTED rather than guessed: R needs the
+    kepler/sun/moon isolation, which the long arc does not re-run.
+    """
+    def g(m):
+        return by[(m, inc)]
+    j2, full = g("j2_only"), g("sun_moon_j2")
+    combined = full["rate"] - j2["rate"]
+    # Baseline breathing: J2 rate evaluated with each run's own elements.
+    D = full["oj2_mean"] - j2["oj2_mean"]
+    D_sm = full["oj2_smoothed_mean"] - j2["oj2_smoothed_mean"]
+    s = {
+        "combined": combined,
+        "D_baseline_breathing": D,
+        "D_smoothed": D_sm,
+        "combined_corrected_smoothed": combined - D_sm,
+        "delta_i_mean_deg": full["i_mean_deg"] - j2["i_mean_deg"],
+        "delta_a_mean_km": full["a_mean"] - j2["a_mean"],
+        "full_smoothed_di_deg_over_arc": (full["i_smoothed_last_deg"]
+                                          - full["i_smoothed_first_deg"]),
+        "full_smoothed_da_km_over_arc": full["a_smoothed_last"] - full["a_smoothed_first"],
+        "sensitivity_check_deg_day": 0.12579 * (full["i_smoothed_last_deg"]
+                                                - full["i_smoothed_first_deg"]),
+    }
+    if {"kepler_only", "sun_only", "moon_only"} <= set(modes):
+        kep, su, mo = g("kepler_only"), g("sun_only"), g("moon_only")
+        isolated = (su["rate"] - kep["rate"]) + (mo["rate"] - kep["rate"])
+        R = combined - isolated
+        s["R_measured"] = R
+        s["isolated"] = isolated
+        s["fraction_of_R_explained_raw"] = (D / R) if R not in (0.0, None) else None
+        s["fraction_of_R_explained_smoothed"] = (D_sm / R) if R not in (0.0, None) else None
+        s["implied_di_for_R_deg"] = (R / 0.12579) if R not in (0.0, None) else None
+    return s
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--years", type=float, default=1.0)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--modes", default=",".join(MODES),
+                    help="comma-separated subset of: %s" % ",".join(MODES))
     args = ap.parse_args()
+    modes = [m.strip() for m in args.modes.split(",") if m.strip()]
+    unknown = [m for m in modes if m not in MODES]
+    if unknown:
+        ap.error("unknown mode(s): %s" % ", ".join(unknown))
+    missing = [m for m in ("j2_only", "sun_moon_j2") if m not in modes]
+    if missing:
+        ap.error("j2_only and sun_moon_j2 are required; they define D and combined")
     (HERE / "results").mkdir(exist_ok=True)
-    tasks = [(m, inc, args.years) for inc in INCS for m in MODES]
+    tasks = [(m, inc, args.years) for inc in INCS for m in modes]
     with Pool(args.workers) as p:
         rows = p.map(job, tasks)
     by = {(r["mode"], r["inc"]): r for r in rows}
-    out = {"years": args.years, "rows": rows, "summary": {}}
+    out = {"years": args.years, "modes": modes, "rows": rows, "summary": {}}
     for inc in INCS:
-        def g(m, _inc=inc):
-            return by[(m, _inc)]
-        kep, j2, su, mo, full = (g("kepler_only"), g("j2_only"), g("sun_only"),
-                                 g("moon_only"), g("sun_moon_j2"))
-        combined = full["rate"] - j2["rate"]
-        isolated = (su["rate"] - kep["rate"]) + (mo["rate"] - kep["rate"])
-        R = combined - isolated
-        # Baseline breathing: J2 rate evaluated with each run's own elements.
-        D = full["oj2_mean"] - j2["oj2_mean"]
-        D_sm = full["oj2_smoothed_mean"] - j2["oj2_smoothed_mean"]
-        di_deg = full["i_mean_deg"] - j2["i_mean_deg"]
-        da_km = full["a_mean"] - j2["a_mean"]
-        di_sm_deg = full["i_smoothed_last_deg"] - full["i_smoothed_first_deg"]
-        da_sm_km = full["a_smoothed_last"] - full["a_smoothed_first"]
-        out["summary"][str(inc)] = {
-            "R_measured": R, "combined": combined, "isolated": isolated,
-            "D_baseline_breathing": D,
-            "D_smoothed": D_sm,
-            "fraction_of_R_explained_raw": (D / R) if R not in (0.0, None) else None,
-            "fraction_of_R_explained_smoothed": (D_sm / R) if R not in (0.0, None) else None,
-            "delta_i_mean_deg": di_deg,
-            "delta_a_mean_km": da_km,
-            "full_smoothed_di_deg_over_arc": di_sm_deg,
-            "full_smoothed_da_km_over_arc": da_sm_km,
-            "sensitivity_check_deg_day": 0.12579 * di_sm_deg,
-            "implied_di_for_R_deg": (R / 0.12579) if R not in (0.0, None) else None,
-        }
+        out["summary"][str(inc)] = summary_for(by, inc, modes)
     out["provenance"] = {
         "sun_sha256": ME.load_snapshot(ME.SUN_SNAPSHOT)["sha256"],
         "moon_sha256": ME.load_snapshot(ME.MOON_SNAPSHOT)["sha256"],
@@ -212,6 +235,7 @@ def main() -> None:
                  for p in sorted(HERE.glob("*.py"))},
     }
     name = "phase0_%gyr.json" % args.years
+    out["mode_set_complete"] = set(modes) == set(MODES)
     (HERE / "results" / name).write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(json.dumps(out["summary"], indent=2))
 
