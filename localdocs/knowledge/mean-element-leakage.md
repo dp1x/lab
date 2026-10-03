@@ -60,6 +60,29 @@ slope of one absorbs the other.
 | node-crossing sampling biases the rate | **EXONERATED** | node-detection-free estimator reproduces committed `combined` to **5.8e-9 deg/day** at 1 yr, all three inclinations |
 | `ols_slope` conditioning artifact (+2.17e-3) | **DOES NOT REPRODUCE** | +4.7e-18 on the real grid; re-scoring moves the residual by 8.9e-16 |
 
+### Reconciliation of a dissenting independent run
+
+A second, independently-implemented node-free estimator run returned the **opposite**
+verdict — every estimator failing the <1% gate — and reported "no answer obtained". That
+was re-examined rather than averaged away, and the **oracle** is what was wrong:
+
+| test | result |
+|---|---|
+| uniform-cadence OLS vs node-crossing OLS, real 1-yr propagation, 2 modes, 3 inclinations | **1.8e-5 / 2.1e-7 / 6.6e-6 relative** agreement on `combined` (SSO / 90° / 30°) |
+| recovery of the analytic arc-mean J2 rate on `j2_only` | **0.0832%** (SSO), **0.2335%** (30°) — passes |
+| recovery of a *known injected* drift | **0.00000000%** at k = 1.2345e-4 and 8.56e-4 deg/day |
+
+Its h-cap estimator is separately unusable on its own terms (wrong algebraic kernel —
+missing a `(1 − 1.5 sin²i)` factor, correctly diagnosed), and its harmonic-regression arms
+fail on conditioning (κ = 2.5e9 at 30 d), independently reproducing audit-020's finding.
+
+**Diagnostic worth keeping.** The lead agent's first version of the injection oracle
+returned an *identical* recovery for `+k` and `−k`, which is impossible for a real
+estimator. Cause: injecting `k·(t−t₀)` in radians without converting deg/day → rad/s, an
+**86400× seconds-per-day error**. A recovery ratio that is constant across injected
+amplitudes is a clean tell for a units bug in an oracle — the same class of mistake that
+produced this mission's earlier DE441 interpolation defect.
+
 ## The mean-element question, settled against the lab's own prior fear
 
 Three independent lines converge:

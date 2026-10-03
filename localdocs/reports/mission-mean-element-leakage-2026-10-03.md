@@ -153,6 +153,39 @@ equator-crossing search) reproduces the committed node-crossing `combined` to
 figures. Oracle gate: **0.083–0.257%** recovery of known injected drift over 1-yr and 4-yr
 synthetic J2 arcs; ≤ 2e-15 on pure 2-body. **Node-crossing sampling geometry is exonerated.**
 
+**Reconciled against a dissenting independent run (2026-10-03, post-commit).** A second,
+independently-implemented Track C returned the *opposite* verdict — every estimator
+failing the <1% gate (A: +52…+134%; linear arms 95–99%; harmonic arms 10⁵–10¹⁹%) — and
+concluded "no answer obtained". That result was re-examined rather than averaged away,
+and it is **the oracle that is wrong, not the estimator**:
+
+| test | result |
+|---|---|
+| **T1** uniform-cadence OLS vs node-crossing OLS on the *real* 1-yr propagation, both modes, 3 inclinations | agree to **1.2e-7 … 6.6e-6 relative** on `combined` (SSO 1.84e-5, 90° 2.1e-7, 30° 6.6e-6) |
+| **T2** does the uniform estimator recover the analytic arc-mean J2 rate on `j2_only`? | **0.0832%** (SSO), **0.2335%** (30°) — passes the gate |
+| **T3** inject a *known* drift into the measured uniform series and recover it | **0.00000000%** error at k = +1.2345e-4 and +8.56e-4 deg/day, both inclinations — machine precision |
+
+T3 is the correct form of the dissenting track's injected-drift oracle, and it is exact.
+Its two "unusable" findings are separately explained:
+
+- The h-cap estimator (A) has a genuinely wrong algebraic kernel — the dissenting track
+  correctly diagnosed the missing `(1 − 1.5 sin²i)` factor — so **A is unusable on its own
+  terms**; that is a defect of that estimator, not of node-free sampling in general.
+- The harmonic-regression arms fail on design-matrix conditioning (κ = 2.5e9 at 30 d),
+  reproducing audit-020's independent fragility finding.
+
+**Note on a trap encountered while building this check.** The lead agent's own first
+version of T3 recovered 611 deg/day from an injected 1.2345e-4 deg/day, and returned the
+*identical* value for `k` and `−k` — the signature of a term that does not depend on `k`.
+Cause: the injected signal was written as `k·(t − t₀)` in radians without converting
+deg/day → rad/s, an **86400× seconds-per-day error**. Corrected, the recovery is exact.
+Recorded because the failure mode (a ratio that is constant across injected amplitudes)
+is a clean diagnostic for a units bug in an oracle, and it is the same class of mistake
+that produced this mission's earlier interpolation defect.
+
+**Net effect on the verdict: none.** The committed exoneration stands on T1/T2/T3, all
+reproducible from the committed snapshots.
+
 ### 2.5 NOT REPRODUCED — the claimed OLS conditioning artifact
 
 A track reported that `ols_slope`'s uncentred `[1, t_s]` fit yields a spurious
