@@ -19,6 +19,9 @@ htmlcov/
 .vscode/
 *.swp
 
+# Agent tooling scratch (session scope docs, scratch scripts, cached series)
+.kilo/
+
 # Data / large artifacts
 # Raw experiment data lives in data/ and stays untracked. Reproducible small
 # summaries are committed inside research/<domain>/experiments/<name>/results/.

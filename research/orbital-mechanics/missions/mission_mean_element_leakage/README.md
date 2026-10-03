@@ -80,3 +80,52 @@ Measured against the 1-yr campaign values (`R` = +1.296e-3 / +6.703e-4 / −2.96
 - `localdocs/reports/audit-019-track-F-mean-vs-osculating.md` (bias theory + verdict), `audit-020-track-2-periodic-terms-and-bias.md` (§7.3 Brouwer subtraction is the wrong tool; §8.4 FFT + multi-window bridge), `audit-020-track-5-independent-estimator.md` (§3 estimator ladder C + A; §4 code design).
 - If H-baseline or H-sampling is confirmed, `localdocs/knowledge/lunisolar-closure-021.md`'s 18.6-yr "sign disagreement" is reclassified as a measurement artifact and the roadmap row's "Brouwer-style propagator" wording is corrected.
 
+---
+
+## 9. PHASE-0 VERDICT (appended 2026-10-03; §4 above is unchanged)
+
+**Verdict: H-baseline NOT CONFIRMED. The mission's central question is not answerable
+on an 18.6-year arc.** Full evidence: `localdocs/reports/mission-mean-element-leakage-2026-10-03.md`.
+
+§4 was evaluated clause-by-clause without retuning any threshold:
+
+| §4 clause | Verdict |
+|---|---|
+| 1a (≥70% of `R` at all three inclinations, 1 yr) | **FAIL** — 30° gives 9.8% (smoothed) / 27.5% (raw) |
+| 1b (18.6-yr SSO residual < 5.72e-3) | **PASS**, but §4 never defines "residual" |
+| H-baseline CONFIRMED (1a ∧ 1b) | **FAIL** |
+| H-sampling CONFIRMED | **UNDEFINED** — estimator data did not exist at write time |
+| PARTIAL / H-phys / FALSIFIED | **UNDEFINED** at 18.6 yr (2-mode arm; `R_measured` correctly omitted) |
+| Oracle gate (<1%) | was **UNSATISFIED** when Phase 0 was written; satisfied 2026-10-03 for EST-1/2/1b |
+
+**The blocking finding.** The residual is **not a window-independent quantity**. Measured
+on the same propagation with the same code, only the analysis window varies:
+
+- residual ranges **+1.69e-3 … −1.90e-3 deg/day** and **changes sign** across sliding
+  windows; its peak-to-peak swing is 1.4–4.2× its own central value;
+- the committed 18.6-yr value (−8.56e-4) is **smaller than its own window-to-window
+  standard deviation**;
+- the detrended node-difference series is **99.4%** explained by one ~35 deg sinusoid at
+  a ~9000-day period; the arc spans only **0.894 lunar nodal cycles**, over which the
+  secular term and the long-period term are **not separable** (the joint fit is degenerate).
+
+A secular rate cannot flip sign with the window. The residual is a **single-phase sample
+of long-period forced content**, not evidence for a dynamical interaction.
+
+**Falsified this session** (all independently measured):
+- the "165 km semi-major-axis decay" — **RK4 step-size artifact**, 5th order in dt
+  (p = 5.001/5.000/5.000), −143.0 km predicted from `kepler_only` vs −164.8 km committed;
+- `a`-drift contamination of the residual — **common-mode, cancels** (the pure-`a`
+  channel is 0.034% of `D` at SSO and 0.000% at 90°);
+- mean-element / Jensen-gap inadequacy — **bounded at 0.17% of the residual** at SSO;
+  the short-period `Ω` term is **exactly zero at the ascending node** (`u = 0`) and
+  aliases to zero in a per-orbit OLS slope;
+- node-crossing sampling bias — **exonerated**: a node-detection-free estimator reproduces
+  the committed `combined` to **5.8e-9 deg/day** (oracle-gated at 0.083–0.257%);
+- a claimed OLS-conditioning artifact of +2.17e-3 deg/day — **does not reproduce**
+  (4.7e-18 on the real grid; re-scoring moves the residual by 8.9e-16).
+
+**Status: still ACTIVE**, for one reason only: the arc cannot contain the signal. The
+evidence-indicated next step is a **multi-cycle, phase-decorrelated determination of the
+long-period nodal term**; formal selection is a human decision (§4.3).
+

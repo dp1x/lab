@@ -419,3 +419,57 @@ Doctrine Graduation (capability mission); (4) NRHO/Cislunar (frontier).
 Mission mission_j2_lunisolar_coupling (POST_ROADMAP_PROBE A,A13.2, LAB_CONSTITUTION A,A13.1) is COMPLETE (2026-09-03) in esearch/orbital-mechanics/missions/mission_j2_lunisolar_coupling/: follow-on to mission_lunisolar_closure. Three-phase campaign: Phase A (synthetic vs real Moon isolation, 1-yr arc, h=600 km i=i_sso); Phase B (perturbative scaling at 90-d arc, lambda_J2 in {0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0}, lambda_3body in {0, 0.5, 1.0, 2.0}, 7x4x2 = 56 jobs); Phase C (force-mode decomposition at 1-yr arc, 3 inclinations x 6 modes = 18 jobs). Parallelized across 8 cores via multiprocessing.Pool (7 workers). The 18.6-yr arc was the canonical mission scale but ~4 hr wall on 7 workers; 1-yr arc gives the same qualitative force-mode decomposition structure at ~20 min wall. **27 new tests, 810 total repo tests (784 baseline + 27 new, 1 skipped).** **HEADLINE FINDING (H1-PARTIALLY-SUPPORTED)**: - Phase B: cross-term a11 = -7.85e-4 +/- 1.14e-4 deg/day, SNR = 6.89 -> statistically significant J2 x Lunisolar coupling signal at 90-d, h=600 km, i=i_sso; retrograde sign matches observation; scales as lambda_J2 x lambda_3body as predicted by perturbation theory. - Phase C: non-additive residual R_J2x3b = (full - J2) - (Sun-only + Moon-only) at 1-yr arc, h=600 km: i_sso R = -1.16e-3 deg/day = 80.8% of combined Lunisolar; i=90 deg R = -4.21e-3 deg/day = 92.2% of combined Lunisolar; i=30 deg R = -2.42e-4 deg/day = 74.0% of combined Lunisolar. The majority of what is conventionally called 'Lunisolar RAAN drift' at LEO is actually J2 x Lunisolar coupling. - **Mechanism (NEW)**: not the direct Lie-transform cross term predicted by naive perturbation theory (which literature says is ~10^-9 scaling � far too small). The actual mechanism is the **J2-precession-modulated Lunisolar coupling**: J2 secular Omega drift (~1 deg/day at h=600 km i_sso) modulates the orbit-plane orientation in the Sun/Moon field. When Sun and Moon are propagated WITHOUT J2, the orbit plane is stationary and this modulation does not occur � hence the isolated modes give much smaller Lunisolar rates. - The corrected doubly-averaged quadrupole formula is **NOT a valid asymptotic predictor** of the OSCULATING-element secular rate at LEO because it omits the J2-precession modulation. The formula is preserved with DeprecationWarning equivalent: it remains the leading-order term but must be augmented by the J2-modulation term. **REMEDIATION (audit-grade)**: the mission's first campaign had a critical implementation bug � use_j2 = mode != 'kepler_only' treated all non-Kepler modes as including J2, causing sun_only/moon_only/sun_moon to silently include J2 and contaminating the decomposition. The bug was caught by the analysis script's R_J2x3b sanity check (showed ~1 deg/day residuals, catastrophically wrong). Fixed in the same session: use_j2 = mode in ('j2_only', 'sun_moon_j2'). 8 new force-mode isolation tests added to guard against the bug class. Smoke test verified: sun_only at h=600 km i_sso 90 d gives -7.26e-5 deg/day (correctly excludes J2), moon_only gives -2.04e-4 deg/day (correctly excludes J2). **Alternative explanations tested**: - Higher-order Lunisolar (octupole) is ~10^-7 scaling -> too small. - Forced-secular lunar nodal mode amplitude bound is comparable to standard secular at i_sso and i=90 deg, ~5x larger at i=30 deg -> competitive candidate at 18.6-yr arc. - Real-Moon synthetic-Moon difference at 1-yr, i_sso: lunar eccentricity/inclination contributes ~2x the synthetic circular Moon -> significant. **Recommended next action**: derive the explicit J2-precession-modulated Lunisolar coupling term (a NEW secular canon term, parameterized by the J2 precession rate and the orbital geometry); run the full 18.6-yr arc with corrected mode isolation (estimated ~4 hr wall, well within budget). The J2 x Lunisolar coupling is now established as a real, dominant effect at LEO � the lab's secular Lunisolar canon must be augmented. See localdocs/knowledge/j2-lunisolar-coupling.md and localdocs/reports/mission-j2-lunisolar-coupling-2026-09-03.md for full scientific report.
 
 Mission mission_j2_precession_modulated_lunisolar_term (follow-on to mission_j2_lunisolar_coupling + mission_lunisolar_closure, POST_ROADMAP_PROBE SS13) is COMPLETE (2026-09-22) in `research/orbital-mechanics/missions/mission_j2_precession_modulated_lunisolar_term/`: derives the J2-precession-modulated lunisolar term falsifiably (singly-averaged quadrupole harmonics A_k via quadrature with no fitted constants, beat frequencies omega_k containing Omega_dot_J2, exact finite-window OLS-bias kernel g(omega*W, phi)), with corrected DE441 interpolation (regression-pinned; the closure/coupling sign-reversed-weights bug quantified at ~15% on 90-d R), 6-mode isolation, open-loop prescribed-precession + frozen-plane controls with a bias-invariance regression guard, an independent 1D averaged-element propagator, and a pre-registered decision rule. **VERDICT: H-mod FALSIFIED.** The modulation is real but 5-17x too small (theory ceiling ~2.4e-4 deg/day vs measured R +1.296e-3 at SSO), sign-flipped at 30 deg, fails both frequency-dependence discriminators (a11 = -1.49e-4 +/- 0.83e-4 deg/day, SNR 1.79 — the prior -7.85e-4 SNR 6.9 did NOT reproduce with corrected interpolation; prescribed-precession slope 2.42 sigma), and the frozen-plane control leaves 52% of R at SSO (kill criterion <25%). 18.6-yr final validation reproduces mission_lunisolar_closure (SSO -2.288e-2, 90 +5.027e-3, 30 -4.021e-4 deg/day). Supersession: the coupling mission's "J2-precession-modulated coupling" mechanism claim is RETRACTED (its measurements remain as priors; pre-fix Phase-B a11 numbers flagged stale); the corrected quadrupole canon stands and is now additionally bounded as an osculating-OLS predictor; the 18.6-yr SSO open question remains OPEN. Strongest surviving mechanism (recorded, not canon): J2-baseline mean-element leakage / osculating-node geometry sampling on a precessing plane (J2-frequency-independent, degenerate in lambda-scaling). 12 focused tests. Report `localdocs/reports/mission-j2-precession-modulated-lunisolar-term-2026-09-22.md`; knowledge `localdocs/knowledge/j2-precession-modulated-lunisolar-term.md`. Recommended next mission: quantify the mean-element/geometry-sampling leakage with a Brouwer-style mean-element reference propagator (directly testable), plus re-derivation of A_k with real lunar e3/i3(t) from the byte-pinned DE441 Moon.
+
+Mission mission_mean_element_leakage (Discrepancy mission, ACTIVE since 2026-09-24) received
+its Phase-0 verdict on 2026-10-03 after a six-track independent audit (A evidence/
+pre-registration, B literature+theory, C node-free estimator, D provenance, E performance,
+F adversarial numerics; the lead agent ran the window ladders). Report
+`localdocs/reports/mission-mean-element-leakage-2026-10-03.md`; knowledge
+`localdocs/knowledge/mean-element-leakage.md`. **The frozen README §4 was NOT edited.**
+**HEADLINE: the surviving −8.564733e-4 deg/day SSO residual is NOT a window-independent
+quantity** — over sliding windows on the same propagation it ranges +1.69e-3 … −1.90e-3
+deg/day and CHANGES SIGN, and the committed value is SMALLER than its own
+window-to-window standard deviation. The detrended node-difference series is 99.4%
+explained by one ~34.8 deg sinusoid at a ~9175-day period, over an arc spanning only
+0.894 lunar nodal cycles — where the secular and long-period terms are not separable.
+**Verdict: H-baseline NOT CONFIRMED (README §4 clause 1a fails at 30°); the mission's
+central question is not answerable on an 18.6-yr arc.** Falsified this session: the
+"165 km semi-major-axis decay" (RK4 step artifact — a pure two-body control, where `a` is
+exactly conserved, gives p = 5.001/5.000 at dt 60/30/15 s; extrapolated −143.0 km vs
+−164.8 km committed); `a`-drift contamination of the residual (common-mode, cancels —
+the pure-`a` channel of `D` is 0.034% of `D` at SSO and 0.000% at 90 deg where `a` still
+dropped 86 km, because `cos 90° = 0`); mean-element inadequacy (Ω_sp is EXACTLY ZERO at
+the ascending node u = 0 and aliases to zero in a per-orbit OLS slope; the boxcar's Jensen
+gap is 0.17% of the residual; Vallado §9.6 p.654 puts the mean/osculating error at O(J₂²)
+for a first-order canon); node-crossing sampling bias (EXONERATED — a node-detection-free
+estimator reproduces committed `combined` to 5.8e-9 deg/day, oracle-gated at
+0.083–0.257%); and a claimed +2.17e-3 deg/day OLS-conditioning artifact (does NOT
+reproduce: +4.7e-18 on the real grid; re-scoring with a centred OLS moves the residual by
+8.9e-16). **RETRACTED:** `audit-019-track-F` §4's "~0.86 deg of short-period scatter at
+each crossing" (it multiplies the short-period amplitude by T_snap/T_orb ≈ 15, which is
+invalid). **CITATION CORRECTED:** Brouwer is **1959**, *Astron. J.* 64(1274), 378–397,
+DOI 10.1086/107958 — "Brouwer (1958) The artificial satellite orbits of Earth" does not
+exist. The lab's separate position that a full Brouwer transform is the wrong tool here is
+CONFIRMED and strengthened. Also found: `D` carries a nuisance contaminant
+`⟨Ω̇_J2⟩_j2 − rate_j2` of +1.06e-3 (SSO, 1.24× the residual) and **−1.24e-2 at 30° (63×
+the residual)** — the 30° column carries no information about H-baseline.
+**Provenance defects found and repaired:** (1) `mission_lunisolar_closure/.gitattributes`
+used repo-root-relative patterns, but a nested .gitattributes resolves patterns RELATIVE
+TO ITS OWN DIRECTORY — all four `-text` rules were SILENTLY INERT and 2.7 MB of
+byte-pinned DE441 data was unprotected (proven in an isolated repo; now `text: unset`,
+guarded by the new `src/lab_utils/tests/test_reference_data_provenance.py`). (2) All 12
+result artifacts embed worktree-byte code hashes that are unverifiable from a fresh clone
+under `core.autocrlf=true`; new artifacts use scheme `lf-normalized-v1` and **NO committed
+artifact was regenerated** (that would rewrite pre-registered evidence for a cosmetic
+check). (3) `rolling_mean` trailing pad `win-1-pad` → `pad` fixed (window was 58 d, not
+30 d; element 0 inflated ~5 km). **Performance audit (Track E):** the 2026-10-02 docstring
+claim of "~80% hot-path cost, 4–6× speedup" is WRONG on the speedup — measured **2.11×**
+bit-for-bit with a scalar RHS — and the docstring's proposed "precess the snapshot array
+once at load" is a **0.05° frame error** (an audit-019-class contract change) and was
+rejected. There is **no GPU on this host** and the workload is a sequential tiny-vector
+ODE (wrong shape for GPU regardless). Compute is NOT the bottleneck (Lab compute share
+< 1% of wall-clock), so the 2.11× was deliberately NOT applied. 24 new tests, 881 total.
+**Next (evidence-indicated; formal selection is a human decision per §4.3):** a
+multi-cycle, phase-decorrelated determination of the long-period nodal term — the arc
+cannot contain the signal, so further J2×lunisolar mechanism work is currently
+unfalsifiable.

@@ -1,6 +1,33 @@
+# Text normalisation.
+# Source and documentation files are stored LF in the blob and checked out LF in the
+# worktree, on every platform. Without this, `core.autocrlf=true` (set at system level on
+# this host) checks them out CRLF, so any artifact that fingerprints worktree bytes
+# cannot be verified from a fresh clone. Fixing this does NOT change existing blobs; it
+# only makes future checkouts agree with them.
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+
 # Raw external-data snapshots must never be line-ending-normalized: their
 # identity is the byte-for-byte SHA-256 pinned in MANIFEST.json, and
 # core.autocrlf=true would otherwise corrupt them on fresh clones.
 research/orbital-mechanics/experiments/jplValidation/reference/*.txt -text
 research/orbital-mechanics/experiments/eclipseTiming/reference/*.txt -text
 research/orbital-mechanics/experiments/lunisolarVerification/reference/*.txt -text
+# MANIFEST.json files are checksum manifests: their pinned SHA-256 values are also
+# line-ending sensitive, so they are `-text` too. This block MUST come after the
+# `*.json text eol=lf` line above -- gitattributes is last-match-wins.
+research/orbital-mechanics/experiments/jplValidation/reference/MANIFEST.json -text
+research/orbital-mechanics/experiments/eclipseTiming/reference/MANIFEST.json -text
+research/orbital-mechanics/experiments/lunisolarVerification/reference/MANIFEST.json -text
+# Byte-pinned DE441 Sun/Moon vectors (mission_lunisolar_closure). These were previously
+# protected only by `mission_lunisolar_closure/.gitattributes`, whose patterns are
+# resolved RELATIVE TO THAT DIRECTORY and were therefore written in a repo-root-relative
+# form that matched nothing: `git check-attr text` reported `unspecified` for all of
+# them. The patterns are repeated here, at the root, where they resolve correctly.
+# `tests/test_reference_data_provenance.py` asserts this does not regress.
+research/orbital-mechanics/missions/mission_lunisolar_closure/reference/*.txt -text
+research/orbital-mechanics/missions/mission_lunisolar_closure/reference/per_chunk/*.txt -text
+research/orbital-mechanics/missions/mission_lunisolar_closure/reference/MANIFEST.json -text

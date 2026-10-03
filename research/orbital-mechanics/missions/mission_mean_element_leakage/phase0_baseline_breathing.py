@@ -129,12 +129,20 @@ def propagate_record(sun: dict, moon: dict, x0: np.ndarray, mode: str,
 
 
 def rolling_mean(y: np.ndarray, win: int) -> np.ndarray:
-    """Causal-free boxcar (centred, 'same' length) used to approximate mean elements."""
+    """Centred boxcar ('same' length) used to approximate mean elements.
+
+    The trailing pad must be ``pad``, not ``win - 1 - pad``: with ``np.convolve(...,
+    mode="valid")`` a padded length of ``win - 1 - pad`` makes the window asymmetric and
+    effectively 2*pad+1 samples wide instead of ``win``, and the leading padded block is
+    then double-counted. For the 30-day window this made the real span ~58 days and
+    inflated the first element by ~5 km. Reproduced against the committed
+    ``phase0_1yr.json`` ``a_smoothed_first`` before this fix.
+    """
     if win < 3 or y.size < win:
         return y.copy()
     k = np.ones(win) / win
     pad = win // 2
-    yp = np.concatenate([np.full(pad, y[0]), y, np.full(win - 1 - pad, y[-1])])
+    yp = np.concatenate([np.full(pad, y[0]), y, np.full(pad, y[-1])])
     return np.convolve(yp, k, mode="valid")
 
 
@@ -231,7 +239,15 @@ def main() -> None:
     out["provenance"] = {
         "sun_sha256": ME.load_snapshot(ME.SUN_SNAPSHOT)["sha256"],
         "moon_sha256": ME.load_snapshot(ME.MOON_SNAPSHOT)["sha256"],
-        "code": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()[:16]
+        # Hash scheme "lf-normalized-v1": CRLF -> LF before hashing, i.e. hash the
+        # bytes as git stores them. Fingerprinting raw worktree bytes made the record
+        # depend on the contributor's core.autocrlf setting, so a recorded hash could
+        # not be verified from a fresh clone. Artifacts written before this key existed
+        # used raw worktree bytes and are still valid under either line-ending
+        # convention -- see localdocs/reports/mission-mean-element-leakage-2026-10-03.md.
+        "code_hash_scheme": "lf-normalized-v1",
+        "code": {p.name: hashlib.sha256(
+            p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:16]
                  for p in sorted(HERE.glob("*.py"))},
     }
     name = "phase0_%gyr.json" % args.years
