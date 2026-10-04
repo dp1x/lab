@@ -1,0 +1,182 @@
+{
+  "acquired_utc": "2026-10-04T15:04:42.983457+00:00",
+  "acquisition_doctrine": "Exp 014/017 byte-pinned snapshot pattern; extended 2026-10-04 for mission_secular_identification (>=2 lunar nodal cycles).",
+  "cadence": "1 day",
+  "center": "Earth (399)",
+  "description": "38-year DE441 geocentric Sun + Moon vectors (geometric states, ICRF/TDB, daily). Long enough for >= 2 complete lunar nodal cycles (6798.383 d each) from T0=820476800.0, plus margin.",
+  "frame": "ICRF",
+  "moon_concat": {
+    "n_rows": 13880,
+    "path": "horizons_moon_geocentric_vectors_2026_to_2064_icrf_tdb_daily.txt",
+    "sha256": "c0723fb640c8e1c9eee7c0a5580a7fb9b41fb2c9a7a2d6de5ef2b4e784a4fd67"
+  },
+  "per_chunk": {
+    "moon": {
+      "2026_2031": {
+        "end_year": 2031,
+        "n_rows": 1827,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1827
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2026_to_2031_icrf_tdb_daily.txt",
+        "sha256": "5d28379b7b46e17d8a66a9e78440cd4204d49ede8d6c4040a03fc8ece9eb860f",
+        "start_year": 2026
+      },
+      "2031_2036": {
+        "end_year": 2036,
+        "n_rows": 1827,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1827
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2031_to_2036_icrf_tdb_daily.txt",
+        "sha256": "b190a5471c10b2a1a7f28be5f725a41624f0e03d465eb3fde4161cefa051aa87",
+        "start_year": 2031
+      },
+      "2036_2041": {
+        "end_year": 2041,
+        "n_rows": 1828,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1828
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2036_to_2041_icrf_tdb_daily.txt",
+        "sha256": "1c9a1a0efa334607f52437839d4b92f0c3a76e67c24b94ed62cf093ccea7c9f3",
+        "start_year": 2036
+      },
+      "2041_2046": {
+        "end_year": 2046,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2041_to_2046_icrf_tdb_daily.txt",
+        "sha256": "fb5197f6312181620b851d999f6145267909f95efe4c1783679af724ab915a1a",
+        "start_year": 2041
+      },
+      "2046_2051": {
+        "end_year": 2051,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2046_to_2051_icrf_tdb_daily.txt",
+        "sha256": "669da4b5cc698395c477215a4cb0b06f447756761c64b284cf1ecc0ceab3ea57",
+        "start_year": 2046
+      },
+      "2051_2056": {
+        "end_year": 2056,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2051_to_2056_icrf_tdb_daily.txt",
+        "sha256": "2be013c9fdd6526a85e39a3aad50f755f4efc3be07323fdedbcd77b113319cf7",
+        "start_year": 2051
+      },
+      "2056_2061": {
+        "end_year": 2061,
+        "n_rows": 1828,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2056_to_2061_icrf_tdb_daily.txt",
+        "sha256": "a199bbd3d8d5b234b788b4671461d5b53611532eda1c7ec2831fa77762a3ffd6",
+        "start_year": 2056
+      },
+      "2061_2064": {
+        "end_year": 2064,
+        "n_rows": 1096,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_moon_geocentric_vectors_2061_to_2064_icrf_tdb_daily.txt",
+        "sha256": "f33544c496fac40633cce4c30b1287f4a21a1e6d157ce3cbfb35008ce85d6bbf",
+        "start_year": 2061
+      }
+    },
+    "sun": {
+      "2026_2031": {
+        "end_year": 2031,
+        "n_rows": 1827,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1827
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2026_to_2031_icrf_tdb_daily.txt",
+        "sha256": "57d5d7875ac416f6577741375d88a3ad26d424cdd8e7e735b4424243fc28dcef",
+        "start_year": 2026
+      },
+      "2031_2036": {
+        "end_year": 2036,
+        "n_rows": 1827,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1827
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2031_to_2036_icrf_tdb_daily.txt",
+        "sha256": "04ea70eaf245a0f72b2f6968e9a6007fcb9aef778d102732ecbf8389a3a01f64",
+        "start_year": 2031
+      },
+      "2036_2041": {
+        "end_year": 2041,
+        "n_rows": 1828,
+        "overlap_vs_committed": {
+          "components_over_1m": 0,
+          "max_abs_delta_km": 0.0,
+          "rows": 1828
+        },
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2036_to_2041_icrf_tdb_daily.txt",
+        "sha256": "93933151baef0352f81e7186e83af9d5a9432ca60de629816ee2434deeb1fb3b",
+        "start_year": 2036
+      },
+      "2041_2046": {
+        "end_year": 2046,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2041_to_2046_icrf_tdb_daily.txt",
+        "sha256": "4bd9c33ad594bc05a08b3663b86e9a7cf206d5f5210b8757a50e8ca6ab869454",
+        "start_year": 2041
+      },
+      "2046_2051": {
+        "end_year": 2051,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2046_to_2051_icrf_tdb_daily.txt",
+        "sha256": "d4593d21fc98de7172e149a9e0a9fa4608c853286374ed454133314c42602ee3",
+        "start_year": 2046
+      },
+      "2051_2056": {
+        "end_year": 2056,
+        "n_rows": 1827,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2051_to_2056_icrf_tdb_daily.txt",
+        "sha256": "02975a8a14c6ab60e807f94c97634572a27b94a09fba4f66908652f8b8f2cc64",
+        "start_year": 2051
+      },
+      "2056_2061": {
+        "end_year": 2061,
+        "n_rows": 1828,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2056_to_2061_icrf_tdb_daily.txt",
+        "sha256": "ee9fbb43efb715ec8c8037a7c3cc19a247b05eba6682b668462819276be5d1cd",
+        "start_year": 2056
+      },
+      "2061_2064": {
+        "end_year": 2064,
+        "n_rows": 1096,
+        "overlap_vs_committed": null,
+        "path": "R:\\lab_scratch\\de441_acquisition\\horizons_sun_geocentric_vectors_2061_to_2064_icrf_tdb_daily.txt",
+        "sha256": "bb384f72efbf289dc46dd78d51371dcba72087cd825e631cb91dba24f216b5b7",
+        "start_year": 2061
+      }
+    }
+  },
+  "source": "NASA/JPL Horizons API (DE441)",
+  "span_end_year": 2064,
+  "span_start_year": 2026,
+  "sun_concat": {
+    "n_rows": 13880,
+    "path": "horizons_sun_geocentric_vectors_2026_to_2064_icrf_tdb_daily.txt",
+    "sha256": "e4ed23279fc5bae5aa4359d03a8a20e2818ae3056248ec2b9c47cba986e7f2cf"
+  },
+  "time_type": "TDB",
+  "units": "KM-S",
+  "vectors_corrected": "NONE (geometric)"
+}

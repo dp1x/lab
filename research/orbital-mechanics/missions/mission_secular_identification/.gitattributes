@@ -1,0 +1,10 @@
+# Byte-pinned DE441 Sun/Moon vectors for mission_secular_identification (2026-10-04).
+# These are raw external-data snapshots whose identity is the SHA-256 pinned in the
+# sibling MANIFEST.json; they must never be line-ending-normalized.
+# NOTE: patterns in a .gitattributes are resolved RELATIVE TO ITS OWN DIRECTORY, so
+# these are dir-relative. They are ALSO duplicated in the repository-root
+# .gitattributes, where they resolve against the repo root; the duplication is
+# deliberate so the guarantee does not depend on this file being present.
+# Guarded by src/lab_utils/tests/test_reference_data_provenance.py.
+reference/*.txt -text
+reference/MANIFEST.json -text

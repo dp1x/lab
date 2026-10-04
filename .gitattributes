@@ -31,3 +31,9 @@ research/orbital-mechanics/experiments/lunisolarVerification/reference/MANIFEST.
 research/orbital-mechanics/missions/mission_lunisolar_closure/reference/*.txt -text
 research/orbital-mechanics/missions/mission_lunisolar_closure/reference/per_chunk/*.txt -text
 research/orbital-mechanics/missions/mission_lunisolar_closure/reference/MANIFEST.json -text
+# Byte-pinned DE441 Sun/Moon vectors (mission_secular_identification, acquired
+# 2026-10-04, span 2026-01-01 -> 2064-01-01, 13880 daily rows). Patterns here
+# resolve against the repository ROOT, which is why they are written out in full.
+# Guarded by src/lab_utils/tests/test_reference_data_provenance.py.
+research/orbital-mechanics/missions/mission_secular_identification/reference/*.txt -text
+research/orbital-mechanics/missions/mission_secular_identification/reference/MANIFEST.json -text
