@@ -52,7 +52,7 @@ def _run_mode(sun, moon, inc_deg, phase_deg, mode, t_end_s, dt_s, every):
 
 
 def _case(arg) -> dict:
-    inc_deg, phase_deg, cycles, dt_s, every = arg
+    inc_deg, phase_deg, cycles, dt_s, every, ladder_spec = arg
     sun, moon = load_snapshots()
     t_end_s = T0_S + cycles * NODE_PERIOD_D * 86400.0
     cov = check_coverage(T0_S, t_end_s, sun, moon)
@@ -62,14 +62,52 @@ def _case(arg) -> dict:
     out = {"inc_deg": inc_deg, "phase_deg": phase_deg, "cycles": cycles,
            "dt_s": dt_s, "nodal_conditioning": node_conditioning(math.radians(inc_deg)),
            "coverage": cov}
+
+    # Propagate ONCE per mode over the LONGEST arc, then derive every window by
+    # TRUNCATION. This is exact, not an approximation: fixed-step RK4 advances a
+    # state independently of the horizon, so the state sequence of a 3-cycle run
+    # has a 2-cycle run as its bit-identical prefix. Verified:
+    #     np.array_equal(short['rate_deg_day'], long['rate_deg_day'][:n]) -> True
+    # This turns a 5x-propagation window ladder into a 1x cost.
+    window_cycles = [c for c, _ in ladder_spec if c <= cycles]
+    window_cycles.append(cycles)
+    window_cycles = sorted(set(window_cycles))
+
     per_mode = {}
+    ladder = {}
     for mode in MODES:
-        t, rate = _run_mode(sun, moon, inc_deg, phase_deg, mode, t_end_s, dt_s, every)
-        fit = fit_secular_fixed_frequency(t, rate, DEFAULT_PERIODS)
-        fit["cycle_mean_deg_day"] = trapezoid_cycle_mean(t, rate)
-        fit["n_samples"] = int(t.size)
+        x0 = circular_ic(A_SSO, math.radians(inc_deg), T0_S, math.radians(phase_deg))
+        r = propagate_rate_series(sun, moon, x0, mode, T0_S, t_end_s, dt_s, every=every)
+        t_all = (r["t_s"] - T0_S) / 86400.0
+        rate_all = r["rate_deg_day"]
+        # the headline window
+        fit = fit_secular_fixed_frequency(t_all, rate_all, DEFAULT_PERIODS)
+        fit["cycle_mean_deg_day"] = trapezoid_cycle_mean(t_all, rate_all)
+        fit["n_samples"] = int(t_all.size)
         per_mode[mode] = fit
+        # every sub-window
+        for c in window_cycles:
+            n = int(round(c * NODE_PERIOD_D * 86400.0 / (dt_s * every))) + 1
+            n = min(n, t_all.size)
+            tw, rw = t_all[:n], rate_all[:n]
+            fw = fit_secular_fixed_frequency(tw, rw, DEFAULT_PERIODS)
+            ladder.setdefault(f"{c:.2f}", {})[mode] = {
+                "slope_deg_day": fw["slope_deg_day"],
+                "vif_max": fw["vif_max"],
+                "cycle_mean_deg_day": trapezoid_cycle_mean(tw, rw),
+                "n_samples": int(tw.size),
+            }
+
     out["modes"] = per_mode
+    out["window_ladder"] = {
+        k: {"lunisolar_deg_day": v["sun_moon_j2"]["slope_deg_day"]
+               - v["j2_only"]["slope_deg_day"],
+           "vif_max": max(v["sun_moon_j2"]["vif_max"], v["j2_only"]["vif_max"]),
+           "cycle_mean_lunisolar_deg_day": v["sun_moon_j2"]["cycle_mean_deg_day"]
+               - v["j2_only"]["cycle_mean_deg_day"],
+           "n_samples": v["sun_moon_j2"]["n_samples"]}
+        for k, v in sorted(ladder.items(), key=lambda kv: float(kv[0]))
+    }
 
     # Lunisolar = difference of the two identically-estimated rates.
     f_full = per_mode["sun_moon_j2"]
@@ -99,40 +137,10 @@ def _case(arg) -> dict:
     return out
 
 
-def _window_ladder(arg) -> dict:
-    """Same propagation re-estimated on sub-windows of increasing cycle count.
-
-    Identifiability means the estimate STOPS MOVING as the window grows. If it
-    keeps drifting, the secular term is not separated from the forced content.
-    """
-    inc_deg, phase_deg, dt_s, every = arg
-    sun, moon = load_snapshots()
-    ladder = {}
-    for cycles in (1.0, 1.5, 2.0, 2.5, 3.0):
-        try:
-            t_end_s = T0_S + cycles * NODE_PERIOD_D * 86400.0
-            if not check_coverage(T0_S, t_end_s, sun, moon)["covered"]:
-                continue
-            vals, vifs = {}, []
-            for mode in MODES:
-                t, rate = _run_mode(sun, moon, inc_deg, phase_deg, mode,
-                                    t_end_s, dt_s, every)
-                f = fit_secular_fixed_frequency(t, rate, DEFAULT_PERIODS)
-                vals[mode] = f["slope_deg_day"]
-                vifs.append(f["vif_max"])
-            ladder[f"{cycles:.1f}"] = {
-                "lunisolar_deg_day": vals["sun_moon_j2"] - vals["j2_only"],
-                "vif_max": max(vifs),
-            }
-        except RuntimeError:
-            continue
-    return {"inc_deg": inc_deg, "phase_deg": phase_deg, "ladder": ladder}
-
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cycles", type=float, default=2.0,
-                    help="Arc length in lunar nodal cycles.")
+                    help="Headline arc length in lunar nodal cycles.")
     ap.add_argument("--dt", type=float, default=30.0,
                     help="RK4 step (s). 30 s is the gate-validated default: it "
                          "agrees with dt=15 s to ~0.04 %% of the lunisolar "
@@ -142,44 +150,40 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--incs", default=",".join(str(i) for i in cf.DIAGNOSTIC_INCS_DEG))
     ap.add_argument("--phases", default=",".join(str(p) for p in PHASES_DEG))
-    ap.add_argument("--ladder", action="store_true",
-                    help="Also run the window ladder (slow).")
+    ap.add_argument("--ladder-max-cycles", type=float, default=0.0,
+                    help="If > 0, propagate to this many cycles and derive the "
+                         "window ladder by truncation (1 propagation instead of 5).")
     args = ap.parse_args()
 
     incs = [float(x) for x in args.incs.split(",")]
     phases = [float(x) for x in args.phases.split(",")]
 
-    # Sample density: dt/every is the effective output cadence.
+    prop_cycles = max(args.cycles, args.ladder_max_cycles)
+    ladder_spec = [(c, c) for c in (1.0, 1.5, 2.0, 2.5, 3.0)]
     out_cadence_s = args.dt * args.every
     (HERE / "results").mkdir(exist_ok=True)
 
-    cases = [(i, p, args.cycles, args.dt, args.every) for i in incs for p in phases]
+    cases = [(i, p, prop_cycles, args.dt, args.every, ladder_spec)
+             for i in incs for p in phases]
     t0 = time.time()
     with Pool(args.workers) as pool:
         rows = pool.map(_case, cases)
     wall = time.time() - t0
 
-    ladders = []
-    if args.ladder:
-        lcases = [(i, p, args.dt, args.every) for i in incs for p in phases[:2]]
-        with Pool(args.workers) as pool:
-            ladders = pool.map(_window_ladder, lcases)
-
     payload = {
         "mission": "mission_secular_identification",
         "arc": {"t0_s": T0_S, "nodal_period_d": NODE_PERIOD_D,
-                "cycles": args.cycles,
-                "arc_days": args.cycles * NODE_PERIOD_D,
-                "arc_years": args.cycles * NODE_PERIOD_D / 365.25},
+                "headline_cycles": args.cycles,
+                "propagated_cycles": prop_cycles,
+                "headline_arc_days": args.cycles * NODE_PERIOD_D,
+                "headline_arc_years": args.cycles * NODE_PERIOD_D / 365.25},
         "integrator": {"scheme": "fixed-step RK4 on the full 6-vector",
                        "dt_s": args.dt, "sample_every": args.every,
                        "effective_cadence_s": out_cadence_s,
-                       "n_samples_per_mode_per_case": int(
-                           args.cycles * NODE_PERIOD_D * 86400.0 / out_cadence_s)},
+                       "ladder_by_truncation": True},
         "estimator": {"periods_d": {k: PHYSICAL_PERIODS_D[k] for k in DEFAULT_PERIODS},
                       "frequencies": "FIXED at physical values; no empirical fitting"},
         "cases": rows,
-        "window_ladder": ladders,
         "provenance": {
             "code_hash_scheme": "lf-normalized-v1",
             "code": {p.name: hashlib.sha256(
@@ -196,14 +200,14 @@ def main() -> None:
             "incs_deg": incs, "phases_deg": phases,
         },
     }
-    name = f"campaign_{args.cycles:g}cyc.json" if not args.ladder else \
-           f"campaign_{args.cycles:g}cyc_ladder.json"
+    name = f"campaign_{args.cycles:g}cyc.json"
     (HERE / "results" / name).write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     # console summary
-    print(f"arc: {args.cycles} nodal cycles = {args.cycles * NODE_PERIOD_D:.1f} d "
-          f"({args.cycles * NODE_PERIOD_D / 365.25:.2f} yr), dt={args.dt}s, "
-          f"cadence={out_cadence_s / 3600:.2f} h, wall={wall:.0f}s")
+    print(f"headline arc: {args.cycles} nodal cycles = {args.cycles * NODE_PERIOD_D:.1f} d "
+          f"({args.cycles * NODE_PERIOD_D / 365.25:.2f} yr); propagated {prop_cycles} cyc "
+          f"for the ladder; dt={args.dt}s, cadence={out_cadence_s / 3600:.2f} h, "
+          f"wall={wall:.0f}s")
     print(f"{'inc':>8} {'phase':>6} {'luni deg/day':>16} {'|stderr|':>11} "
           f"{'VIF':>6} {'FORM-1':>13} {'m/f1':>9} {'FORM-2':>13} {'m/f2':>9}")
     for r in rows:
@@ -213,13 +217,12 @@ def main() -> None:
               f"{L['vif_max']:>6.2f} {F['form1_deg_day']:>13.5e} "
               f"{F['measured_over_form1']:>9.3f} {F['form2_deg_day']:>13.5e} "
               f"{F['measured_over_form2']:>9.3f}")
-    if ladders:
-        print("\nwindow ladder (lunisolar deg/day):")
-        for lad in ladders:
+    if rows and rows[0].get("window_ladder"):
+        print("\nwindow ladder (lunisolar deg/day, by truncation):")
+        for r in rows:
             seq = "  ".join(f"{k}:{v['lunisolar_deg_day']:+.3e}"
-                            for k, v in sorted(lad["ladder"].items(),
-                                               key=lambda kv: float(kv[0])))
-            print(f"  i={lad['inc_deg']:>8.3f} phase={lad['phase_deg']:>5.1f}  {seq}")
+                            for k, v in r["window_ladder"].items())
+            print(f"  i={r['inc_deg']:>8.3f} phase={r['phase_deg']:>5.1f}  {seq}")
     print(f"\nwall = {wall:.0f}s on {args.workers} workers -> {name}")
 
 
