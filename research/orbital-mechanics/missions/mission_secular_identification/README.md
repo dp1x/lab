@@ -2,6 +2,8 @@
 
 **Mission type:** Discrepancy mission (LAB_CONSTITUTION.md §2.5 type 4).
 **Status:** ACTIVE — card, hypothesis and decision rule written BEFORE any campaign result exists.
+Phase A (data + instrument + estimator + **formula adjudication**) COMPLETE; Phase B (multi-phase
+orbital campaign) RUNNING.
 **Date established:** 2026-10-04.
 **Constitutional authority:** §§2.3 (mission architecture), 3 (evidence doctrine), 9 (FET), 10.1 (hard science gates), 12 (mission selection).
 **Budget:** ≤ 10 hr on 8 workers, ≤ 2 GB RAM, local commodity compute only.
@@ -137,11 +139,42 @@ because `interp_snapshot` clamps silently.
 
 ## 6. Phases
 
-0. Data acquisition + validation gate (done, pre-result).
-1. Instrument gates: Kepler Ω̇=0; J2 arc-mean vs analytic; dt convergence p=4.
-2. Estimator validation on synthetic signals with a known answer.
-3. ≥2-cycle campaign, parallel over inclinations × phases × modes.
-4. Adjudication, figures, results.json, report, knowledge note.
+0. Data acquisition + validation gate. **DONE** — 2026 → 2064, 13 880 rows, overlap with the
+   committed 19-yr snapshot reproduces it exactly (max |Δr| = 0.0 km, 0 components > 1 m).
+1. Instrument gates. **DONE** — Kepler 2.5e-13 deg/day; J2 0.49 %; coverage 282 d margin;
+   i = 90° excluded by construction.
+2. Estimator validation on synthetic signals. **DONE** — recovers a known 1.3476e-4 deg/day signal
+   to <1e-12 relative at ≥2 cycles; VIF 2.55 → 1.07–1.18.
+3. **Formula adjudication by independent quadrature referee. DONE — H1 SUPPORTED, H2 REFUTED.**
+4. Multi-phase ≥2-cycle orbital campaign. **RUNNING.**
+5. Adjudication, figures, report, knowledge note.
+
+## 6.1 PHASE-A VERDICT (appended 2026-10-04; §4 above is unchanged and was not retuned)
+
+An independent quadrature referee — double-averaging the **exact** point-mass potential, touching
+neither the propagator, the estimator nor the DE441 data — reproduces **FORM-1 to 0.02 %** in
+magnitude, sign and inclination law at every diagnostic inclination, and independently reproduces
+the 1.51× SSO-twin gap (referee 1.5096 vs FORM-1 1.5094, same sign).
+
+| | twin ratio 82.21°/97.79° | sign |
+|---|---|---|
+| quadrature referee | 1.5096 | same |
+| FORM-1 (audit-018) | 1.5094 | same |
+| FORM-2 (competitor) | −1.0000 | **opposite** |
+
+**§4.3 verdict: FORM-1 SUPPORTED, FORM-2 REFUTED** — by the first branch's negation. FORM-2
+predicts an equal-and-opposite twin pair; the exact potential produces an equal-and-same-sign pair.
+
+This verdict is reached on §4.3 grounds alone and does not depend on §4.1/§4.2, because the
+discriminator is structural: no orbital measurement could have reconciled the two formulas by
+tuning. Phase 4 (the orbital campaign) tests the *amplitude* independently and is still running.
+
+Also settled: the §3 handoff values are a **Sun + Moon sum** with each body at its own inclination
+to the plane of `i`; they do not reproduce from the Moon alone under any choice of i₃. Exp 018's
+code *comment* mislabels the 28.584° frame (equatorial, not ecliptic); the formula is correct.
+
+Full evidence: `localdocs/reports/mission-secular-identification-2026-10-04.md`,
+`localdocs/knowledge/secular-lunisolar-raan-canon.md`.
 
 ## 7. Limitations / non-claims
 
