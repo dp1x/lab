@@ -251,6 +251,53 @@ class TestCompetingFormulas:
         assert d["form1"]["signed_ratio"] > 0 > d["form2"]["signed_ratio"]
 
 
+class TestQuadratureReferee:
+    """The referee must agree with FORM-1 and disagree with FORM-2.
+
+    This is the independent line of evidence: it never touches the propagator,
+    the estimator or the DE441 data, so agreement with FORM-1 cannot be an
+    artefact of any of them.
+    """
+
+    A3 = 384400.0
+    MU3 = 4902.8001
+    A_S = 1.4959787e8
+    MU_S = 132712440018.0
+    I3 = 28.5843
+    OBLIQ = 23.4393
+
+    def test_double_average_converges_in_grid_resolution(self):
+        from quadrature_referee import quadrature_node_rate
+        vals = [quadrature_node_rate(97.7876, A_SSO, self.A3, self.MU3, self.I3,
+                                     n_u3=n, n_phi=m)
+                for n, m in ((360, 90), (720, 180), (1440, 360))]
+        # the coarsest grid must already be within 1e-4 relative of the finest
+        assert abs(vals[0] - vals[-1]) / abs(vals[-1]) < 1e-4
+
+    def test_referee_reproduces_form1_within_0p1_percent(self):
+        from quadrature_referee import quadrature_node_rate
+        for inc in (97.7876, 82.2124, 89.5, 90.5):
+            q = (quadrature_node_rate(inc, A_SSO, self.A3, self.MU3, self.I3)
+                 + quadrature_node_rate(inc, A_SSO, self.A_S, self.MU_S, self.OBLIQ))
+            f1 = cf.form1_audit018(A_SSO, inc)
+            assert q / f1 == pytest.approx(1.0, rel=0.001), f"i={inc}"
+
+    def test_referee_agrees_with_form1_and_not_form2_on_the_twin_test(self):
+        """The structural discriminator, decided without any orbital data."""
+        from quadrature_referee import quadrature_node_rate
+
+        def total(inc):
+            return (quadrature_node_rate(inc, A_SSO, self.A3, self.MU3, self.I3)
+                    + quadrature_node_rate(inc, A_SSO, self.A_S, self.MU_S, self.OBLIQ))
+
+        hi, lo = total(97.7876), total(82.2124)
+        assert hi * lo > 0, "quadrature predicts SAME sign for the twin pair"
+        assert lo / hi == pytest.approx(1.51, rel=0.01)
+        # FORM-2 is refuted by its own prediction of the opposite sign
+        assert cf.form2_competitor(A_SSO, 82.2124) * \
+            cf.form2_competitor(A_SSO, 97.7876) < 0
+
+
 # --------------------------------------------------------------------------- #
 # 4. Ephemeris coverage guard -- the silent-clamping defect class
 # --------------------------------------------------------------------------- #
