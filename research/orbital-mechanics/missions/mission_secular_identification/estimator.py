@@ -93,11 +93,29 @@ def node_rate_to_deg_day(rate_rad_s: np.ndarray | float) -> np.ndarray | float:
         float(rate_rad_s) * SEC_PER_DAY * DEG_PER_RAD
 
 
-def design_matrix(t_days: np.ndarray, periods_d: tuple) -> np.ndarray:
+def resolve_periods(periods: tuple) -> tuple:
+    """Accept either NAMES from :data:`PHYSICAL_PERIODS_D` or numeric days.
+
+    Names are resolved through the fixed physical table, which is what keeps
+    the estimator from ever accepting a fitted frequency.
+    """
+    out = []
+    for p in periods:
+        if isinstance(p, str):
+            if p not in PHYSICAL_PERIODS_D:
+                raise KeyError(f"unknown physical period {p!r}; "
+                               f"known: {sorted(PHYSICAL_PERIODS_D)}")
+            out.append(PHYSICAL_PERIODS_D[p])
+        else:
+            out.append(float(p))
+    return tuple(out)
+
+
+def design_matrix(t_days: np.ndarray, periods: tuple) -> np.ndarray:
     """[1, t, cos(w_p t), sin(w_p t)] for each fixed physical period."""
     t = np.asarray(t_days, float)
     cols = [np.ones_like(t), t]
-    for p in periods_d:
+    for p in resolve_periods(periods):
         w = 2.0 * math.pi / p
         cols.append(np.cos(w * t))
         cols.append(np.sin(w * t))
@@ -119,12 +137,12 @@ def _vif_linear(t_days: np.ndarray, period_d: float) -> float:
     return 1.0 / (1.0 - r2)
 
 
-def vif_table(t_days: np.ndarray, periods_d: tuple) -> dict:
-    return {f"{p:g}": _vif_linear(t_days, p) for p in periods_d}
+def vif_table(t_days: np.ndarray, periods: tuple) -> dict:
+    return {f"{p:g}": _vif_linear(t_days, p) for p in resolve_periods(periods)}
 
 
 def fit_secular_fixed_frequency(t_days: np.ndarray, rate_deg_day: np.ndarray,
-                                periods_d: tuple = DEFAULT_PERIODS,
+                                periods: tuple = DEFAULT_PERIODS,
                                 sample_weights: np.ndarray | None = None) -> dict:
     """Joint fixed-frequency fit of a secular rate plus forced terms.
 
@@ -144,29 +162,46 @@ def fit_secular_fixed_frequency(t_days: np.ndarray, rate_deg_day: np.ndarray,
     """
     t = np.asarray(t_days, float)
     y = np.asarray(rate_deg_day, float)
-    A = design_matrix(t, periods_d)
+    A = design_matrix(t, periods)
     if sample_weights is not None:
         w = np.sqrt(np.asarray(sample_weights, float))
         A, y = A * w[:, None], y * w
-    coef, *_ = np.linalg.lstsq(A, y, rcond=None)
+    # COLUMN EQUILIBRATION -- mandatory, not an optimisation.
+    #
+    # The raw design matrix is badly scaled: over a multi-year arc the `t`
+    # column has norm ~2e4 while every harmonic column has norm ~140, and the
+    # secular direction is also nearly parallel to the constant column. Measured
+    # cond(A) = 1.76e4 on a 2-cycle arc, and plain `lstsq` applied to a PURELY
+    # SECULAR signal returned 1e-24 instead of 1.35e-4 deg/day: the secular
+    # coefficient was annihilated outright, not merely imprecise. Solving the
+    # equilibrated system and rescaling the secular coefficient back is
+    # algebraically identical and is what makes the estimator able to recover a
+    # known secular rate at all.
+    scale = np.linalg.norm(A, axis=0)
+    scale[scale == 0.0] = 1.0
+    An = A / scale
+    coef_n, *_ = np.linalg.lstsq(An, y, rcond=None)
+    coef = coef_n / scale
     resid = y - A @ coef
     n, k = A.shape
     dof = max(n - k, 1)
     sigma2 = float(np.sum(resid ** 2) / dof)
-    cov = sigma2 * np.linalg.pinv(A.T @ A)
+    cov = sigma2 * np.linalg.pinv(An.T @ An) / np.outer(scale, scale)
     slope = float(coef[1])
+    vifs = vif_table(t, periods)
     return {
         "slope_deg_day": slope,
         "slope_stderr_deg_day": float(math.sqrt(cov[1, 1])),
         "intercept": float(coef[0]),
-        "periods_d": tuple(periods_d),
+        "periods_d": tuple(resolve_periods(periods)),
         "n_samples": int(n),
         "n_params": int(k),
         "rms_resid": float(math.sqrt(np.mean(resid ** 2))),
         "max_abs_harmonic_deg_day": float(np.max(np.abs(coef[2:]))) if k > 2 else 0.0,
-        "vif_max": max(vif_table(t, periods_d).values()),
-        "vif_by_period": vif_table(t, periods_d),
-        "cond": float(np.linalg.cond(A)),
+        "vif_max": max(vifs.values()),
+        "vif_by_period": vifs,
+        "cond_raw": float(np.linalg.cond(A)),
+        "cond_equilibrated": float(np.linalg.cond(An)),
     }
 
 
