@@ -519,3 +519,44 @@ secular+forced fit with FIXED physical frequencies over ≥2 nodal cycles. 15 ne
 896 total. **Scratch-loss discipline: every published finding was re-derived from the
 repo after the wipe and is test-pinned; no finding rests on lost data.**
 
+SESSION 2026-10-04 (mission_secular_identification). The human selected the
+evidence-indicated follow-up: determine the measurable secular lunisolar RAAN rate
+with an estimator NOT structurally biased by a near-one-cycle arc, then adjudicate
+the two competing secular formulas. The abandoned J2-coupling-theory branch was NOT
+resumed. **RE-ACQUIRED** DE441 Sun/Moon 2026-01-01 -> 2064-01-01 (13,880 daily rows,
+2.04 nodal cycles + margin), committed in-repo under
+`research/orbital-mechanics/missions/mission_secular_identification/reference/`
+with `-text` gitattributes; every chunk overlapping the committed 19-yr snapshot
+reproduces it exactly (max |dr| = 0.000000e+00 km, 0 components > 1 m). Raw-response
+sha256 was deliberately NOT the gate: Horizons embeds its acquisition timestamp, so
+it is not reproducible by construction; the gate compares numeric rows.
+`check_coverage()` now aborts any arc exceeding the pinned span, because
+`interp_snapshot` clamps silently. **INSTRUMENT:** exact instantaneous nodal rate
+`(h_y(-hdot_x) + h_x hdot_y)/(h_x^2+h_y^2)` with `h = r x v`, `hdot = r x a` — no
+angle, no unwrapping, no node detection. Gates: Kepler 2.1e-16 deg/day; J2 arc-mean
+0.55 % vs analytic; i=90 deg EXCLUDED BY CONSTRUCTION (cos i = 0 makes the node line
+undefined; 1/cos^2 i = 1.3e4 at 89.5 deg), replaced by 89.5/90.5 deg.
+**ESTIMATOR:** joint fixed-frequency fit (lunar nodal 6798.383 d, annual 365.256363 d,
+anomalistic month, evection) with NO empirical frequency fitting (§10.1); recovers a
+known 1.3476e-4 deg/day signal to <1e-12 relative at >=2 cycles; VIF 2.55 -> 1.07-1.18.
+**ADJUDICATION (E3, done):** an independent quadrature referee double-averaging the
+EXACT point-mass potential (the referee the 2026-10-04 session had reported as FAILED
+from cancellation) reproduces **FORM-1 (audit-018) to 0.02 %** in magnitude, sign AND
+inclination law at every diagnostic inclination, and independently reproduces the
+1.51x SSO-twin gap (referee 1.5096 vs FORM-1 1.5094, same sign). **FORM-2 predicts an
+equal-and-OPPOSITE twin pair (-1.0000) and is REFUTED.** FORM-1 = sum over Sun AND
+Moon of `(3/8) n (mu3/mu)(a/a3)^3 sin2(i-i3)/sin i`; the handoff's quoted values
+(+1.3476e-4 SSO) reproduce ONLY with both bodies. Exp 018's code COMMENT mislabels
+28.584 deg as an ecliptic inclination when it is equatorial; the formula is correct.
+Four defects found and fixed in-code: (1) column equilibration is MANDATORY
+(cond(A) = 1.8e4; plain lstsq annihilated the secular coefficient, returning 1e-24
+for a 1.35e-4 signal); (2) campaign dt default 120 -> 30 s (dt=120 is 1.37 % off the
+signal, dt=240 catastrophically wrong; the ABSOLUTE rate converges only slowly from
+an incomplete J2 short-period average, but the lunisolar DIFFERENCE cancels it, so the
+gate tests the difference); (3) the referee initially used the second-derivative
+formula for the first derivative, caught by its own grid-convergence check; (4) the
+window ladder was re-propagating every rung — since fixed-step RK4 advances a state
+independently of the horizon, sub-windows are BIT-IDENTICAL truncations of a longer
+run (verified), so one propagation serves the whole ladder. 35 new tests.
+The multi-phase >=2-cycle numerical campaign was still running at session end.
+
