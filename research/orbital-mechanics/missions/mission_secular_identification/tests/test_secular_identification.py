@@ -298,6 +298,96 @@ class TestQuadratureReferee:
             cf.form2_competitor(A_SSO, 97.7876) < 0
 
 
+class TestAdjudicationRule:
+    """The decision rule must be mechanical, not a matter of emphasis.
+
+    These tests drive `adjudicate()` with SYNTHETIC campaign payloads so the
+    rule's behaviour is pinned before (and independently of) the real run.
+    """
+
+    @staticmethod
+    def _payload(values_by_inc):
+        cases = []
+        for inc, vals in values_by_inc.items():
+            for ph, v in enumerate(vals):
+                cases.append({
+                    "inc_deg": inc, "phase_deg": float(ph), "cycles": 2.0,
+                    "nodal_conditioning": 54.0,
+                    "lunisolar": {"secular_deg_day": v, "vif_max": 1.05},
+                    "window_ladder": {"1.00": {"lunisolar_deg_day": v},
+                                      "1.50": {"lunisolar_deg_day": v},
+                                      "2.00": {"lunisolar_deg_day": v}},
+                })
+        return {"cases": cases}
+
+    def test_a_clean_measurement_passes_the_identifiability_gate(self):
+        from adjudicate import adjudicate
+        v = adjudicate(self._payload({97.7876: [1.35e-4] * 4}))
+        assert v["per_inclination"]["97.7876"]["identifiable"] is True
+        assert v["identifiability_verdict"] == "IDENTIFIABLE"
+
+    def test_high_vif_blocks_scoring_entirely(self):
+        """A non-identifiable inclination must NOT be scored against a formula."""
+        from adjudicate import adjudicate
+        p = self._payload({97.7876: [1.35e-4] * 4})
+        for c in p["cases"]:
+            c["lunisolar"]["vif_max"] = 9.9
+        v = adjudicate(p)
+        e = v["per_inclination"]["97.7876"]
+        assert e["identifiable"] is False
+        assert e["formulas"] is None
+        assert v["identifiability_verdict"] == "NOT IDENTIFIABLE"
+
+    def test_unstable_ladder_blocks_scoring(self):
+        from adjudicate import adjudicate
+        p = self._payload({97.7876: [1.35e-4] * 4})
+        for c in p["cases"]:
+            c["window_ladder"] = {"1.00": {"lunisolar_deg_day": 1.0e-4},
+                                  "1.50": {"lunisolar_deg_day": -2.0e-4},
+                                  "2.00": {"lunisolar_deg_day": 5.0e-5}}
+        v = adjudicate(p)
+        assert v["per_inclination"]["97.7876"]["identifiable"] is False
+
+    def test_structural_rule_picks_form1_on_a_same_sign_gap(self):
+        from adjudicate import adjudicate
+        v = adjudicate(self._payload({97.7876: [1.3476e-4] * 4,
+                                      82.2124: [2.034e-4] * 4}))
+        s = v["structural_discriminator"]
+        assert s["evaluable"] is True
+        assert s["measured_same_sign"] is True
+        assert s["rule_form1_same_sign_gap"] is True
+        assert "FORM-1" in s["verdict"]
+
+    def test_structural_rule_picks_form2_on_an_equal_and_opposite_pair(self):
+        from adjudicate import adjudicate
+        v = adjudicate(self._payload({97.7876: [4.0369e-5] * 4,
+                                      82.2124: [-4.0369e-5] * 4}))
+        s = v["structural_discriminator"]
+        assert s["measured_same_sign"] is False
+        assert s["rule_form2_equal_and_opposite"] is True
+        assert "FORM-2" in s["verdict"]
+
+    def test_structural_rule_reports_neither_on_a_same_sign_unit_ratio(self):
+        """Same sign but ratio ~1 satisfies NEITHER pre-registered branch."""
+        from adjudicate import adjudicate
+        v = adjudicate(self._payload({97.7876: [1.0e-4] * 4,
+                                      82.2124: [1.05e-4] * 4}))
+        s = v["structural_discriminator"]
+        assert s["rule_form1_same_sign_gap"] is False
+        assert s["rule_form2_equal_and_opposite"] is False
+        assert "NEITHER" in s["verdict"]
+
+    def test_a_formula_is_not_scored_when_an_inclination_fails_the_gate(self):
+        """The twin test must be skipped, not run on unreliable data."""
+        from adjudicate import adjudicate
+        p = self._payload({97.7876: [1.3476e-4] * 4, 82.2124: [2.034e-4] * 4})
+        for c in p["cases"]:
+            if c["inc_deg"] == 82.2124:
+                c["lunisolar"]["vif_max"] = 9.9
+        v = adjudicate(p)
+        assert v["structural_discriminator"]["evaluable"] is False
+
+
 # --------------------------------------------------------------------------- #
 # 4. Ephemeris coverage guard -- the silent-clamping defect class
 # --------------------------------------------------------------------------- #
