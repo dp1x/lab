@@ -31,6 +31,10 @@ data/
 *.h5
 *.pkl
 
+# Agent tooling scratch (never lab content)
+.kilo/
+.freebuff/
+
 # OS
 Thumbs.db
 .DS_Store

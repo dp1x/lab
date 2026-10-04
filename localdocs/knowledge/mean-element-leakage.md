@@ -1,13 +1,33 @@
 ---
 title: Mean-element leakage and the lunisolar RAAN residual
-status: UNRESOLVED — the residual is not window-independent
+status: UNRESOLVED — the residual is not window-independent; the 9175-day
+  identification is RETRACTED (2026-10-04) and the arc is 0.9993 nodal cycles,
+  not 0.894
 date: 2026-10-03
+updated: 2026-10-04
 mission: mission_mean_element_leakage
 supersedes: "[[lunisolar-closure-021]]" residual interpretation (partially)
 related: "[[j2-precession-modulated-lunisolar-term]]", "[[lunisolar-secular-limit-020]]", "[[scientific-stack]]"
 ---
 
-# The SSO lunisolar RAAN residual is a windowing artifact of a long-period term
+# The SSO lunisolar RAAN residual is an estimator artefact of a one-cycle arc
+
+> **2026-10-04 CORRECTION.** The section below states "0.894 lunar nodal cycles".
+> That is arithmetically wrong: 6793.6 / 6798.383 = **0.9993**. The `--years 18.6`
+> arc is *almost exactly one* nodal cycle — a worse case than 0.894, so the
+> diagnosis is strengthened, not weakened. See
+> `localdocs/reports/mission-mean-element-leakage-2026-10-04.md`.
+
+## RETRACTED (2026-10-04): the "99.4 % explained by a 9175-day sinusoid"
+
+The claim that the detrended series is explained by a single ~34.8 deg sinusoid at a
+fitted ~9175-day period is **not supported**. On an arc of 0.9993 nodal cycles the
+variance inflation factor of the secular term against that harmonic is **11.1**, and
+**every** period from 6798 d to 20 000 d explains ≥ 99.96 % of the variance while
+biasing the fitted secular rate by **−937 % to +7671 %**, including a sign flip. The
+frequency is not identifiable, and neither is the secular term. What survives is the
+weaker and better-supported statement: **the residual is a window artefact**, because
+the estimator is an OLS slope taken over almost exactly one forcing period.
 
 ## Claim
 

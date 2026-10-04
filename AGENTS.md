@@ -473,3 +473,49 @@ ODE (wrong shape for GPU regardless). Compute is NOT the bottleneck (Lab compute
 multi-cycle, phase-decorrelated determination of the long-period nodal term — the arc
 cannot contain the signal, so further J2×lunisolar mechanism work is currently
 unfalsifiable.
+
+SESSION 2026-10-04 (six-track estimator-identifiability investigation;
+report `localdocs/reports/mission-mean-element-leakage-2026-10-04.md`).
+**The 2026-10-03 spectral identification is RETRACTED and its arc arithmetic is
+CORRECTED.** (1) The 2026-10-03 statement "6793.6 d = 0.894 lunar nodal cycles" is
+arithmetically wrong — 6793.6/6798.383 = **0.9993**, i.e. almost exactly ONE nodal
+cycle, the worst possible window (the `--years 18.6` arc really is 6793.65 d). This
+strengthens the window-artifact verdict. (2) The "99.4% explained by a ~9175-day
+sinusoid" is **RETRACTED as unsupported**: on a 0.9993-cycle arc the VIF of the
+secular term against that harmonic is **11.1**, and every period from 6798 d to
+20 000 d explains ≥99.96% of the variance while biasing the fitted secular rate by
+**−937% to +7671%** including a sign flip. Neither the period NOR the secular term is
+identifiable; on a 2-cycle arc the VIF falls to 1.007. **What survives** is the weaker
+but sound claim: the residual is an OLS-slope artefact of an almost-exactly-one-period
+window. (3) **The i=90° arm is unmeasurable by construction** — the node longitude
+comes from h_x:h_y whose magnitude is |cos i|, so at i=90° exactly h_x=h_y=0 and the
+node is undefined (1/cos²i = 1.3e4 even at 89.5°, vs 54.5 at SSO). This explains the
+otherwise-puzzling 108.45% sign-reversing "correction" at 90° and invalidates every
+claim resting on that column, including the README §2 discriminating prediction;
+replace with i=89.5°/90.5°. The node CONVENTION itself is correct (atan2(−h_x,h_y) =
+RAAN, +180° for retrograde; a constant offset cancels in a slope) — a same-session
+suspicion that it measured the argument of latitude was wrong and is retracted.
+(4) **BLOCKER:** `interp_snapshot` CLAMPS beyond the pinned 2045-01-01 snapshot end, so
+any arc past it silently freezes Sun and Moon; 2 nodal cycles need DE441 to 2063-03-24.
+The test must compare the RAW (unprecessed) vector — the precession rotation depends on
+t, so a frozen J2000 vector still rotates and the precessed comparison falsely reads
+"not clamped". A 38-year extension was acquired and validated (bit-for-bit on all 6941
+overlap days, 0 days differing >1 m) but **was lost when the host's `R:` scratch volume
+was wiped mid-session** and must be re-acquired (~3 min, 16 chunks x 2 bodies).
+(5) **Competing secular derivations, kept separate, NEITHER adopted:** the lab's
+audit-018 formula `(3/8)n(μ₃/μ)(a/a₃)³sin2(i−i₃)/sin i` (SSO +1.35e-4 deg/day) vs a
+Track-A derivation `−(3/4)n(μ₃/μ)(a/a₃)³cos i·P₂(cos i₃)` (+4.04e-5 deg/day, zero at
+i=90°). They differ in a STRUCTURAL property, so they are decidable by measurement
+with no literature: at i=97.79° vs 82.21° Track A predicts equal magnitude/opposite
+sign (audit-018 predicts same sign, 1.51x gap), and at i=89.5° they differ by 68x AND
+opposite sign. The lead's own numerical referee attempt FAILED (cancellation in
+dR̄/dΩ) and is reported as a failed referee, not a verdict. (6) Validated a
+window-free instrument — exact instantaneous nodal rate from ḣ=r×a, gates: Kepler
+1.7e-13 deg/day, J2 arc-mean 0.080% of analytic, dt-convergence p=4 — and proved a
+trapezoid cycle-mean over integer nodal cycles is exact (3e-10%) where OLS is wrong by
+1e6%; but one cycle is NOT enough, since the offset grows as |k−1| and the committed
+arc sits 27x the signal away from an integer cycle. Method required: joint
+secular+forced fit with FIXED physical frequencies over ≥2 nodal cycles. 15 new tests,
+896 total. **Scratch-loss discipline: every published finding was re-derived from the
+repo after the wipe and is test-pinned; no finding rests on lost data.**
+
