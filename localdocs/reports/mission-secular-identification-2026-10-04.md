@@ -199,36 +199,65 @@ against the exact potential it claims to approximate, with no fitted constants a
 external check that remains genuinely missing is a **published SSO (Landsat-family) measured nodal
 drift rate** — that is still un-obtained.
 
-## 5. The multi-phase ≥2-cycle orbital campaign — ABANDONED (resource overrun)
+## 5. The multi-phase ≥2-cycle orbital campaign — RESULT RETRACTED (Nyquist violation)
 
-**No measurement was completed. This is a lost run, not a negative result.**
+**No valid orbital measurement was obtained. This is a retracted result, not a negative result.**
 
-The campaign ran ~10 hr wall on 8 workers (~64 CPU-hours) and was terminated while on its third
-of four waves. Measured throughput: **~1.9 hr per full-mode case per worker** at dt = 30 s. The
-requested matrix (4 inclinations × 4 phases × 2 modes × 13 597 d = 32 propagations) needed ~30 hr
-wall on 8 workers — **three times the mission's own declared budget** and well past
-`LAB_CONSTITUTION.md` §4.3's "> 10 hr single-core" stop condition.
+### 5.1 What happened
 
-This is the lead agent's planning error: the dt = 30 s gate requirement was correctly identified,
-but its per-step cost was not multiplied across the full case matrix before committing. The
-governance rule that should have caught it — declare a budget, then check the estimate against it
-— was satisfied on paper (the card says ≤ 10 hr) and violated in practice.
+A correctly-sized run (2 cases × 2 modes, 2 cycles, dt = 30 s, 6 workers, 16 425 s) completed and
+produced numbers:
 
-`campaign.py` writes its JSON only after `pool.map` returns, so **no partial artifact exists and
-nothing from the run can be misread**. The absence of `results/campaign_2cyc.json` means lost.
+```
+  inc    phase   measured lunisolar      |stderr|   VIF    FORM-1       m/FORM-1
+  82.212   0.0   +4.751804e-09 deg/day   6.80e-07   1.18   +2.03403e-04     0.000
+  97.788   0.0   -1.937345e-07 deg/day   6.79e-07   1.18   +1.34756e-04    -0.001
+```
 
-**What this cost the mission:** the independent *amplitude* check. The mission card's §4.2
-per-inclination scoring (does `|measured/formula| ∈ [0.5, 2.0]?`) was therefore never evaluated.
+**These are not measurements of the secular lunisolar rate and must not be cited.**
 
-**What it did not cost:** the §4.3 structural verdict. That rests on exact-potential quadrature,
-which never touches the propagator, the estimator, or the ephemeris data. FORM-1's inclination law,
-sign and magnitude to 0.02 %, and FORM-2's refutation by its opposite-sign twin prediction, stand
-unchanged and are E3 on their own.
+### 5.2 Cause
 
-Correctly-sized variant if resumed: 2 inclinations (the 97.7876°/82.2124° twin pair the
-discriminator actually needs) × 1 phase × 2 modes at dt = 30 s ≈ **7.6 hr** on 8 workers, or
-dt = 45 s (still inside the dt-stability gate) ≈ 5 hr. Alternatively, dt = 120 s would cut it to
-~1.9 hr but sits outside the 0.5 % gate and must not be used.
+`--every 240` at `dt = 30 s` produces a **120-minute output cadence**. The orbital period at
+h = 600 km is **96.7 minutes**. The output therefore sampled the orbit at **0.81 samples per
+revolution** — below Nyquist. The instantaneous nodal rate carries the full short-period content at
+orbital frequency; that harmonic aliases onto DC and contaminates the fitted secular slope at order
+1e-4 deg/day, the size of the signal being measured.
+
+### 5.3 Why the numbers looked believable
+
+`+4.75e-09` and `-1.94e-07` deg/day with `6.8e-07` error bars are near zero and internally
+consistent, and sit 3–4 orders of magnitude below FORM-1. Read naively that is a spectacular
+refutation of the formula — and it would have been an artefact of sampling.
+
+**This is the central methodological lesson of the session: a near-zero answer with small error bars
+cannot be distinguished from an aliasing artefact by inspecting the number. It can only be caught
+before the run.** The campaign's own identifiability gate (VIF = 1.18, ladder stable) passed
+cleanly, because aliasing corrupts the *sampling*, not the conditioning — the gate was measuring the
+right thing and was blind to the actual defect.
+
+Root cause: the 2-hour cadence was chosen to reduce sample count and was never checked against the
+orbital period.
+
+### 5.4 Fix
+
+`check_sample_cadence()` refuses to launch below 2 samples/orbit and records the check in the
+results payload. Verified: it blocks the exact `--every 240` configuration that produced this
+result, and accepts `--every 20` (10-minute cadence, 9.7 samples/orbit).
+
+### 5.5 Status
+
+**Phase 4 is abandoned with no valid orbital measurement.** The §4.3 structural verdict is
+unaffected: it rests on exact-potential quadrature, which never touches the propagator, the
+estimator, or the sampling cadence.
+
+Correctly-sized re-run, now that both guards exist (budget preflight + Nyquist), would be:
+```
+uv run python campaign.py --cycles 2.0 --ladder-max-cycles 2.0 --dt 30 --every 20 \
+    --workers 6 --incs 97.7876,82.2124 --phases 0 --budget-hours 9
+```
+Cost: the propagation cost is unchanged by `--every` (it only changes sampling), so ≈ 5.1 CPU-h
+per case, ≈ 2.5 hr wall on 6 workers. Memory ≈ 250 MB for 1.95 M samples/case.
 
 ## 6. Defects found and fixed this session
 

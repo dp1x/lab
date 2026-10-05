@@ -146,7 +146,7 @@ because `interp_snapshot` clamps silently.
 2. Estimator validation on synthetic signals. **DONE** — recovers a known 1.3476e-4 deg/day signal
    to <1e-12 relative at ≥2 cycles; VIF 2.55 → 1.07–1.18.
 3. **Formula adjudication by independent quadrature referee. DONE — H1 SUPPORTED, H2 REFUTED.**
-4. Multi-phase ≥2-cycle orbital campaign. **ABANDONED — resource overrun.**
+4. Multi-phase ≥2-cycle orbital campaign. **RESULT RETRACTED — Nyquist violation (§6.3).**
 5. Adjudication, figures, report, knowledge note. **DONE.**
 
 ## 6.1 PHASE-A VERDICT (appended 2026-10-04; §4 above is unchanged and was not retuned)
@@ -201,6 +201,40 @@ the next mission.
 Correctly-sized variant if it is ever resumed: 2 inclinations (97.7876°, 82.2124° — the twin pair
 that the discriminator actually needs) × 1 phase × 2 modes at dt = 30 s ≈ 7.6 hr on 8 workers,
 or the same at dt = 45 s (still inside the dt-stability gate) ≈ 5 hr.
+
+## 6.3 Phase 4 result: RETRACTED — Nyquist violation (supersedes §6.2's framing)
+
+A later, correctly-sized run (2 cases × 2 modes, 2 cycles, dt = 30 s, 6 workers, 16 425 s) **did**
+complete and produced numbers. **Those numbers are not measurements and are retracted.**
+
+```
+  inc    phase   measured lunisolar      |stderr|   VIF    FORM-1       m/FORM-1
+  82.212   0.0   +4.751804e-09 deg/day   6.80e-07   1.18   +2.03403e-04     0.000
+  97.788   0.0   -1.937345e-07 deg/day   6.79e-07   1.18   +1.34756e-04    -0.001
+```
+
+**Cause.** `--every 240` at `dt = 30 s` gives a **120-minute output cadence**. The orbital period
+at h = 600 km is **96.7 minutes**, so the output sampled the orbit at **0.81 samples per
+revolution** — below Nyquist. The instantaneous nodal rate carries the full short-period content
+at orbital frequency; that harmonic aliases onto DC and contaminates the fitted secular slope at
+order 1e-4 deg/day, which is the size of the signal being measured.
+
+**Why the numbers looked believable.** +4.75e-09 and -1.94e-07 deg/day with 6.8e-07 error bars
+are near zero and internally consistent — precisely how an aliased signal presents. The values are
+~3–4 orders of magnitude below FORM-1, which would have looked like a spectacular refutation.
+**A near-zero answer with small error bars cannot be caught by inspecting the number; it has to be
+caught before the run.**
+
+**Root cause.** The 2-hour cadence was chosen to reduce sample count and was never checked against
+the orbital period.
+
+**Fixed.** `check_sample_cadence()` now refuses to launch below 2 samples/orbit, and records the
+check in the results payload. Verified: it blocks the exact `--every 240` configuration that
+produced this result, and accepts `--every 20` (10-minute cadence, 9.7 samples/orbit).
+
+**Status: Phase 4 is abandoned with no valid orbital measurement.** The §6.1 verdict is unaffected —
+it rests on §4.3, decided by exact-potential quadrature, which never touches the propagator, the
+estimator, or the sampling cadence.
 
 ## 7. Limitations / non-claims
 
