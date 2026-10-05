@@ -568,5 +568,16 @@ depend on it (structural discriminator via exact-potential quadrature); what is 
 whether a real orbit reproduces FORM-1's AMPLITUDE. LESSON (two long jobs lost this session):
 `campaign.py` buffers through `pool.map` and writes nothing until the end, so a multi-hour run
 that dies yields no partial state -- any resumed long campaign MUST write each case to its own
-file as it completes.
+file as it completes. **LATER RETRACTION (2026-10-05):** a correctly-sized re-run DID complete
+(2 cases x 2 modes, 2 cycles, 16425 s) but **its numbers are NOT measurements and are RETRACTED**.
+`--every 240` at dt=30 s gave a 120-minute OUTPUT cadence against a **96.7-minute orbital
+period** = 0.81 samples/revolution, BELOW NYQUIST; the orbital harmonic aliased onto DC and
+contaminated the fitted secular slope at order 1e-4 deg/day, the size of the signal. It returned
++4.75e-09 / -1.94e-07 deg/day with 6.8e-07 error bars -- near zero, internally consistent, and
+3-4 orders BELOW FORM-1, i.e. it read as a spectacular refutation. **The campaign's own
+identifiability gate PASSED (VIF 1.18, stable ladder) because aliasing corrupts SAMPLING, not
+CONDITIONING.** `check_sample_cadence()` now refuses to launch below 2 samples/orbit (verified:
+it blocks the exact `--every 240` config; accepts `--every 20` = 10 min = 9.7 samples/orbit).
+**GENERAL LESSON: a near-zero answer with small error bars cannot be distinguished from an
+aliasing artefact by inspecting the number -- it can only be caught before the run.**
 
