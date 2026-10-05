@@ -88,16 +88,29 @@ ecliptic inclination when it is equatorial); the committed formula is correct.
 
 ## 5. What is still open
 
-The **numerical** measurement — whether a multi-cycle, phase-decorrelated orbit
-propagation reproduces the +1.35e-4 deg/day FORM-1 value at SSO — was still
-running when this session ended. `campaign_2cyc.json` is written only on
-completion, so **its absence means the run was lost, not that it returned null**.
+**The numerical amplitude check was ABANDONED for resource overrun, not completed.**
+`campaign.py --cycles 2.0 --ladder-max-cycles 2.0 --dt 30 --every 240 --workers 8
+--phases 0,90,180,270` was terminated after ~10 hr wall / ~64 CPU-hours, on its third of four
+waves. Measured throughput **~1.9 hr per full-mode case per worker**; the full matrix needed
+~30 hr on 8 workers, 3x the mission's declared budget.
 
-To re-run (≈ 2–6 hr on 8 workers):
+`campaign_2cyc.json` is written only after `pool.map` returns, so there is **no partial
+artifact** — its absence means *lost*, not *null*.
+
+Correctly-sized variant (~7.6 hr on 8 workers): the twin pair only, one phase:
 ```
-uv run python campaign.py --cycles 2.0 --ladder-max-cycles 2.0 \
-    --dt 30 --every 240 --workers 8 --phases 0,90,180,270
+uv run python campaign.py --cycles 2.0 --ladder-max-cycles 2.0 --dt 30 --every 240 \
+    --workers 8 --incs 97.7876,82.2124 --phases 0
 ```
+Judgement call for whoever picks this up: the referee already settled the *formula*, so run
+Phase 4 only if the *amplitude* check is judged worth ~7 hr.
+
+## 5.1 Blocker discipline lesson (the real cost of this session)
+
+Two of the three long jobs were lost to session/host events, and the third blew its budget.
+`campaign.py` buffered everything through `pool.map` and wrote nothing until the end, so a
+multi-hour run that died returned **no usable output and no partial state**. If this is resumed,
+write each case's result to its own file as it completes.
 
 ## 6. Constraints a fresh session must not break
 

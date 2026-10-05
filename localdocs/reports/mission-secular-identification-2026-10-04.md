@@ -23,8 +23,9 @@ independently reproduces the 1.51× SSO-twin gap. FORM-2 predicts the twin pair 
 Separately, the estimator question is settled: a secular rate *is* recoverable on a ≥2-cycle arc
 with fixed physical frequencies, and the estimator recovers a known 1.3476e-4 deg/day signal to
 **<1e-12 relative** where the naive OLS slope is wrong by ~100 % and the bare cycle-mean by
-~100–500 %. Whether the multi-phase orbital campaign reproduces FORM-1's amplitude is reported in
-§5.
+~100–500 %. Whether a real orbit reproduces FORM-1's amplitude is the question the campaign was
+meant to answer; **it ran out of budget (§5) and is unresolved.** That gap is a planning failure
+on the lead agent's part, not a scientific one.
 
 ## 1. What was blocking, and what was done about it
 
@@ -198,10 +199,36 @@ against the exact potential it claims to approximate, with no fitted constants a
 external check that remains genuinely missing is a **published SSO (Landsat-family) measured nodal
 drift rate** — that is still un-obtained.
 
-## 5. The multi-phase ≥2-cycle orbital campaign
+## 5. The multi-phase ≥2-cycle orbital campaign — ABANDONED (resource overrun)
 
-*(completed after this section was drafted — see `results/campaign_2cyc.json` and
-`results/adjudication.json`)*
+**No measurement was completed. This is a lost run, not a negative result.**
+
+The campaign ran ~10 hr wall on 8 workers (~64 CPU-hours) and was terminated while on its third
+of four waves. Measured throughput: **~1.9 hr per full-mode case per worker** at dt = 30 s. The
+requested matrix (4 inclinations × 4 phases × 2 modes × 13 597 d = 32 propagations) needed ~30 hr
+wall on 8 workers — **three times the mission's own declared budget** and well past
+`LAB_CONSTITUTION.md` §4.3's "> 10 hr single-core" stop condition.
+
+This is the lead agent's planning error: the dt = 30 s gate requirement was correctly identified,
+but its per-step cost was not multiplied across the full case matrix before committing. The
+governance rule that should have caught it — declare a budget, then check the estimate against it
+— was satisfied on paper (the card says ≤ 10 hr) and violated in practice.
+
+`campaign.py` writes its JSON only after `pool.map` returns, so **no partial artifact exists and
+nothing from the run can be misread**. The absence of `results/campaign_2cyc.json` means lost.
+
+**What this cost the mission:** the independent *amplitude* check. The mission card's §4.2
+per-inclination scoring (does `|measured/formula| ∈ [0.5, 2.0]?`) was therefore never evaluated.
+
+**What it did not cost:** the §4.3 structural verdict. That rests on exact-potential quadrature,
+which never touches the propagator, the estimator, or the ephemeris data. FORM-1's inclination law,
+sign and magnitude to 0.02 %, and FORM-2's refutation by its opposite-sign twin prediction, stand
+unchanged and are E3 on their own.
+
+Correctly-sized variant if resumed: 2 inclinations (the 97.7876°/82.2124° twin pair the
+discriminator actually needs) × 1 phase × 2 modes at dt = 30 s ≈ **7.6 hr** on 8 workers, or
+dt = 45 s (still inside the dt-stability gate) ≈ 5 hr. Alternatively, dt = 120 s would cut it to
+~1.9 hr but sits outside the 0.5 % gate and must not be used.
 
 ## 6. Defects found and fixed this session
 

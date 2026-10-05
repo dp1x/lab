@@ -2,8 +2,8 @@
 
 **Mission type:** Discrepancy mission (LAB_CONSTITUTION.md §2.5 type 4).
 **Status:** ACTIVE — card, hypothesis and decision rule written BEFORE any campaign result exists.
-Phase A (data + instrument + estimator + **formula adjudication**) COMPLETE; Phase B (multi-phase
-orbital campaign) RUNNING.
+Phase A COMPLETE (data + instrument + estimator + **formula adjudication**). Phase B (multi-phase
+orbital campaign) **ABANDONED — resource overrun, see §6.2.**
 **Date established:** 2026-10-04.
 **Constitutional authority:** §§2.3 (mission architecture), 3 (evidence doctrine), 9 (FET), 10.1 (hard science gates), 12 (mission selection).
 **Budget:** ≤ 10 hr on 8 workers, ≤ 2 GB RAM, local commodity compute only.
@@ -146,8 +146,8 @@ because `interp_snapshot` clamps silently.
 2. Estimator validation on synthetic signals. **DONE** — recovers a known 1.3476e-4 deg/day signal
    to <1e-12 relative at ≥2 cycles; VIF 2.55 → 1.07–1.18.
 3. **Formula adjudication by independent quadrature referee. DONE — H1 SUPPORTED, H2 REFUTED.**
-4. Multi-phase ≥2-cycle orbital campaign. **RUNNING.**
-5. Adjudication, figures, report, knowledge note.
+4. Multi-phase ≥2-cycle orbital campaign. **ABANDONED — resource overrun.**
+5. Adjudication, figures, report, knowledge note. **DONE.**
 
 ## 6.1 PHASE-A VERDICT (appended 2026-10-04; §4 above is unchanged and was not retuned)
 
@@ -175,6 +175,32 @@ code *comment* mislabels the 28.584° frame (equatorial, not ecliptic); the form
 
 Full evidence: `localdocs/reports/mission-secular-identification-2026-10-04.md`,
 `localdocs/knowledge/secular-lunisolar-raan-canon.md`.
+
+## 6.2 Phase 4 outcome: ABANDONED (resource overrun) — NOT a negative result
+
+The multi-phase orbital campaign was **terminated without producing results**. It ran ~10 hr wall
+on 8 workers (~64 CPU-hours) and was on its third of four waves when stopped. Measured
+throughput was ~1.9 hr per full-mode case per worker at dt = 30 s; the requested matrix
+(4 inclinations × 4 phases × 2 modes × 13 597 d) needed ~30 hr wall on 8 workers.
+
+**This exceeded the mission's own declared budget** (`README` §0.1: "≤ 10 hr on 8 workers") and
+LAB_CONSTITUTION.md §4.3's stop condition ("> 10 hr single-core, remote/Colab not available").
+The overrun is the lead agent's planning error: the dt=30 s gate requirement was applied but its
+per-step cost was not multiplied by the full case matrix before committing.
+
+**Nothing was concluded from this run and no number from it exists.** `campaign.py` writes its
+JSON only after `pool.map` returns, so there is no partial artifact and nothing to misinterpret.
+The absence of `results/campaign_2cyc.json` means *lost*, not *null*.
+
+**This does not weaken the §6.1 verdict.** That verdict rests on §4.3 — a structural
+discriminator decided by exact-potential quadrature, which never touches the propagator, the
+estimator, or the ephemeris data. A tighter resource estimate for Phase 4 (and a decision on
+whether it is worth running at all, given the referee already settled the question) belongs to
+the next mission.
+
+Correctly-sized variant if it is ever resumed: 2 inclinations (97.7876°, 82.2124° — the twin pair
+that the discriminator actually needs) × 1 phase × 2 modes at dt = 30 s ≈ 7.6 hr on 8 workers,
+or the same at dt = 45 s (still inside the dt-stability gate) ≈ 5 hr.
 
 ## 7. Limitations / non-claims
 

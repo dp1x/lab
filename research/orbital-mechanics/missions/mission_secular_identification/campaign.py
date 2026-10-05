@@ -137,6 +137,77 @@ def _case(arg) -> dict:
     return out
 
 
+def _run_and_checkpoint(args) -> tuple:
+    """Run ONE case, write it to its own file immediately, return its path.
+
+    CHECKPOINTING (added 2026-10-05 after a ~64 CPU-hour run was lost).
+    The first version of this campaign buffered every case through `pool.map`
+    and wrote a single JSON only after all of them returned. Terminating it at
+    10 hr produced NO recoverable state at all -- not even the 12 of 16 cases
+    that had already finished. Each case is now written to its own file the
+    moment it completes, so an interrupted run keeps everything it earned and a
+    restart resumes rather than recomputes.
+    """
+    import tempfile
+
+    arg, ckpt_dir = args
+    inc_deg, phase_deg, cycles, dt_s, every, ladder_spec = arg
+    tag = f"i{inc_deg:.4f}_ph{phase_deg:05.1f}".replace(".", "p").replace("-", "m")
+    ckpt = Path(ckpt_dir) / f"case_{tag}.json"
+    if ckpt.exists():
+        return str(ckpt)                     # resume: already paid for this case
+    t0 = time.time()
+    row = _case(arg)
+    row["wall_s"] = round(time.time() - t0, 1)
+    ckpt.write_text(json.dumps(row, indent=2), encoding="utf-8")
+    print(f"    [done] i={inc_deg:.3f} phase={phase_deg:g} "
+          f"luni={row['lunisolar']['secular_deg_day']:+.4e} deg/day "
+          f"({row['wall_s']:.0f}s)", flush=True)
+    return str(ckpt)
+
+
+#: Measured cost constants for this host (2026-10-05, calibrated against a real
+#: 20-day benchmark: 19.8 s for 57 600 steps at dt=30 s in sun_moon_j2 mode).
+#: The j2_only mode skips ephemeris interpolation and precession entirely and
+#: measures ~0.35x the cost.
+US_PER_STEP_SUN_MOON_J2 = 344.0
+J2_ONLY_COST_RATIO = 0.35
+
+
+def estimate_cost(cases: int, cycles: float, dt_s: float, every: int,
+                  workers: int, modes: int = 2) -> dict:
+    """Preflight cost estimate. REFUSES to launch a run that overruns budget.
+
+    WHY THIS EXISTS. The 2026-10-04 session measured one case, assumed its cost
+    scaled trivially, and launched a 32-propagation matrix without multiplying
+    out. It overran by ~3x and was terminated at ~64 CPU-hours with no results
+    written, because the run buffered everything through `pool.map`. This
+    function is the guard against that class of error: it runs before a single
+    CPU-second is spent, and it is calibrated from a MEASURED per-step cost
+    rather than an assumed one.
+
+    Calibration: 19.8 s / 57 600 steps = 344 us/step for `sun_moon_j2` on this
+    host, measured after the scalar hot-path rewrite (which gave 1.42x). The
+    first version of this function used 2.0 us/step and overstated cost by ~170x,
+    which would have made every run look impossible; the number is pinned by
+    `tests/test_secular_identification.py::test_cost_estimate_is_calibrated`.
+    """
+    steps = cycles * 6798.383 * 86400.0 / dt_s
+    per_step = (US_PER_STEP_SUN_MOON_J2 + US_PER_STEP_SUN_MOON_J2 * J2_ONLY_COST_RATIO) / 1e6
+    per_case_s = steps * per_step
+    total_s = cases * per_case_s
+    wall_s = total_s / workers
+    return {
+        "n_cases": cases, "modes_per_case": modes, "cycles": cycles, "dt_s": dt_s,
+        "steps_per_propagation": int(steps),
+        "us_per_step_sun_moon_j2": US_PER_STEP_SUN_MOON_J2,
+        "est_seconds_per_case": round(per_case_s, 1),
+        "est_total_cpu_hours": round(total_s / 3600.0, 2),
+        "est_wall_hours": round(wall_s / 3600.0, 2),
+        "workers": workers,
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cycles", type=float, default=2.0,
@@ -150,9 +221,13 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--incs", default=",".join(str(i) for i in cf.DIAGNOSTIC_INCS_DEG))
     ap.add_argument("--phases", default=",".join(str(p) for p in PHASES_DEG))
-    ap.add_argument("--ladder-max-cycles", type=float, default=0.0,
-                    help="If > 0, propagate to this many cycles and derive the "
-                         "window ladder by truncation (1 propagation instead of 5).")
+    ap.add_argument("--ladder-max-cycles", type=float, default=0.0)
+    ap.add_argument("--budget-hours", type=float, default=10.0,
+                    help="Hard wall-clock budget. The run REFUSES to start if "
+                         "the preflight estimate exceeds this (LAB_CONSTITUTION "
+                         "section 4.3). Use --force-budget to override knowingly.")
+    ap.add_argument("--force-budget", action="store_true",
+                    help="Launch anyway despite exceeding the budget.")
     args = ap.parse_args()
 
     incs = [float(x) for x in args.incs.split(",")]
@@ -165,10 +240,34 @@ def main() -> None:
 
     cases = [(i, p, prop_cycles, args.dt, args.every, ladder_spec)
              for i in incs for p in phases]
+
+    # ---- PREFLIGHT: refuse an over-budget run before spending any CPU -----
+    est = estimate_cost(len(cases), prop_cycles, args.dt, args.every,
+                        args.workers, modes=len(MODES))
+    print(f"PREFLIGHT: {len(cases)} cases x {len(MODES)} modes, "
+          f"{prop_cycles:g} nodal cycles ({prop_cycles * NODE_PERIOD_D:.0f} d), "
+          f"dt={args.dt:g}s, {args.workers} workers")
+    print(f"  estimate: {est['est_wall_hours']:.2f} h wall "
+          f"({est['est_total_cpu_hours']:.1f} CPU-h), "
+          f"{est['steps_per_propagation']:,} steps/propagation")
+    print(f"  budget:   {args.budget_hours:.2f} h")
+    if est["est_wall_hours"] > args.budget_hours and not args.force_budget:
+        print("\nREFUSING TO LAUNCH: estimate exceeds budget by "
+              f"{est['est_wall_hours'] - args.budget_hours:.2f} h.")
+        print("Reduce --incs / --phases / --cycles, raise --dt (only within the "
+              "dt gate), or pass --force-budget if you are deliberately "
+              "accepting the overrun.")
+        sys.exit(2)
+
+    ckpt_dir = HERE / "results" / "checkpoints"
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    payload_args = [(c, str(ckpt_dir)) for c in cases]
     t0 = time.time()
     with Pool(args.workers) as pool:
-        rows = pool.map(_case, cases)
+        paths = pool.map(_run_and_checkpoint, payload_args)
     wall = time.time() - t0
+    rows = [json.loads(Path(p).read_text(encoding="utf-8")) for p in paths]
+    rows.sort(key=lambda r: (r["inc_deg"], r["phase_deg"]))
 
     payload = {
         "mission": "mission_secular_identification",
@@ -184,6 +283,7 @@ def main() -> None:
         "estimator": {"periods_d": {k: PHYSICAL_PERIODS_D[k] for k in DEFAULT_PERIODS},
                       "frequencies": "FIXED at physical values; no empirical fitting"},
         "cases": rows,
+        "cost_preflight": est,
         "provenance": {
             "code_hash_scheme": "lf-normalized-v1",
             "code": {p.name: hashlib.sha256(
@@ -198,6 +298,8 @@ def main() -> None:
             "wall_clock_s": round(wall, 1),
             "n_workers": args.workers,
             "incs_deg": incs, "phases_deg": phases,
+            "checkpointed": True,
+            "checkpoint_dir": "results/checkpoints",
         },
     }
     name = f"campaign_{args.cycles:g}cyc.json"

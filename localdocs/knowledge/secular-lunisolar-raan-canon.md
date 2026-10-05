@@ -140,9 +140,11 @@ Each is a measurement artefact masquerading as physics — the dominant failure 
   rate would be the decisive independent confirmation. Web access was unavailable in this
   environment (HTTP 426; fallback engines presented CAPTCHAs, not circumvented), so no literature
   verification was performed and none is claimed.
-- **The multi-phase ≥2-cycle orbital campaign is the remaining measurement**, and its outcome does
-  not change §1–§3 (those are settled by the referee) but does test whether a real orbit reproduces
-  the amplitude.
+- **The multi-phase ≥2-cycle orbital amplitude check was ABANDONED for resource overrun** (~10 hr
+  wall / ~64 CPU-hours on 8 workers, 3× the declared budget). There is no partial artifact and no
+  number from it. So: **the formula is settled; whether a real multi-cycle orbit reproduces its
+  amplitude is NOT.** See `AUTONOMOUS_HANDOFF_mission_secular_identification_2026-10-04.md` §5
+  for a correctly-sized (~7.6 hr) variant.
 
 ## 7. Related
 

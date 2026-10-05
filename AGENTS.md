@@ -557,6 +557,16 @@ gate tests the difference); (3) the referee initially used the second-derivative
 formula for the first derivative, caught by its own grid-convergence check; (4) the
 window ladder was re-propagating every rung — since fixed-step RK4 advances a state
 independently of the horizon, sub-windows are BIT-IDENTICAL truncations of a longer
-run (verified), so one propagation serves the whole ladder. 35 new tests.
-The multi-phase >=2-cycle numerical campaign was still running at session end.
+run (verified), so one propagation serves the whole ladder. 35 new tests. **MISSION STATE: the >=2-cycle multi-phase orbital campaign was ABANDONED for
+resource overrun** (~10 hr wall / ~64 CPU-hours on 8 workers, third of four waves; measured
+throughput ~1.9 hr per full-mode case per worker, so the 32-propagation matrix needed ~30 hr --
+3x the mission's own declared budget). `campaign.py` writes JSON only after `pool.map` returns,
+so there is NO partial artifact: absence of `results/campaign_2cyc.json` means LOST, not null.
+Correctly-sized variant (~7.6 hr on 8 workers): twin pair only, one phase,
+`--incs 97.7876,82.2124 --phases 0 --dt 30 --every 240`. The FORM-1/FORM-2 verdict does NOT
+depend on it (structural discriminator via exact-potential quadrature); what is unresolved is
+whether a real orbit reproduces FORM-1's AMPLITUDE. LESSON (two long jobs lost this session):
+`campaign.py` buffers through `pool.map` and writes nothing until the end, so a multi-hour run
+that dies yields no partial state -- any resumed long campaign MUST write each case to its own
+file as it completes.
 
