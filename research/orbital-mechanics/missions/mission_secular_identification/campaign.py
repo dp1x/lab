@@ -155,10 +155,28 @@ def _run_and_checkpoint(args) -> tuple:
     tag = f"i{inc_deg:.4f}_ph{phase_deg:05.1f}".replace(".", "p").replace("-", "m")
     ckpt = Path(ckpt_dir) / f"case_{tag}.json"
     if ckpt.exists():
+        # PROVENANCE: a checkpoint written by an older, unvalidated campaign.py
+        # may carry numbers that were later retracted (the 2026-10-05 Nyquist
+        # case). Never silently reuse one that does not declare itself valid.
+        try:
+            prior = json.loads(ckpt.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            prior = {}
+        if prior.get("VALIDITY") != "VALID":
+            raise RuntimeError(
+                f"checkpoint {ckpt.name} predates the Nyquist guard and carries "
+                "no validity marker; its numbers may be from a retracted "
+                "campaign. Delete results/checkpoints/ and re-run, or rename the "
+                f"file deliberately after confirming provenance. (stored value: "
+                f"{prior.get('lunisolar', {}).get('secular_deg_day')})")
         return str(ckpt)                     # resume: already paid for this case
     t0 = time.time()
     row = _case(arg)
     row["wall_s"] = round(time.time() - t0, 1)
+    row["VALIDITY"] = "VALID"
+    row["validity_note"] = (
+        "Cadence and budget preflight passed for this run; see "
+        "cost_preflight and sample_cadence_check in the campaign payload.")
     ckpt.write_text(json.dumps(row, indent=2), encoding="utf-8")
     print(f"    [done] i={inc_deg:.3f} phase={phase_deg:g} "
           f"luni={row['lunisolar']['secular_deg_day']:+.4e} deg/day "
@@ -323,6 +341,7 @@ def main() -> None:
 
     payload = {
         "mission": "mission_secular_identification",
+        "VALIDITY": ("VALID" if cad["pass"] else "INVALID"),
         "arc": {"t0_s": T0_S, "nodal_period_d": NODE_PERIOD_D,
                 "headline_cycles": args.cycles,
                 "propagated_cycles": prop_cycles,
