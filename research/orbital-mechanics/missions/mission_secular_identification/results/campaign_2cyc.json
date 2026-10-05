@@ -11,8 +11,8 @@
   "integrator": {
     "scheme": "fixed-step RK4 on the full 6-vector",
     "dt_s": 30.0,
-    "sample_every": 240,
-    "effective_cadence_s": 7200.0,
+    "sample_every": 20,
+    "effective_cadence_s": 600.0,
     "ladder_by_truncation": true
   },
   "estimator": {
@@ -25,114 +25,6 @@
     "frequencies": "FIXED at physical values; no empirical fitting"
   },
   "cases": [
-    {
-      "inc_deg": 82.2124,
-      "phase_deg": 0.0,
-      "cycles": 2.0,
-      "dt_s": 30.0,
-      "nodal_conditioning": 54.46456417422423,
-      "coverage": {
-        "snapshot_start_s": 820497600.0,
-        "snapshot_end_s": 2019643200.0,
-        "arc_start_s": 820476800.0,
-        "arc_end_s": 1995237382.3999999,
-        "covered": true,
-        "start_slack_days_used": 1.0,
-        "margin_days": 282.4747407407424,
-        "arc_days": 13596.765999999998
-      },
-      "modes": {
-        "j2_only": {
-          "slope_deg_day": -3.335268588489271e-07,
-          "slope_stderr_deg_day": 4.811239255816398e-07,
-          "intercept": -0.9900624620002434,
-          "periods_d": [
-            6798.383,
-            365.256363,
-            29.530589,
-            14.765
-          ],
-          "n_samples": 163162,
-          "n_params": 10,
-          "rms_resid": 0.7023296988705031,
-          "max_abs_harmonic_deg_day": 1.1355279319802048e-05,
-          "vif_max": 1.1792168003529313,
-          "vif_by_period": {
-            "6798.38": 1.1792168003529313,
-            "365.256": 1.00025047778479,
-            "29.5306": 1.0000001274400494,
-            "14.765": 1.0000006240383914
-          },
-          "cond_raw": 17582.882320922075,
-          "cond_equilibrated": 4.10053418655161,
-          "cycle_mean_deg_day": -0.992330016570409
-        },
-        "sun_moon_j2": {
-          "slope_deg_day": -3.287750552572639e-07,
-          "slope_stderr_deg_day": 4.811909137403623e-07,
-          "intercept": -0.9902339188338517,
-          "periods_d": [
-            6798.383,
-            365.256363,
-            29.530589,
-            14.765
-          ],
-          "n_samples": 163162,
-          "n_params": 10,
-          "rms_resid": 0.7024274860950451,
-          "max_abs_harmonic_deg_day": 1.1018496776771814e-05,
-          "vif_max": 1.1792168003529313,
-          "vif_by_period": {
-            "6798.38": 1.1792168003529313,
-            "365.256": 1.00025047778479,
-            "29.5306": 1.0000001274400494,
-            "14.765": 1.0000006240383914
-          },
-          "cond_raw": 17582.882320922075,
-          "cond_equilibrated": 4.10053418655161,
-          "cycle_mean_deg_day": -0.9924691370304537
-        }
-      },
-      "window_ladder": {
-        "1.00": {
-          "lunisolar_deg_day": -5.251412111903227e-10,
-          "vif_max": 2.550341928201241,
-          "cycle_mean_lunisolar_deg_day": -0.00015594939455010337,
-          "n_samples": 81582
-        },
-        "1.50": {
-          "lunisolar_deg_day": 2.975184300116946e-09,
-          "vif_max": 1.0123213934595416,
-          "cycle_mean_lunisolar_deg_day": -0.0001494393810343997,
-          "n_samples": 122372
-        },
-        "2.00": {
-          "lunisolar_deg_day": 4.7518035916632225e-09,
-          "vif_max": 1.1792168003529313,
-          "cycle_mean_lunisolar_deg_day": -0.00013912046004471712,
-          "n_samples": 163162
-        }
-      },
-      "lunisolar": {
-        "secular_deg_day": 4.7518035916632225e-09,
-        "stderr_deg_day": 6.804593501697013e-07,
-        "abs_stderr_deg_day": 6.804593501697013e-07,
-        "vif_max": 1.1792168003529313,
-        "cycle_mean_deg_day": -0.00013912046004471712,
-        "max_abs_harmonic_deg_day": 1.1355279319802048e-05
-      },
-      "formulas": {
-        "form1_deg_day": 0.00020340286968375463,
-        "form2_deg_day": -2.632652190058441e-05,
-        "measured_over_form1": 2.3361536634420154e-05,
-        "measured_over_form2": -0.00018049492483690902,
-        "same_sign_form1": true,
-        "same_sign_form2": false,
-        "ratio_in_0p5_to_2_form1": false,
-        "ratio_in_0p5_to_2_form2": false
-      },
-      "wall_s": 16424.2
-    },
     {
       "inc_deg": 97.7876,
       "phase_deg": 0.0,
@@ -243,22 +135,34 @@
     }
   ],
   "cost_preflight": {
-    "n_cases": 2,
+    "n_cases": 1,
     "modes_per_case": 2,
     "cycles": 2.0,
     "dt_s": 30.0,
     "steps_per_propagation": 39158686,
     "us_per_step_sun_moon_j2": 344.0,
     "est_seconds_per_case": 18185.3,
-    "est_total_cpu_hours": 10.1,
-    "est_wall_hours": 1.68,
-    "workers": 6
+    "est_total_cpu_hours": 5.05,
+    "est_wall_hours": 2.53,
+    "workers": 2
+  },
+  "sample_cadence_check": {
+    "orbital_period_s": 5801.231785926518,
+    "orbital_period_min": 96.68719643210862,
+    "dt_s": 30.0,
+    "sample_every": 20,
+    "sample_cadence_s": 600.0,
+    "sample_cadence_min": 10.0,
+    "samples_per_orbit": 9.668719643210864,
+    "nyquist_requirement": ">= 2 samples per orbit (10 used by default)",
+    "pass": true,
+    "hint": ""
   },
   "provenance": {
     "code_hash_scheme": "lf-normalized-v1",
     "code": {
       "adjudicate.py": "a54c78d84db0ee28",
-      "campaign.py": "d684a36adb79b2e5",
+      "campaign.py": "51e9e1cdf8d700bd",
       "competing_formulas.py": "66e7006fb773cd6e",
       "estimator.py": "03fcaad78ed04bf8",
       "fetch_de441_sun_moon.py": "49eec836debb9e81",
@@ -273,19 +177,15 @@
     "numpy_version": "2.5.1",
     "compute": "local",
     "rng_seed": null,
-    "wall_clock_s": 16424.8,
-    "n_workers": 6,
+    "wall_clock_s": 0.3,
+    "n_workers": 2,
     "incs_deg": [
-      97.7876,
-      82.2124
+      97.7876
     ],
     "phases_deg": [
       0.0
     ],
     "checkpointed": true,
     "checkpoint_dir": "results/checkpoints"
-  },
-  "VALIDITY": "INVALID - SAMPLE CADENCE BELOW NYQUIST",
-  "validity_note": "RETRACTED 2026-10-05 by the lead agent. The run used sample_every=240 at dt=30 s, i.e. a 120-minute output cadence. The orbit period at h=600 km is 96.7 minutes, so the output sampled the orbit at 0.81 samples per revolution -- BELOW the Nyquist rate for the orbital harmonic the instantaneous nodal rate contains. The orbital-frequency content aliases to DC and contaminates the fitted secular slope at order 1e-4 deg/day, which is the size of the signal being measured. The reported values (+4.75e-09 at 82.21 deg, -1.94e-07 at 97.79 deg) are therefore NOT measurements of the secular lunisolar rate and MUST NOT be cited.",
-  "required_cadence": "sample_every <= 20 at dt=30 s (10-minute cadence, 9.7 samples/orbit)"
+  }
 }

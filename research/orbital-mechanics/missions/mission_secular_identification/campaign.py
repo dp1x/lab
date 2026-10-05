@@ -174,6 +174,46 @@ US_PER_STEP_SUN_MOON_J2 = 344.0
 J2_ONLY_COST_RATIO = 0.35
 
 
+def check_sample_cadence(cycles: float, dt_s: float, every: int,
+                         a_km: float = 6978.137) -> dict:
+    """REFUSE to run below Nyquist for the orbital harmonic.
+
+    WHY THIS EXISTS (2026-10-05). A completed campaign returned +4.75e-09 and
+    -1.94e-07 deg/day -- near zero, internally consistent, and meaningless. The
+    cause was `--every 240` at `dt=30 s`, i.e. a 120-minute output cadence
+    against a 96.7-minute orbital period: 0.81 samples per revolution. The
+    instantaneous nodal rate carries the full short-period content at orbital
+    frequency, so that harmonic aliased straight to DC and contaminated the
+    fitted secular slope at order 1e-4 deg/day -- the size of the signal.
+
+    The result was RETRACTED. A near-zero answer with small error bars is
+    exactly what an aliased signal looks like, so it cannot be caught by
+    inspection of the number; it has to be caught before the run.
+
+    Requirement: at least 2 samples per orbital revolution, and we use 10 by
+    default because the nodal rate is not a pure sinusoid -- it carries
+    J2 short-period harmonics at 2x and 3x orbital frequency as well.
+    """
+    mu = 398600.4418
+    t_orb = 2.0 * math.pi * math.sqrt(a_km ** 3 / mu)      # seconds
+    cadence = dt_s * every
+    per_orbit = t_orb / cadence
+    ok = per_orbit >= 2.0
+    return {
+        "orbital_period_s": t_orb,
+        "orbital_period_min": t_orb / 60.0,
+        "dt_s": dt_s, "sample_every": every,
+        "sample_cadence_s": cadence,
+        "sample_cadence_min": cadence / 60.0,
+        "samples_per_orbit": per_orbit,
+        "nyquist_requirement": ">= 2 samples per orbit (10 used by default)",
+        "pass": bool(ok),
+        "hint": (f"--every {int(dt_s * 600 // 30)} gives a 10-minute cadence "
+                 f"({per_orbit * cadence / 600.0:.1f} samples/orbit)"
+                 if not ok else ""),
+    }
+
+
 def estimate_cost(cases: int, cycles: float, dt_s: float, every: int,
                   workers: int, modes: int = 2) -> dict:
     """Preflight cost estimate. REFUSES to launch a run that overruns budget.
@@ -244,13 +284,25 @@ def main() -> None:
     # ---- PREFLIGHT: refuse an over-budget run before spending any CPU -----
     est = estimate_cost(len(cases), prop_cycles, args.dt, args.every,
                         args.workers, modes=len(MODES))
+    cad = check_sample_cadence(prop_cycles, args.dt, args.every)
     print(f"PREFLIGHT: {len(cases)} cases x {len(MODES)} modes, "
           f"{prop_cycles:g} nodal cycles ({prop_cycles * NODE_PERIOD_D:.0f} d), "
           f"dt={args.dt:g}s, {args.workers} workers")
+    print(f"  cadence: {cad['sample_cadence_min']:.1f} min = "
+          f"{cad['samples_per_orbit']:.2f} samples/orbit "
+          f"(orbit {cad['orbital_period_min']:.1f} min) -> "
+          f"{'OK' if cad['pass'] else 'BELOW NYQUIST'}")
     print(f"  estimate: {est['est_wall_hours']:.2f} h wall "
           f"({est['est_total_cpu_hours']:.1f} CPU-h), "
           f"{est['steps_per_propagation']:,} steps/propagation")
     print(f"  budget:   {args.budget_hours:.2f} h")
+    if not cad["pass"]:
+        print("\nREFUSING TO LAUNCH: sample cadence is below Nyquist. "
+              f"{cad['hint']}")
+        print("An undersampled orbit aliases the orbital harmonic onto DC and "
+              "produces a plausible, wrong secular rate (this happened on "
+              "2026-10-05 and the result had to be retracted).")
+        sys.exit(2)
     if est["est_wall_hours"] > args.budget_hours and not args.force_budget:
         print("\nREFUSING TO LAUNCH: estimate exceeds budget by "
               f"{est['est_wall_hours'] - args.budget_hours:.2f} h.")
@@ -284,6 +336,7 @@ def main() -> None:
                       "frequencies": "FIXED at physical values; no empirical fitting"},
         "cases": rows,
         "cost_preflight": est,
+        "sample_cadence_check": cad,
         "provenance": {
             "code_hash_scheme": "lf-normalized-v1",
             "code": {p.name: hashlib.sha256(
