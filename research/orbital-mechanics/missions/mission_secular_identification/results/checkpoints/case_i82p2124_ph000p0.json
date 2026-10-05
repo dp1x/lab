@@ -1,0 +1,108 @@
+{
+  "inc_deg": 82.2124,
+  "phase_deg": 0.0,
+  "cycles": 2.0,
+  "dt_s": 30.0,
+  "nodal_conditioning": 54.46456417422423,
+  "coverage": {
+    "snapshot_start_s": 820497600.0,
+    "snapshot_end_s": 2019643200.0,
+    "arc_start_s": 820476800.0,
+    "arc_end_s": 1995237382.3999999,
+    "covered": true,
+    "start_slack_days_used": 1.0,
+    "margin_days": 282.4747407407424,
+    "arc_days": 13596.765999999998
+  },
+  "modes": {
+    "j2_only": {
+      "slope_deg_day": -3.335268588489271e-07,
+      "slope_stderr_deg_day": 4.811239255816398e-07,
+      "intercept": -0.9900624620002434,
+      "periods_d": [
+        6798.383,
+        365.256363,
+        29.530589,
+        14.765
+      ],
+      "n_samples": 163162,
+      "n_params": 10,
+      "rms_resid": 0.7023296988705031,
+      "max_abs_harmonic_deg_day": 1.1355279319802048e-05,
+      "vif_max": 1.1792168003529313,
+      "vif_by_period": {
+        "6798.38": 1.1792168003529313,
+        "365.256": 1.00025047778479,
+        "29.5306": 1.0000001274400494,
+        "14.765": 1.0000006240383914
+      },
+      "cond_raw": 17582.882320922075,
+      "cond_equilibrated": 4.10053418655161,
+      "cycle_mean_deg_day": -0.992330016570409
+    },
+    "sun_moon_j2": {
+      "slope_deg_day": -3.287750552572639e-07,
+      "slope_stderr_deg_day": 4.811909137403623e-07,
+      "intercept": -0.9902339188338517,
+      "periods_d": [
+        6798.383,
+        365.256363,
+        29.530589,
+        14.765
+      ],
+      "n_samples": 163162,
+      "n_params": 10,
+      "rms_resid": 0.7024274860950451,
+      "max_abs_harmonic_deg_day": 1.1018496776771814e-05,
+      "vif_max": 1.1792168003529313,
+      "vif_by_period": {
+        "6798.38": 1.1792168003529313,
+        "365.256": 1.00025047778479,
+        "29.5306": 1.0000001274400494,
+        "14.765": 1.0000006240383914
+      },
+      "cond_raw": 17582.882320922075,
+      "cond_equilibrated": 4.10053418655161,
+      "cycle_mean_deg_day": -0.9924691370304537
+    }
+  },
+  "window_ladder": {
+    "1.00": {
+      "lunisolar_deg_day": -5.251412111903227e-10,
+      "vif_max": 2.550341928201241,
+      "cycle_mean_lunisolar_deg_day": -0.00015594939455010337,
+      "n_samples": 81582
+    },
+    "1.50": {
+      "lunisolar_deg_day": 2.975184300116946e-09,
+      "vif_max": 1.0123213934595416,
+      "cycle_mean_lunisolar_deg_day": -0.0001494393810343997,
+      "n_samples": 122372
+    },
+    "2.00": {
+      "lunisolar_deg_day": 4.7518035916632225e-09,
+      "vif_max": 1.1792168003529313,
+      "cycle_mean_lunisolar_deg_day": -0.00013912046004471712,
+      "n_samples": 163162
+    }
+  },
+  "lunisolar": {
+    "secular_deg_day": 4.7518035916632225e-09,
+    "stderr_deg_day": 6.804593501697013e-07,
+    "abs_stderr_deg_day": 6.804593501697013e-07,
+    "vif_max": 1.1792168003529313,
+    "cycle_mean_deg_day": -0.00013912046004471712,
+    "max_abs_harmonic_deg_day": 1.1355279319802048e-05
+  },
+  "formulas": {
+    "form1_deg_day": 0.00020340286968375463,
+    "form2_deg_day": -2.632652190058441e-05,
+    "measured_over_form1": 2.3361536634420154e-05,
+    "measured_over_form2": -0.00018049492483690902,
+    "same_sign_form1": true,
+    "same_sign_form2": false,
+    "ratio_in_0p5_to_2_form1": false,
+    "ratio_in_0p5_to_2_form2": false
+  },
+  "wall_s": 16424.2
+}
